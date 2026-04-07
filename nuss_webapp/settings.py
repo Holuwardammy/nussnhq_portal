@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -40,8 +40,12 @@ INSTALLED_APPS = [
     'students',
 ]
 
+# Middleware order fixed (only one MIDDLEWARE list now)
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # for static files
+
+    # Required middlewares for sessions & auth
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -115,47 +119,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'   # URL for static files
-
 STATICFILES_DIRS = [
     BASE_DIR / "static",   # tells Django where to find your static folder
 ]
 
-import os
-
-# Media files (for profile pictures)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# MEDIA FILES
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'  # Ensure BASE_DIR is defined
-
-# Example if BASE_DIR not defined:
-# import os
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Static files (CSS, images)
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
-import os
-
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-
 # This is where collectstatic will put your files
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-# Optional: additional directories to look for static files
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
+# Media files (for profile pictures)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
-# Whitenoise for serving static files in production
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # <--- add this near top
-    # ... other middlewares ...
-]
+# Whitenoise will serve static files in production
+# Already included in MIDDLEWARE above
