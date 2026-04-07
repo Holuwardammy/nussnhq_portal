@@ -1,0 +1,313 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>NUSS Website</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+    <h2>NUSS</h2>
+
+    <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#programs">Programs</a></li>
+        <li><a href="#events">Events</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</nav>
+
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <h1>Welcome to NUSSNHQ</h1>
+    <p>National Union of Saki Students National Headquarter</p>
+    <!-- Register Button -->
+    <a href="{% url 'register_student' %}" class="btn-hero">Register Now</a>
+    <a href="{% url 'login' %}" class="btn-hero">Login</a>
+</section>
+
+
+<script src="{% static 'js/script.js' %}"></script>
+
+<!-- ABOUT SECTION -->
+
+<section id="about" class="about">
+
+    <h2>About NUSS</h2>
+
+    <p class="about-intro">
+        The National Union of Saki Students National Headquarter (NUSSNHQ) is dedicated to supporting
+        Saki students through education, leadership, and community development.
+        We aim to empower the next generation of leaders.
+    </p>
+
+    <div class="about-cards">
+
+        <div class="card">
+            <h3>Our Mission</h3>
+            <p>
+                To empower Somali students through education, mentorship,
+                and leadership opportunities.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>Our Vision</h3>
+            <p>
+                To build a strong community of Somali students who contribute
+                positively to society.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>Our Community</h3>
+            <p>
+                We connect students across universities and create opportunities
+                for collaboration and growth.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- PROGRAMS SECTION -->
+
+<section id="programs" class="programs">
+
+    <h2>Our Programs</h2>
+
+    <p class="programs-intro">
+        NUSS offers several programs designed to support Somali students
+        academically, professionally, and socially.
+    </p>
+
+    <div class="programs-container">
+
+        <div class="program">
+            <h3>Leadership Training</h3>
+            <p>
+                Developing future Somali leaders through workshops,
+                seminars, and leadership opportunities.
+            </p>
+        </div>
+
+        <div class="program">
+            <h3>Student Mentorship</h3>
+            <p>
+                Connecting experienced students with new members
+                to guide them through university life.
+            </p>
+        </div>
+
+        <div class="program">
+            <h3>Academic Support</h3>
+            <p>
+                Providing resources, tutoring, and study groups
+                to help students succeed academically.
+            </p>
+        </div>
+
+        <div class="program">
+            <h3>Networking Events</h3>
+            <p>
+                Creating opportunities for students to connect
+                with professionals and industry leaders.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- EVENTS SECTION -->
+
+<section id="events" class="events">
+
+    <h2>Upcoming Events</h2>
+
+    <p class="events-intro">
+        Join our events to learn, connect, and grow with fellow Somali students.
+    </p>
+
+    <div class="events-container">
+
+        <div class="event-card">
+            <h3>Leadership Workshop</h3>
+            <p class="event-date">July 25, 2026</p>
+            <p>
+                A leadership training workshop designed to help students
+                develop leadership and communication skills.
+            </p>
+        </div>
+
+        <div class="event-card">
+            <h3>Career Networking Event</h3>
+            <p class="event-date">August 10, 2026</p>
+            <p>
+                Meet professionals and alumni who will share advice
+                about career opportunities and internships.
+            </p>
+        </div>
+
+        <div class="event-card">
+            <h3>Student Welcome Meetup</h3>
+            <p class="event-date">September 5, 2026</p>
+            <p>
+                A friendly gathering to welcome new Somali students
+                and help them connect with the community.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- GALLERY SECTION -->
+
+<section id="gallery" class="gallery">
+
+    <h2>Gallery</h2>
+    <p class="gallery-intro">
+        Take a look at some moments from our events and activities.
+    </p>
+
+    <div class="gallery-container">
+
+        <div class="gallery-item">
+            <img src="{% static 'images/gallery1.jpg' %}" alt="Event 1">
+        </div>
+
+        <div class="gallery-item">
+            <img src="{% static 'images/gallery2.jpg' %}" alt="Event 2">
+        </div>
+
+        <div class="gallery-item">
+            <img src="{% static 'images/gallery3.jpg' %}" alt="Event 3">
+        </div>
+
+        <div class="gallery-item">
+            <img src="{% static 'images/gallery4.jpg' %}" alt="Event 4">
+        </div>
+
+    </div>
+
+</section>
+
+<!-- CONTACT SECTION -->
+
+<section id="contact" class="contact">
+    <h2>Contact Us</h2>
+    <p class="contact-intro">
+        Have questions or suggestions? Reach out to us anytime!
+    </p>
+
+    <div class="contact-container">
+
+        <!-- Contact Form -->
+        <div class="contact-form">
+            <form action="#" method="post">
+                {% csrf_token %}
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="contact-info">
+            <h3>Our Office</h3>
+            <p>National Union of Saki Students HQ</p>
+            <p>Email: <a href="mailto:info@nuss.com">info@nuss.com</a></p>
+            <p>Phone: +234 123 456 7890</p>
+            <h3>Location</h3>
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3958.123456789!2d3.673987!3d7.678123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103bb!2sSaki!5e0!3m2!1sen!2sng!4v1696400000000" 
+                width="100%" 
+                height="250" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy">
+            </iframe>
+        </div>
+
+    </div>
+</section>
+
+<!-- FOOTER SECTION -->
+<footer>
+    <div class="footer-container">
+        <div class="footer-left">
+            <h3>National Union of Saki Students</h3>
+            <p>Connecting students, sharing knowledge, and celebrating unity.</p>
+        </div>
+
+        <div class="footer-right">
+            <h4>Follow Us</h4>
+            <div class="social-links">
+                <a href="#" target="_blank"><img src="{% static 'images/facebook.png' %}" alt="Facebook"></a>
+                <a href="#" target="_blank"><img src="{% static 'images/twitter.png' %}" alt="Twitter"></a>
+                <a href="#" target="_blank"><img src="{% static 'images/instagram.png' %}" alt="Instagram"></a>
+                <a href="#" target="_blank"><img src="{% static 'images/linkedin.png' %}" alt="LinkedIn"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2026 National Union of Saki Students. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+const sections = document.querySelectorAll("section");
+const navLinks = document.querySelectorAll("nav ul li a");
+const navbar = document.getElementById("navbar");
+
+window.addEventListener("scroll", () => {
+    let current = "";
+
+    // ---------- Highlight active nav link ----------
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop - 60; // adjust for navbar
+        if (pageYOffset >= sectionTop) {
+            current = section.getAttribute("id");
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove("active");
+        if (link.getAttribute("href") === "#" + current) {
+            link.classList.add("active");
+        }
+    });
+
+    // ---------- Shrink navbar when scrolling ----------
+    if (window.scrollY > 50) {
+        navbar.classList.add("scrolled");
+    } else {
+        navbar.classList.remove("scrolled");
+    }
+
+    // ---------- Fade-in sections ----------
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        if (window.scrollY >= sectionTop - window.innerHeight + 50) {
+            section.classList.add("visible");
+        }
+    });
+});
+</script>
+
+</body>
+
+</html>

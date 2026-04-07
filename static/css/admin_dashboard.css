@@ -1,0 +1,300 @@
+/* =====================================
+   Admin Dashboard CSS - Professional Design
+   ===================================== */
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 0;
+    color: #1f2937;
+}
+
+/* Header */
+
+header {
+    background-color: #1e3a8a; /* deep blue header */
+    color: white;
+    padding: 20px 50px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* Logout Button */
+
+.logout-btn {
+    position: absolute;
+    top: 20px;
+    right: 50px;
+}
+
+.logout-btn a {
+    color: white;
+    background-color: #ef4444;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.logout-btn a:hover {
+    background-color: #dc2626;
+    transform: scale(1.05);
+}
+
+/* Container */
+
+.container {
+    width: 95%;
+    margin: 30px auto;
+}
+
+/* Flash Messages */
+
+.messages {
+    margin-bottom: 20px;
+}
+
+.message {
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.message.success {
+    background-color: #10b981;
+    color: white;
+}
+
+.message.success::before {
+    content: "✔";
+    margin-right: 10px;
+}
+
+.message.error {
+    background-color: #ef4444;
+    color: white;
+}
+
+.message.error::before {
+    content: "✖";
+    margin-right: 10px;
+}
+
+.message.info {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.message.info::before {
+    content: "ℹ";
+    margin-right: 10px;
+}
+
+/* Admin Welcome Section */
+
+.admin-welcome {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
+}
+
+.admin-welcome h2 {
+    margin-top: 0;
+    color: #1e3a8a;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.admin-welcome p {
+    font-size: 16px;
+    margin: 8px 0;
+    color: #1f2937;
+}
+
+/* Admin Info Section */
+
+.admin-info {
+    background-color: #f8fafc;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.admin-info p {
+    margin: 6px 0;
+    font-weight: 600;
+}
+
+/* Tab Buttons */
+
+.tab-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+    background-color: #2563eb;
+    transform: scale(1.05);
+}
+
+.tab-btn.active {
+    background-color: #10b981;
+}
+
+/* Tab Content */
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+/* Tables */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+th {
+    background-color: #1e3a8a;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+td {
+    font-size: 14px;
+    color: #1f2937;
+}
+
+tr:nth-child(even) {
+    background-color: #f3f4f6;
+}
+
+tr:hover {
+    background-color: #e0f2fe;
+    transition: all 0.3s ease;
+}
+
+/* Profile Pictures in Table */
+
+img.profile-pic {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #3b82f6;
+}
+
+/* Buttons inside table */
+
+a.button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+a.button:hover {
+    background-color: #10b981;
+    transform: scale(1.05);
+}
+
+a.delete-btn {
+    background-color: #ef4444;
+}
+
+a.delete-btn:hover {
+    background-color: #dc2626;
+}
+
+/* Headings */
+
+h2 {
+    color: #1e3a8a;
+    margin-bottom: 15px;
+}
+
+/* Responsive Design */
+
+@media (max-width: 1024px) {
+    .tab-buttons {
+        flex-direction: column;
+    }
+
+    .logout-btn {
+        top: 15px;
+        right: 20px;
+    }
+
+    table {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+
+    th, td {
+        padding: 8px 10px;
+    }
+
+    h2, h1 {
+        font-size: 20px;
+    }
+}

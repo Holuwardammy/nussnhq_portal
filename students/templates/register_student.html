@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Registration</title>
+<link rel="stylesheet" href="{% static 'css/registration.css' %}">
+</head>
+
+<body>
+
+<div class="registration-container">
+
+<h2>Student Registration</h2>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data" action="{% url 'register_student' %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <label>{{ form.full_name.label }}</label>
+    {{ form.full_name.errors }}
+    {{ form.full_name }}
+
+    <label>{{ form.email.label }}</label>
+    {{ form.email.errors }}
+    {{ form.email }}
+
+    <label>{{ form.password.label }}</label>
+    {{ form.password.errors }}
+    {{ form.password }}
+
+    <label>{{ form.phone.label }}</label>
+    {{ form.phone.errors }}
+    {{ form.phone }}
+
+    <label for="school-search">School</label>
+    <div class="searchable-select">
+        <input type="text" id="school-search" placeholder="Search your school..." autocomplete="off"
+               value="{{ request.POST.school|default_if_none:'' }}">
+        <ul id="school-list">
+            <li>University of Lagos</li>
+            <li>Obafemi Awolowo University</li>
+            <li>University of Ibadan</li>
+            <li>Lagos State University</li>
+            <li>Polytechnic Ibadan</li>
+            <li>Yaba College of Technology</li>
+            <li>Bauchi State University</li>
+            <li>Federal University of Technology Minna</li>
+            <li>Federal University of Agriculture Abeokuta</li>
+            <li>The Oke Ogun Polytechnic Saki</li>
+        </ul>
+        <input type="hidden" name="school" id="school-selected" value="{{ request.POST.school|default_if_none:'' }}">
+    </div>
+
+    <label>{{ form.department.label }}</label>
+    {{ form.department.errors }}
+    {{ form.department }}
+
+    <label>{{ form.level.label }}</label>
+    {{ form.level.errors }}
+    {{ form.level }}
+
+    <label>{{ form.age.label }}</label>
+    {{ form.age.errors }}
+    {{ form.age }}
+
+    <label>{{ form.state.label }}</label>
+    {{ form.state.errors }}
+    {{ form.state }}
+
+    <label>{{ form.nationality.label }}</label>
+    {{ form.nationality.errors }}
+    {{ form.nationality }}
+
+    <label>{{ form.member_type.label }}</label>
+    {{ form.member_type.errors }}
+    {{ form.member_type }}
+
+    <label>{{ form.profile_picture.label }}</label>
+    {{ form.profile_picture.errors }}
+    {{ form.profile_picture }}
+
+    <button type="submit">Register</button>
+</form>
+
+</div>
+
+<script>
+const searchInput = document.getElementById('school-search');
+const schoolList = document.getElementById('school-list');
+const selectedSchool = document.getElementById('school-selected');
+
+// Filter school list
+searchInput.addEventListener('input', () => {
+    const filter = searchInput.value.toLowerCase();
+    let visible = false;
+    Array.from(schoolList.getElementsByTagName('li')).forEach(li => {
+        if(li.textContent.toLowerCase().includes(filter)){
+            li.style.display = '';
+            visible = true;
+        } else {
+            li.style.display = 'none';
+        }
+    });
+    schoolList.style.display = visible ? 'block' : 'none';
+});
+
+// Select school
+Array.from(schoolList.getElementsByTagName('li')).forEach(li => {
+    li.addEventListener('click', () => {
+        searchInput.value = li.textContent;
+        selectedSchool.value = li.textContent;
+        schoolList.style.display = 'none';
+    });
+});
+
+// Close school list if clicked outside
+document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !schoolList.contains(e.target)) {
+        schoolList.style.display = 'none';
+    }
+});
+</script>
+
+</body>
+</html>
