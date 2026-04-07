@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-95=8gc$s8_70$q5l$9ohez!!y3&ut*lt+_wc*ht1l8#^=tzeh8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "nussnhq-portal.onrender.com",
+    "localhost",
+    "127.0.0.1"
+]
 
 
 # Application definition
