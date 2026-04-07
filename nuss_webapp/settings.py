@@ -28,7 +28,11 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "nussnhq-portal.onrender.com",
     "localhost",
-    "127.0.0.1"
+    "127.0.0.1",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://nussnhq-portal.onrender.com"
 ]
 
 
