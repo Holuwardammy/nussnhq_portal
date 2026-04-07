@@ -1,0 +1,207 @@
+/* =====================================
+   Student Home CSS - Professional Design
+   ===================================== */
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f0f4f8;
+    color: #1f2937;
+}
+
+/* Header */
+
+.header {
+    background: #1e3a8a; /* deep blue for professionalism */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header h2 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 1px;
+}
+
+.logout-btn a {
+    text-decoration: none;
+    color: white;
+    background: #ef4444;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.logout-btn a:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+}
+
+/* Container */
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 60px auto;
+    background: #ffffff;
+    padding: 50px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Welcome Title */
+
+.welcome-section h1 {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 40px;
+}
+
+/* Layout */
+
+.student-info {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+/* Profile Section */
+
+.profile-section {
+    text-align: center;
+    width: 280px;
+}
+
+.profile-section img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid #e0f2fe;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-section img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+}
+
+.profile-section h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 15px 0 10px 0;
+    color: #111827;
+}
+
+.badge {
+    display: inline-block;
+    padding: 8px 22px;
+    background: #10b981; /* default green for general badge */
+    color: white;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Specific badge colors for roles */
+.badge.president { background-color: #3b82f6; }          /* Blue */
+.badge.treasurer { background-color: #f59e0b; }          /* Amber */
+.badge.financial_secretary { background-color: #ef4444; } /* Red */
+.badge.student_member { background-color: #6366f1; }     /* Indigo for student member */
+.badge.senate_president { background-color: #8b5cf6; }  /* Purple */
+.badge.deputy_senate_president { background-color: #ec4899; } /* Pink */
+.badge.social_director { background-color: #10b981; }    /* Green */
+.badge.welfare { background-color: #14b8a6; }            /* Teal */
+.badge.organising_committee { background-color: #f97316; } /* Orange */
+.badge.general_secretary { background-color: #06b6d4; }  /* Cyan */
+.badge.assistant_general_secretary { background-color: #3b82f6; } /* Blue */
+.badge.pro { background-color: #8b5cf6; }               /* Purple */
+.badge.pro_ii { background-color: #6366f1; }            /* Indigo */
+.badge.student_member { background-color: #3b82f6; } /* blue for student_member */
+
+/* Student Details Section */
+
+.student-details {
+    flex: 1;
+}
+
+.details-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.student-details p {
+    font-size: 17px;
+    margin: 0;
+    padding: 18px 22px;
+    background: linear-gradient(135deg, #e0f7fa, #ffffff);
+    border-radius: 14px;
+    border-left: 6px solid #0284c7;
+    color: #1e3a8a;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.student-details p:hover {
+    background: linear-gradient(135deg, #bae6fd, #ffffff);
+    transform: translateX(8px);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+}
+
+.student-details p strong {
+    width: 120px; /* fixed width for labels */
+    color: #0c4a6e;
+}
+
+/* Optional Icons for Details */
+.student-details p::before {
+    content: '•';
+    color: #0284c7;
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+/* Responsive Design */
+
+@media (max-width: 900px) {
+    .student-info {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .profile-section {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .student-details {
+        width: 100%;
+    }
+
+    .container {
+        padding: 30px;
+    }
+}

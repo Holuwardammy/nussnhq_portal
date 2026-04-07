@@ -139,3 +139,23 @@ MEDIA_ROOT = BASE_DIR / 'media'  # Ensure BASE_DIR is defined
 # Static files (CSS, images)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+import os
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+
+# This is where collectstatic will put your files
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# Optional: additional directories to look for static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+# Whitenoise for serving static files in production
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # <--- add this near top
+    # ... other middlewares ...
+]
