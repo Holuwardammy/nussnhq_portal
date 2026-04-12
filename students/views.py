@@ -1,3 +1,6 @@
+import email
+from urllib import request
+
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
@@ -24,6 +27,9 @@ def register_student(request):
     else:
         form = StudentForm()
     return render(request, 'register_student.html', {'form': form})
+    if User.objects.filter(email=email).exists():
+        messages.erroe(request, "Email already registered")
+        return redirect('register_student')
 
 
 def login_view(request):
@@ -46,7 +52,7 @@ def login_view(request):
         # If not found by serial number, try email
         if user is None:
             try:
-                user_obj = User.objects.get(email=username_input)
+                user_obj = User.objects.get(email=username_input).first()
                 user = authenticate(request, username=user_obj.username, password=password)
             except User.DoesNotExist:
                 user = None
