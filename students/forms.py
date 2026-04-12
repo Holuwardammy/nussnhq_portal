@@ -51,7 +51,7 @@ class StudentForm(forms.ModelForm):
 
         widgets = {
             'full_name': forms.TextInput(attrs={'placeholder': 'Enter your full name'}),
-            'school': forms.HiddenInput(),
+            'school': forms.TextInput(attrs={'placeholder': 'Enter your school'}),
             'department': forms.TextInput(attrs={'placeholder': 'Enter your department'}),
             'level': forms.TextInput(attrs={'placeholder': 'Enter your level'}),
             'phone': forms.TextInput(attrs={'placeholder': 'Enter your phone number'}),
@@ -69,7 +69,7 @@ class StudentForm(forms.ModelForm):
             raise forms.ValidationError("A student with this email already exists.")
 
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("This email is already registered with another account.")
+            raise forms.ValidationError("This email is already registered.")
 
         return email
 
@@ -81,24 +81,24 @@ class StudentForm(forms.ModelForm):
         full_name = self.cleaned_data.get('full_name')
         member_type = self.cleaned_data.get('member_type')
 
-        admin_executives = ["president", "treasurer", "financial_secretary"]
-        is_admin = member_type in admin_executives
+        admin_roles = ["president", "treasurer", "financial_secretary"]
+        is_admin = member_type in admin_roles
 
-        # ✅ FIX: Always ensure user exists safely
+        # 🔥 SAFE USER CREATION (NO PASSWORD OVERWRITE BUG)
         user = User.objects.filter(username=email).first()
 
-        if not user:
+        if user is None:
             user = User.objects.create_user(
                 username=email,
                 email=email,
                 password=password
             )
         else:
-            # ensure password is always correct if user exists
-            user.set_password(password)
+            # ❌ DO NOT overwrite password (FIXED BUG)
+            pass
 
-        # set names safely
-        name_parts = full_name.split()
+        # split name safely
+        name_parts = full_name.strip().split()
         user.first_name = name_parts[0] if name_parts else ""
         user.last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
 
