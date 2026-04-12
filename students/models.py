@@ -67,23 +67,30 @@ class Student(models.Model):
 
     registration_date = models.DateField(auto_now_add=True)
 
-    def save(self, *args, **kwargs):
-        # Sync email and username
-        if self.user:
-            if self.email:
-                self.user.email = self.email
-                self.user.username = self.email # Keep username synced with email
-                self.user.save()
-            elif self.user.email:
-                self.email = self.user.email
+    # 🔥 FIX: Added the missing is_executive method
+    def is_executive(self):
+        """Checks if the student's member_type is in the executive roles list."""
+        return self.member_type in self.EXECUTIVE_ROLES
 
-        # Executive role check
-        if self.member_type in self.EXECUTIVE_ROLES:
+    def save(self, *args, **kwargs):
+        # Sync email and username with the User model
+        if self.user:
+            update_user = False
+            if self.email and self.user.username != self.email:
+                self.user.username = self.email
+                self.user.email = self.email
+                update_user = True
+            
+            if update_user:
+                self.user.save()
+
+        # Update executive_position based on member_type
+        if self.is_executive():
             self.executive_position = self.member_type
         else:
             self.executive_position = None
 
-        # Serial number generation
+        # Serial number generation logic
         if not self.serial_number:
             year = timezone.now().year
             last_student = Student.objects.filter(
@@ -99,6 +106,9 @@ class Student(models.Model):
             self.serial_number = f"NUSSNHQ/{year}/{last_number + 1:04d}"
 
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.full_name} ({self.serial_number})"
 
 
 # ---------------------------
