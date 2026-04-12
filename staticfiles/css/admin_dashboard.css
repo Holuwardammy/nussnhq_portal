@@ -1,300 +1,240 @@
-/* =====================================
-   Admin Dashboard CSS - Professional Design
-   ===================================== */
-
+/* ===================== GLOBAL ===================== */
 body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background-color: #f0f4f8;
     margin: 0;
-    padding: 0;
-    color: #1f2937;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0f172a; /* dark navy */
+    color: #e5e7eb;
 }
 
-/* Header */
-
+/* ===================== HEADER ===================== */
 header {
-    background-color: #1e3a8a; /* deep blue header */
-    color: white;
-    padding: 20px 50px;
-    text-align: center;
-    position: relative;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: #111827;
+    padding: 18px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1f2937;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 header h1 {
+    font-size: 20px;
     margin: 0;
-    font-size: 28px;
-    font-weight: 700;
-}
-
-/* Logout Button */
-
-.logout-btn {
-    position: absolute;
-    top: 20px;
-    right: 50px;
+    color: #ffffff;
+    letter-spacing: 1px;
 }
 
 .logout-btn a {
+    background: #ef4444;
     color: white;
-    background-color: #ef4444;
-    padding: 10px 18px;
+    padding: 8px 14px;
     border-radius: 8px;
     text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    transition: 0.3s;
 }
 
 .logout-btn a:hover {
-    background-color: #dc2626;
-    transform: scale(1.05);
+    background: #dc2626;
 }
 
-/* Container */
-
+/* ===================== CONTAINER ===================== */
 .container {
-    width: 95%;
-    margin: 30px auto;
-}
-
-/* Flash Messages */
-
-.messages {
-    margin-bottom: 20px;
-}
-
-.message {
-    padding: 12px 15px;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-.message.success {
-    background-color: #10b981;
-    color: white;
-}
-
-.message.success::before {
-    content: "✔";
-    margin-right: 10px;
-}
-
-.message.error {
-    background-color: #ef4444;
-    color: white;
-}
-
-.message.error::before {
-    content: "✖";
-    margin-right: 10px;
-}
-
-.message.info {
-    background-color: #3b82f6;
-    color: white;
-}
-
-.message.info::before {
-    content: "ℹ";
-    margin-right: 10px;
-}
-
-/* Admin Welcome Section */
-
-.admin-welcome {
-    background: #ffffff;
     padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
-    margin-bottom: 25px;
 }
 
-.admin-welcome h2 {
-    margin-top: 0;
-    color: #1e3a8a;
-    font-size: 24px;
+/* ===================== FLASH MESSAGES ===================== */
+.messages {
     margin-bottom: 15px;
 }
 
-.admin-welcome p {
-    font-size: 16px;
-    margin: 8px 0;
-    color: #1f2937;
+.message {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #1f2937;
+    border-left: 4px solid #3b82f6;
 }
 
-/* Admin Info Section */
-
-.admin-info {
-    background-color: #f8fafc;
-    padding: 15px 20px;
+/* ===================== STATS GRID ===================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
     margin-bottom: 25px;
+}
+
+.stat-card {
+    background: #111827;
+    padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #1f2937;
+    transition: 0.3s;
+    text-align: center;
 }
 
-.admin-info p {
-    margin: 6px 0;
-    font-weight: 600;
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: #3b82f6;
 }
 
-/* Tab Buttons */
+.stat-card h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #9ca3af;
+}
 
+.stat-card p {
+    font-size: 24px;
+    margin: 10px 0 0;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+/* ===================== ADMIN WELCOME ===================== */
+.admin-welcome {
+    background: linear-gradient(135deg, #1e293b, #111827);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #334155;
+}
+
+.admin-welcome h2 {
+    margin: 0 0 10px;
+    color: #60a5fa;
+}
+
+/* ===================== INFO BOX ===================== */
+.admin-info {
+    background: #0b1220;
+    border: 1px dashed #334155;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    color: #94a3b8;
+}
+
+/* ===================== TABS ===================== */
 .tab-buttons {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 20px;
     flex-wrap: wrap;
 }
 
 .tab-btn {
-    padding: 12px 22px;
+    background: #1f2937;
+    color: #e5e7eb;
     border: none;
-    border-radius: 10px;
+    padding: 10px 16px;
+    border-radius: 8px;
     cursor: pointer;
-    background-color: #3b82f6;
-    color: white;
-    font-weight: 600;
-    font-size: 15px;
-    transition: all 0.3s ease;
+    transition: 0.3s;
 }
 
 .tab-btn:hover {
-    background-color: #2563eb;
-    transform: scale(1.05);
+    background: #374151;
 }
 
 .tab-btn.active {
-    background-color: #10b981;
+    background: #3b82f6;
+    color: white;
 }
 
-/* Tab Content */
-
+/* ===================== TAB CONTENT ===================== */
 .tab-content {
     display: none;
-    animation: fadeIn 0.4s ease-in-out;
+    background: #111827;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #1f2937;
 }
 
 .tab-content.active {
     display: block;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px);}
-    to { opacity: 1; transform: translateY(0);}
-}
-
-/* Tables */
-
+/* ===================== TABLE ===================== */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 40px;
-    background-color: white;
-    border-radius: 12px;
+    margin-top: 15px;
     overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    border-radius: 10px;
+}
+
+thead {
+    background: #1f2937;
 }
 
 th, td {
-    padding: 12px 15px;
+    padding: 12px;
     text-align: left;
-}
-
-th {
-    background-color: #1e3a8a;
-    color: white;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-td {
+    border-bottom: 1px solid #1f2937;
     font-size: 14px;
-    color: #1f2937;
-}
-
-tr:nth-child(even) {
-    background-color: #f3f4f6;
 }
 
 tr:hover {
-    background-color: #e0f2fe;
-    transition: all 0.3s ease;
+    background: #0b1220;
 }
 
-/* Profile Pictures in Table */
-
-img.profile-pic {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
+/* ===================== PROFILE IMAGE ===================== */
+.profile-pic {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    object-fit: cover;
     border: 2px solid #3b82f6;
 }
 
-/* Buttons inside table */
-
-a.button {
-    background-color: #3b82f6;
+/* ===================== BUTTONS ===================== */
+.button {
+    background: #3b82f6;
     color: white;
     padding: 6px 12px;
-    text-decoration: none;
     border-radius: 6px;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 13px;
+    transition: 0.3s;
 }
 
-a.button:hover {
-    background-color: #10b981;
-    transform: scale(1.05);
+.button:hover {
+    background: #2563eb;
 }
 
-a.delete-btn {
-    background-color: #ef4444;
+.delete-btn {
+    background: #ef4444;
 }
 
-a.delete-btn:hover {
-    background-color: #dc2626;
+.delete-btn:hover {
+    background: #dc2626;
 }
 
-/* Headings */
-
-h2 {
-    color: #1e3a8a;
-    margin-bottom: 15px;
+/* ===================== STATUS ===================== */
+.paid {
+    color: #22c55e;
+    font-weight: bold;
 }
 
-/* Responsive Design */
+.pending {
+    color: #f59e0b;
+    font-weight: bold;
+}
 
-@media (max-width: 1024px) {
-    .tab-buttons {
-        flex-direction: column;
-    }
-
-    .logout-btn {
-        top: 15px;
-        right: 20px;
+/* ===================== MOBILE RESPONSIVE ===================== */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
 
     table {
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 768px) {
-    .container {
-        width: 95%;
-        padding: 10px;
+        font-size: 12px;
     }
 
-    th, td {
-        padding: 8px 10px;
-    }
-
-    h2, h1 {
-        font-size: 20px;
+    header {
+        flex-direction: column;
+        gap: 10px;
     }
 }
