@@ -10,7 +10,6 @@ class StudentForm(forms.ModelForm):
         label="Password"
     )
 
-    # Define full membership type choices
     MEMBERSHIP_CHOICES = [
         ('student', 'Student'),
         ('student_member', 'Student Member'),
@@ -52,7 +51,7 @@ class StudentForm(forms.ModelForm):
 
         widgets = {
             'full_name': forms.TextInput(attrs={'placeholder': 'Enter your full name'}),
-            'school': forms.HiddenInput(),  # because school is handled by your searchable dropdown
+            'school': forms.HiddenInput(),  # keep your original logic (IMPORTANT)
             'department': forms.TextInput(attrs={'placeholder': 'Enter your department'}),
             'level': forms.TextInput(attrs={'placeholder': 'Enter your level'}),
             'phone': forms.TextInput(attrs={'placeholder': 'Enter your phone number'}),
@@ -66,20 +65,16 @@ class StudentForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
 
-        # Check if email exists in Student model
+        # FIXED SAFE CHECKS
         if Student.objects.filter(email=email).exists():
             raise forms.ValidationError("A student with this email already exists.")
 
-        # Check if email exists in User model
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("This email is already registered with another account.")
 
         return email
 
     def save(self, commit=True):
-        """
-        Override save to also create the linked User object for login.
-        """
         student = super().save(commit=False)
 
         email = self.cleaned_data.get('email')
@@ -87,11 +82,9 @@ class StudentForm(forms.ModelForm):
         full_name = self.cleaned_data.get('full_name')
         member_type = self.cleaned_data.get('member_type')
 
-        # Determine if the member is an executive who should have admin access
         admin_executives = ["president", "treasurer", "financial_secretary"]
-        is_admin_executive = member_type in admin_executives
+        is_admin = member_type in admin_executives
 
-        # Create or get User object
         user, created = User.objects.get_or_create(username=email, email=email)
 
         if created:
@@ -99,18 +92,15 @@ class StudentForm(forms.ModelForm):
             user.first_name = full_name.split()[0]
             user.last_name = ' '.join(full_name.split()[1:]) if len(full_name.split()) > 1 else ''
 
-            # Set staff status only for admin executives
-            if is_admin_executive:
+            if is_admin:
                 user.is_staff = True
 
             user.save()
 
-        # Link student to user
         student.user = user
         student.member_type = member_type
 
-        # Only admin executives get executive_position
-        if is_admin_executive:
+        if is_admin:
             student.executive_position = member_type
         else:
             student.executive_position = None

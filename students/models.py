@@ -21,23 +21,14 @@ class Student(models.Model):
         ('student_member', 'Student Member'),
     ]
 
-    EXECUTIVE_POSITION_CHOICES = [
-        ('president', 'President'),
-        ('senate_president', 'Senate President'),
-        ('deputy_senate_president', 'Deputy Senate President'),
-        ('social_director', 'Social Director'),
-        ('welfare', 'Welfare'),
-        ('organising_committee', 'Organising Committee'),
-        ('general_secretary', 'General Secretary'),
-        ('assistant_general_secretary', 'Assistant General Secretary'),
-        ('pro', 'PRO'),
-        ('pro_ii', 'PRO II'),
-        ('treasurer', 'Treasurer'),
-        ('financial_secretary', 'Financial Secretary'),
-        ('student_member', 'Student Member'),
-    ]
+    EXECUTIVE_POSITION_CHOICES = MEMBER_TYPE_CHOICES
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, unique=True)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
 
     full_name = models.CharField(max_length=100)
     school = models.CharField(max_length=100)
@@ -50,24 +41,41 @@ class Student(models.Model):
     state = models.CharField(max_length=50, null=True, blank=True)
     nationality = models.CharField(max_length=50, null=True, blank=True)
 
-    member_type = models.CharField(max_length=50, choices=MEMBER_TYPE_CHOICES, default='student_member')
-    executive_position = models.CharField(max_length=50, choices=EXECUTIVE_POSITION_CHOICES, null=True, blank=True)
+    member_type = models.CharField(
+        max_length=50,
+        choices=MEMBER_TYPE_CHOICES,
+        default='student_member'
+    )
+
+    executive_position = models.CharField(
+        max_length=50,
+        choices=EXECUTIVE_POSITION_CHOICES,
+        null=True,
+        blank=True
+    )
 
     serial_number = models.CharField(max_length=20, unique=True, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+
+    profile_picture = models.ImageField(
+        upload_to='profile_pics/',
+        null=True,
+        blank=True
+    )
+
     registration_date = models.DateField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
 
-        if self.user:
+        # sync email with auth user
+        if self.user and self.user.email:
             self.email = self.user.email
 
-        # automatically assign executive_position
+        # auto assign executive position
         executive_roles = [
-            'president','senate_president','deputy_senate_president',
-            'social_director','welfare','organising_committee',
-            'general_secretary','assistant_general_secretary',
-            'pro','pro_ii','treasurer','financial_secretary'
+            'president', 'senate_president', 'deputy_senate_president',
+            'social_director', 'welfare', 'organising_committee',
+            'general_secretary', 'assistant_general_secretary',
+            'pro', 'pro_ii', 'treasurer', 'financial_secretary'
         ]
 
         if self.member_type in executive_roles:
@@ -75,13 +83,22 @@ class Student(models.Model):
         else:
             self.executive_position = None
 
+        # auto generate serial number
         if not self.serial_number:
             year = timezone.now().year
+
             last_student = Student.objects.filter(
                 serial_number__startswith=f"NUSSNHQ/{year}/"
             ).order_by('id').last()
 
-            last_number = int(last_student.serial_number.split('/')[-1]) if last_student else 0
+            if last_student and last_student.serial_number:
+                try:
+                    last_number = int(last_student.serial_number.split('/')[-1])
+                except:
+                    last_number = 0
+            else:
+                last_number = 0
+
             self.serial_number = f"NUSSNHQ/{year}/{last_number + 1:04d}"
 
         super().save(*args, **kwargs)

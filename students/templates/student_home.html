@@ -9,75 +9,108 @@
 
 <body>
 
-    <!-- HEADER -->
-    <header class="header">
+<header class="header">
 
-        <div class="logo-area">
-            <h2>NUSSN Student Portal</h2>
+    <div class="logo-area">
+        <h2>NUSSN Student Portal</h2>
+    </div>
+
+    <div class="logout-btn">
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+
+</header>
+
+<main class="container">
+
+    <!-- WELCOME -->
+    <div class="welcome-section">
+        <h1>Welcome, {{ student.full_name }}!</h1>
+    </div>
+
+    <!-- TOP INFO CARDS -->
+    <section class="dashboard-cards">
+
+        <div class="card">
+            <h3>Student ID</h3>
+            <p>{{ student.serial_number }}</p>
         </div>
 
-        <div class="logout-btn">
-            <a href="{% url 'logout' %}">Logout</a>
+        <div class="card">
+            <h3>Member Type</h3>
+            <p>{{ student.member_type|title }}</p>
         </div>
 
-    </header>
-
-
-    <!-- MAIN CONTENT -->
-    <main class="container">
-
-        <!-- Welcome Title -->
-        <div class="welcome-section">
-            <h1>Welcome, {{ student.full_name }}!</h1>
+        <div class="card">
+            <h3>Payment Status</h3>
+            <p>
+                {% if payments %}
+                    {% for p in payments %}
+                        {% if p.paid %}
+                            Paid ✔
+                        {% else %}
+                            Pending ⏳
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    No record
+                {% endif %}
+            </p>
         </div>
 
+    </section>
 
-        <!-- STUDENT DASHBOARD -->
-        <section class="student-info">
+    <!-- PROFILE SECTION -->
+    <section class="student-info">
 
-            <!-- PROFILE SECTION -->
-            <div class="profile-section">
+        <div class="profile-section">
 
-                <div class="profile-card">
+            <div class="profile-card">
 
-                    {% if student.profile_picture %}
-                        <img src="{{ student.profile_picture.url }}" alt="Profile Picture">
-                    {% else %}
-                        <img src="{% static 'images/default_profile.png' %}" alt="Profile Picture">
-                    {% endif %}
+                {% if student.profile_picture %}
+                    <img src="{{ student.profile_picture.url }}" alt="Profile Picture">
+                {% else %}
+                    <img src="{% static 'images/default_profile.png' %}" alt="Profile Picture">
+                {% endif %}
 
-                    <h3>{{ student.full_name }}</h3>
-
-                    <div class="badge">
-                        {{ student.member_type|title }}
-                    </div>
-
-                </div>
+                <h3>{{ student.full_name }}</h3>
 
             </div>
 
+        </div>
 
-            <!-- STUDENT DETAILS -->
-            <div class="student-details">
+        <!-- DETAILS -->
+        <div class="student-details">
 
-                <div class="details-card">
+            <div class="details-card">
 
-                    <p><strong>Email:</strong> {{ student.user.email }}</p>
-                    <p><strong>Phone:</strong> {{ student.phone }}</p>
-                    <p><strong>School:</strong> {{ student.school }}</p>
-                    <p><strong>Department:</strong> {{ student.department }}</p>
-                    <p><strong>Level:</strong> {{ student.level }}</p>
-                    <p><strong>Age:</strong> {{ student.age }}</p>
-                    <p><strong>State:</strong> {{ student.state }}</p>
-                    <p><strong>Nationality:</strong> {{ student.nationality }}</p>
-
-                </div>
+                <p><strong>Email:</strong> {{ student.user.email }}</p>
+                <p><strong>Phone:</strong> {{ student.phone }}</p>
+                <p><strong>School:</strong> {{ student.school }}</p>
+                <p><strong>Department:</strong> {{ student.department }}</p>
+                <p><strong>Level:</strong> {{ student.level }}</p>
+                <p><strong>Age:</strong> {{ student.age }}</p>
+                <p><strong>State:</strong> {{ student.state }}</p>
+                <p><strong>Nationality:</strong> {{ student.nationality }}</p>
 
             </div>
 
-        </section>
+        </div>
 
-    </main>
+    </section>
+
+    <!-- NOTIFICATIONS (READY FOR FUTURE) -->
+    <section class="notifications">
+
+        <h2>Notifications</h2>
+
+        <div class="notify-box">
+            <p>No new notifications yet.</p>
+        </div>
+
+    </section>
+
+</main>
 
 </body>
 </html>

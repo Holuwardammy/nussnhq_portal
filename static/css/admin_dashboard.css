@@ -13,7 +13,7 @@ body {
 /* Header */
 
 header {
-    background-color: #1e3a8a; /* deep blue header */
+    background-color: #1e3a8a;
     color: white;
     padding: 20px 50px;
     text-align: center;
@@ -141,7 +141,7 @@ header h1 {
     font-weight: 600;
 }
 
-/* Tab Buttons */
+/* TAB BUTTONS */
 
 .tab-buttons {
     display: flex;
@@ -171,7 +171,7 @@ header h1 {
     background-color: #10b981;
 }
 
-/* Tab Content */
+/* TAB CONTENT */
 
 .tab-content {
     display: none;
@@ -187,7 +187,44 @@ header h1 {
     to { opacity: 1; transform: translateY(0);}
 }
 
-/* Tables */
+/* =========================
+   🔥 NEW STATS GRID (ADDED)
+   ========================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.stat-card p {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1e3a8a;
+    margin-top: 8px;
+}
+
+/* TABLES */
 
 table {
     width: 100%;
@@ -225,7 +262,7 @@ tr:hover {
     transition: all 0.3s ease;
 }
 
-/* Profile Pictures in Table */
+/* Profile Pictures */
 
 img.profile-pic {
     width: 50px;
@@ -235,7 +272,7 @@ img.profile-pic {
     border: 2px solid #3b82f6;
 }
 
-/* Buttons inside table */
+/* Buttons */
 
 a.button {
     background-color: #3b82f6;
@@ -267,7 +304,7 @@ h2 {
     margin-bottom: 15px;
 }
 
-/* Responsive Design */
+/* RESPONSIVE */
 
 @media (max-width: 1024px) {
     .tab-buttons {

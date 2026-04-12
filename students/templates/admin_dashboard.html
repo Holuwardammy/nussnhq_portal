@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
 </head>
 <body>
+
     <header>
         <h1>Admin Dashboard</h1>
         <div class="logout-btn">
@@ -15,6 +16,7 @@
     </header>
 
     <div class="container">
+
         <!-- FLASH MESSAGES -->
         {% if messages %}
             <div class="messages">
@@ -23,6 +25,31 @@
                 {% endfor %}
             </div>
         {% endif %}
+
+        <!-- DASHBOARD STATS (NEW SAFE BLOCK ADDED) -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <h3>Total Students</h3>
+                <p>{{ students|length }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total Payments</h3>
+                <p>{{ payments|length }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total Events</h3>
+                <p>{{ events|length }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Fundraising</h3>
+                <p>{{ fundraising|length }}</p>
+            </div>
+
+        </div>
 
         <!-- WELCOME ADMIN STUDENT INFO -->
         {% if admin_student %}
@@ -52,6 +79,7 @@
         <!-- STUDENTS LIST -->
         <div id="students-tab" class="tab-content active">
             <h2>Registered Students</h2>
+
             <table>
                 <thead>
                     <tr>
@@ -66,9 +94,10 @@
                         <th>State</th>
                         <th>Nationality</th>
                         <th>Serial</th>
-                        <th>Action</th> <!-- Added Action column -->
+                        <th>Action</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for student in students %}
                     <tr>
@@ -79,6 +108,7 @@
                                 <img src="{% static 'images/default_profile.png' %}" class="profile-pic" alt="Profile">
                             {% endif %}
                         </td>
+
                         <td>{{ student.full_name }}</td>
                         <td>{{ student.user.email }}</td>
                         <td>{{ student.phone }}</td>
@@ -89,12 +119,14 @@
                         <td>{{ student.state }}</td>
                         <td>{{ student.nationality }}</td>
                         <td>{{ student.serial_number }}</td>
+
                         <td>
-                            <a href="{% url 'delete_student' student.id %}" 
-                               onclick="return confirm('Are you sure you want to delete this student?');" 
+                            <a href="{% url 'delete_student' student.id %}"
+                               onclick="return confirm('Are you sure you want to delete this student?');"
                                class="button delete-btn">Delete</a>
                         </td>
                     </tr>
+
                     {% empty %}
                     <tr>
                         <td colspan="12">No students registered yet.</td>
@@ -107,6 +139,7 @@
         <!-- PAYMENTS LIST -->
         <div id="payments-tab" class="tab-content">
             <h2>Payments</h2>
+
             <table>
                 <thead>
                     <tr>
@@ -117,6 +150,7 @@
                         <th>Action</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for payment in payments %}
                     <tr>
@@ -126,7 +160,9 @@
                         <td>{{ payment.date_paid }}</td>
                         <td>
                             {% if not payment.paid %}
-                                <a href="{% url 'mark_payment' payment.student.id %}" class="button">Mark as Paid</a>
+                                <a href="{% url 'mark_payment' payment.student.id %}" class="button">
+                                    Mark as Paid
+                                </a>
                             {% else %}
                                 <span>Paid</span>
                             {% endif %}
@@ -144,7 +180,9 @@
         <!-- EVENTS LIST -->
         <div id="events-tab" class="tab-content">
             <h2>Events</h2>
+
             <a href="{% url 'create_event' %}" class="button">Create Event</a>
+
             <table>
                 <thead>
                     <tr>
@@ -154,6 +192,7 @@
                         <th>Location</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for event in events %}
                     <tr>
@@ -162,6 +201,7 @@
                         <td>{{ event.date }}</td>
                         <td>{{ event.location }}</td>
                     </tr>
+
                     {% empty %}
                     <tr>
                         <td colspan="4">No events created yet.</td>
@@ -174,7 +214,9 @@
         <!-- FUNDRAISING LIST -->
         <div id="fundraising-tab" class="tab-content">
             <h2>Fundraising</h2>
+
             <a href="{% url 'create_fundraising' %}" class="button">Create Fundraising</a>
+
             <table>
                 <thead>
                     <tr>
@@ -183,6 +225,7 @@
                         <th>Goal</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for fund in fundraising %}
                     <tr>
@@ -190,6 +233,7 @@
                         <td>{{ fund.description }}</td>
                         <td>{{ fund.goal }}</td>
                     </tr>
+
                     {% empty %}
                     <tr>
                         <td colspan="3">No fundraising campaigns yet.</td>
@@ -198,8 +242,10 @@
                 </tbody>
             </table>
         </div>
+
     </div>
 
+    <!-- TAB SCRIPT (UNCHANGED) -->
     <script>
         const buttons = document.querySelectorAll('.tab-btn');
         const contents = document.querySelectorAll('.tab-content');
@@ -214,5 +260,6 @@
             });
         });
     </script>
+
 </body>
 </html>
