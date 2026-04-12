@@ -2,96 +2,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Student Registration</title>
-<link rel="stylesheet" href="{% static 'css/registration.css' %}">
+    <meta charset="UTF-8">
+    <title>Student Registration</title>
+    <link rel="stylesheet" href="{% static 'css/registration.css' %}">
 </head>
 
 <body>
 
 <div class="registration-container">
 
-<h2>Student Registration</h2>
+    <h2>Student Registration</h2>
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
-            {{ message }}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'register_student' %}">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <label>{{ form.full_name.label }}</label>
+        {{ form.full_name }}
+
+        <label>{{ form.email.label }}</label>
+        {{ form.email }}
+
+        <label>{{ form.password.label }}</label>
+        {{ form.password }}
+
+        <label>{{ form.phone.label }}</label>
+        {{ form.phone }}
+
+        <label>School</label>
+        <div class="searchable-select">
+            <input type="text" 
+                   id="school-search" 
+                   placeholder="Search or type your school..." 
+                   autocomplete="off" 
+                   required>
+
+            <ul id="school-list" style="display: none;">
+                <li>University of Lagos</li>
+                <li>Obafemi Awolowo University</li>
+                <li>University of Ibadan</li>
+                <li>Lagos State University</li>
+                <li>Polytechnic Ibadan</li>
+                <li>Yaba College of Technology</li>
+                <li>Bauchi State University</li>
+                <li>Federal University of Technology Minna</li>
+                <li>Federal University of Agriculture Abeokuta</li>
+                <li>The Oke Ogun Polytechnic Saki</li>
+            </ul>
+
+            <input type="hidden" 
+                   name="school" 
+                   id="school-selected" 
+                   value="{{ request.POST.school|default_if_none:'' }}">
         </div>
-    {% endfor %}
-{% endif %}
 
-<form method="POST" enctype="multipart/form-data" action="{% url 'register_student' %}">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
+        <label>{{ form.department.label }}</label>
+        {{ form.department }}
 
-    <label>{{ form.full_name.label }}</label>
-    {{ form.full_name }}
+        <label>{{ form.level.label }}</label>
+        {{ form.level }}
 
-    <label>{{ form.email.label }}</label>
-    {{ form.email }}
+        <label>{{ form.age.label }}</label>
+        {{ form.age }}
 
-    <label>{{ form.password.label }}</label>
-    {{ form.password }}
+        <label>{{ form.state.label }}</label>
+        {{ form.state }}
 
-    <label>{{ form.phone.label }}</label>
-    {{ form.phone }}
+        <label>{{ form.nationality.label }}</label>
+        {{ form.nationality }}
 
-    <!-- 🔥 FIXED SCHOOL FIELD (NOW PROPERLY CONNECTED) -->
-    <label>School</label>
+        <label>{{ form.member_type.label }}</label>
+        {{ form.member_type }}
 
-    <div class="searchable-select">
-        <input type="text"
-               id="school-search"
-               placeholder="Search your school..."
-               autocomplete="off"
-               required>
+        <label>{{ form.profile_picture.label }}</label>
+        {{ form.profile_picture }}
 
-        <ul id="school-list">
-            <li>University of Lagos</li>
-            <li>Obafemi Awolowo University</li>
-            <li>University of Ibadan</li>
-            <li>Lagos State University</li>
-            <li>Polytechnic Ibadan</li>
-            <li>Yaba College of Technology</li>
-            <li>Bauchi State University</li>
-            <li>Federal University of Technology Minna</li>
-            <li>Federal University of Agriculture Abeokuta</li>
-            <li>The Oke Ogun Polytechnic Saki</li>
-        </ul>
-
-        <!-- ✅ THIS IS THE CRITICAL FIX -->
-        <input type="hidden"
-               name="school"
-               id="school-selected"
-               value="{{ request.POST.school|default_if_none:'' }}">
-    </div>
-
-    <label>{{ form.department.label }}</label>
-    {{ form.department }}
-
-    <label>{{ form.level.label }}</label>
-    {{ form.level }}
-
-    <label>{{ form.age.label }}</label>
-    {{ form.age }}
-
-    <label>{{ form.state.label }}</label>
-    {{ form.state }}
-
-    <label>{{ form.nationality.label }}</label>
-    {{ form.nationality }}
-
-    <label>{{ form.member_type.label }}</label>
-    {{ form.member_type }}
-
-    <label>{{ form.profile_picture.label }}</label>
-    {{ form.profile_picture }}
-
-    <button type="submit">Register</button>
-
-</form>
-
+        <button type="submit">Register</button>
+    </form>
 </div>
 
 <script>
@@ -99,10 +94,13 @@ const searchInput = document.getElementById('school-search');
 const schoolList = document.getElementById('school-list');
 const selectedSchool = document.getElementById('school-selected');
 
-// Filter school list
+// 1. Filter list AND sync value while typing
 searchInput.addEventListener('input', () => {
     const filter = searchInput.value.toLowerCase();
     let visible = false;
+
+    // IMPORTANT: Keep the hidden field updated even if they don't click a list item
+    selectedSchool.value = searchInput.value;
 
     Array.from(schoolList.getElementsByTagName('li')).forEach(li => {
         if (li.textContent.toLowerCase().includes(filter)) {
@@ -113,22 +111,29 @@ searchInput.addEventListener('input', () => {
         }
     });
 
-    schoolList.style.display = visible ? 'block' : 'none';
+    schoolList.style.display = (visible && filter.length > 0) ? 'block' : 'none';
 });
 
-// Select school
+// 2. Select school from list
 Array.from(schoolList.getElementsByTagName('li')).forEach(li => {
     li.addEventListener('click', () => {
         searchInput.value = li.textContent;
-        selectedSchool.value = li.textContent;  // 🔥 IMPORTANT FIX
+        selectedSchool.value = li.textContent; 
         schoolList.style.display = 'none';
     });
 });
 
-// Close dropdown when clicking outside
+// 3. Close dropdown when clicking outside
 document.addEventListener('click', (e) => {
     if (!searchInput.contains(e.target) && !schoolList.contains(e.target)) {
         schoolList.style.display = 'none';
+    }
+});
+
+// 4. Pre-fill if validation fails and page reloads
+window.addEventListener('load', () => {
+    if (selectedSchool.value) {
+        searchInput.value = selectedSchool.value;
     }
 });
 </script>

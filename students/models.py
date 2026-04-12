@@ -68,42 +68,37 @@ class Student(models.Model):
     registration_date = models.DateField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
+        # Sync email and username
+        if self.user:
+            if self.email:
+                self.user.email = self.email
+                self.user.username = self.email # Keep username synced with email
+                self.user.save()
+            elif self.user.email:
+                self.email = self.user.email
 
-        # sync email with user
-        if self.user and self.user.email:
-            self.email = self.user.email
-
-        # assign executive position safely
+        # Executive role check
         if self.member_type in self.EXECUTIVE_ROLES:
             self.executive_position = self.member_type
         else:
             self.executive_position = None
 
-        # generate serial number safely
+        # Serial number generation
         if not self.serial_number:
             year = timezone.now().year
-
             last_student = Student.objects.filter(
                 serial_number__startswith=f"NUSSNHQ/{year}/"
             ).order_by('id').last()
 
             last_number = 0
-
             if last_student and last_student.serial_number:
                 try:
                     last_number = int(last_student.serial_number.split('/')[-1])
-                except:
+                except (IndexError, ValueError):
                     last_number = 0
-
             self.serial_number = f"NUSSNHQ/{year}/{last_number + 1:04d}"
 
         super().save(*args, **kwargs)
-
-    def is_executive(self):
-        return self.member_type in self.EXECUTIVE_ROLES
-
-    def __str__(self):
-        return f"{self.full_name} ({self.serial_number})"
 
 
 # ---------------------------

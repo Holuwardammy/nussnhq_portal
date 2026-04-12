@@ -75,7 +75,6 @@ class StudentForm(forms.ModelForm):
 
     def save(self, commit=True):
         student = super().save(commit=False)
-
         email = self.cleaned_data.get('email')
         password = self.cleaned_data.get('password')
         full_name = self.cleaned_data.get('full_name')
@@ -84,35 +83,25 @@ class StudentForm(forms.ModelForm):
         admin_roles = ["president", "treasurer", "financial_secretary"]
         is_admin = member_type in admin_roles
 
-        # 🔥 SAFE USER CREATION (NO PASSWORD OVERWRITE BUG)
+        # Use email as the username
         user = User.objects.filter(username=email).first()
-
         if user is None:
+            # create_user automatically hashes the password correctly
             user = User.objects.create_user(
-                username=email,
+                username=email, 
                 email=email,
                 password=password
             )
-        else:
-            # ❌ DO NOT overwrite password (FIXED BUG)
-            pass
-
-        # split name safely
+        
         name_parts = full_name.strip().split()
         user.first_name = name_parts[0] if name_parts else ""
         user.last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
-
         user.is_staff = is_admin
         user.save()
 
-        # link student
         student.user = user
-        student.member_type = member_type
-        student.executive_position = member_type if is_admin else None
-
         if commit:
             student.save()
-
         return student
 
 

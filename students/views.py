@@ -16,69 +16,61 @@ def home(request):
 # REGISTER (SAFE)
 # ---------------------------
 def register_student(request):
-
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
-
         if form.is_valid():
-            student = form.save()
-
-            # ensure profile exists
-            Student.objects.get_or_create(user=student.user)
-
-            messages.success(request, "Registration Successful! Please login.")
+            form.save() # The form handles user creation and hashing
+            messages.success(request, "Registration Successful! Please login with your email.")
             return redirect('login')
-
-        messages.error(request, "Please correct the errors below.")
-
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = StudentForm()
-
     return render(request, 'register_student.html', {'form': form})
 
-
-# ---------------------------
-# LOGIN (CLEAN + SAFE)
-# ---------------------------
 def login_view(request):
-
     if request.method == "POST":
+        email_input = request.POST.get("username") # The email typed in the box
+        password_input = request.POST.get("password")
 
-        username_input = request.POST.get("username")
-        password = request.POST.get("password")
-
-        # serial number support
-        try:
-            student_obj = Student.objects.get(serial_number=username_input)
-            username_input = student_obj.email
-        except Student.DoesNotExist:
-            pass
-
-        user = authenticate(request, username=username_input, password=password)
+        # Authenticate using the email as the username
+        user = authenticate(request, username=email_input, password=password_input)
 
         if user:
-
             login(request, user)
-
-            student, created = Student.objects.get_or_create(
-                user=user,
-                defaults={
-                    "full_name": user.username,
-                    "email": user.email or "",
-                    "school": "Not set",
-                    "department": "Not set",
-                    "level": "Not set",
-                    "phone": "Not set",
-                    "member_type": "student_member"
-                }
-            )
-
-            if student.is_executive():
+            # Fetch the student profile to check for executive status
+            student = Student.objects.filter(user=user).first()
+            
+            if student and student.is_executive():
                 return redirect('admin_dashboard')
-
             return redirect('student_home')
+        else:
+            messages.error(request, "Invalid login details. Use your registered email.")
 
-        messages.error(request, "Invalid login details.")
+    return render(request, 'login.html')
+
+
+def login_view(request):
+    if request.method == "POST":
+        email_input = request.POST.get("username") # This is the 'email' from your form
+        password = request.POST.get("password")
+
+        # We authenticate using the email_input as the 'username' 
+        # because we synced them during registration above.
+        user = authenticate(request, username=email_input, password=password)
+
+        if user:
+            login(request, user)
+            
+            # Check for student profile
+            student = Student.objects.filter(user=user).first()
+            
+            if student and student.is_executive():
+                return redirect('admin_dashboard')
+            
+            return redirect('student_home')
+        else:
+            messages.error(request, "Invalid login details. Please use your registered email.")
 
     return render(request, 'login.html')
 
