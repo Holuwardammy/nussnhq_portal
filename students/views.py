@@ -16,29 +16,21 @@ def home(request):
 # REGISTER STUDENT
 # ---------------------------
 def register_student(request):
+
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
 
         if form.is_valid():
-            student = form.save(commit=False)
 
-            password = form.cleaned_data.get("password")
-
-            # Create Django user
-            user = User.objects.create_user(
-                username=student.serial_number,
-                email=student.email,
-                password=password
-            )
-
-            student.user = user
-            student.save()
+            # Form already handles User creation
+            form.save()
 
             messages.success(request, "Registration Successful! Please login.")
             return redirect('login')
 
         else:
             messages.error(request, "Please correct the errors below.")
+
     else:
         form = StudentForm()
 
@@ -51,14 +43,13 @@ def register_student(request):
 def login_view(request):
 
     if request.method == "POST":
+
         username_input = request.POST.get("username")
         password = request.POST.get("password")
 
         user = None
 
-        # ---------------------------
         # TRY SERIAL NUMBER LOGIN
-        # ---------------------------
         try:
             student_obj = Student.objects.select_related('user').get(serial_number=username_input)
 
@@ -72,10 +63,9 @@ def login_view(request):
         except Student.DoesNotExist:
             student_obj = None
 
-        # ---------------------------
         # TRY EMAIL LOGIN
-        # ---------------------------
         if user is None:
+
             try:
                 user_obj = User.objects.get(email=username_input)
 
@@ -88,10 +78,10 @@ def login_view(request):
             except User.DoesNotExist:
                 user = None
 
-        # ---------------------------
+
         # LOGIN SUCCESS
-        # ---------------------------
         if user is not None:
+
             login(request, user)
 
             student = Student.objects.filter(user=user).first()
@@ -115,6 +105,7 @@ def login_view(request):
 # STUDENT HOME
 # ---------------------------
 def student_home(request):
+
     if not request.user.is_authenticated:
         return redirect('login')
 
@@ -140,6 +131,7 @@ def student_home(request):
 # ADMIN DASHBOARD
 # ---------------------------
 def admin_dashboard(request):
+
     if not request.user.is_authenticated:
         return redirect('login')
 
@@ -168,7 +160,9 @@ def admin_dashboard(request):
 # CREATE EVENT
 # ---------------------------
 def create_event(request):
+
     if request.method == 'POST':
+
         form = EventForm(request.POST)
 
         if form.is_valid():
@@ -185,7 +179,9 @@ def create_event(request):
 # CREATE FUNDRAISING
 # ---------------------------
 def create_fundraising(request):
+
     if request.method == 'POST':
+
         form = FundraisingForm(request.POST)
 
         if form.is_valid():
@@ -202,6 +198,7 @@ def create_fundraising(request):
 # MARK PAYMENT
 # ---------------------------
 def mark_payment(request, student_id):
+
     student = get_object_or_404(Student, id=student_id)
 
     payment, created = Payment.objects.get_or_create(student=student)
@@ -217,6 +214,7 @@ def mark_payment(request, student_id):
 # LOGOUT
 # ---------------------------
 def logout_view(request):
+
     logout(request)
     return redirect('home')
 
