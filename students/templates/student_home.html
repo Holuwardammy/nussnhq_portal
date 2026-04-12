@@ -3,112 +3,121 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Student Home</title>
-    <link rel="stylesheet" href="{% static 'css/student_home.css' %}?v=2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal | {{ student.full_name }}</title>
+    <link rel="stylesheet" href="{% static 'css/student_home.css' %}?v=4">
 </head>
 
 <body>
 
 <header class="header">
-
     <div class="logo-area">
         <h2>NUSSN Student Portal</h2>
     </div>
-
     <div class="logout-btn">
         <a href="{% url 'logout' %}">Logout</a>
     </div>
-
 </header>
 
 <main class="container">
 
-    <!-- WELCOME -->
     <div class="welcome-section">
-        <h1>Welcome, {{ student.full_name }}!</h1>
+        <h1>Student Dashboard</h1>
     </div>
 
-    <!-- TOP INFO CARDS -->
-    <section class="dashboard-cards">
+    <div class="main-layout">
+        
+        <section class="id-card-container">
+            <div class="id-card">
+                <div class="id-card-header">
+                    <div class="header-text">
+                        <h4>NUSS NATIONAL HQ</h4>
+                        <p>Official Membership Card</p>
+                    </div>
+                </div>
 
-        <div class="card">
-            <h3>Student ID</h3>
-            <p>{{ student.serial_number }}</p>
-        </div>
-
-        <div class="card">
-            <h3>Member Type</h3>
-            <p>{{ student.member_type|title }}</p>
-        </div>
-
-        <div class="card">
-            <h3>Payment Status</h3>
-            <p>
-                {% if payments %}
-                    {% for p in payments %}
-                        {% if p.paid %}
-                            Paid ✔
+                <div class="id-card-body">
+                    <div class="photo-area">
+                        {% if student.profile_picture %}
+                            <img src="{{ student.profile_picture.url }}" alt="Profile Picture">
                         {% else %}
-                            Pending ⏳
+                            <img src="{% static 'images/default_profile.png' %}" alt="Default">
                         {% endif %}
-                    {% endfor %}
-                {% else %}
-                    No record
-                {% endif %}
-            </p>
-        </div>
+                    </div>
+                    
+                    <div class="id-details">
+                        <div class="detail-group">
+                            <label>FULL NAME</label>
+                            <p class="name-text">{{ student.full_name|upper }}</p>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <label>STUDENT ID</label>
+                            <p class="id-text">{{ student.serial_number }}</p>
+                        </div>
 
-    </section>
+                        <div class="id-row">
+                            <div class="detail-group">
+                                <label>MEMBER TYPE</label>
+                                <p class="badge {{ student.member_type }}">
+                                    {{ student.get_member_type_display }}
+                                </p>
+                            </div>
+                            <div class="detail-group">
+                                <label>STATUS</label>
+                                <p class="status-text">
+                                    {% if payments %}
+                                        {% for p in payments %}
+                                            {% if p.paid %}
+                                                <span class="paid">PAID ✔</span>
+                                            {% else %}
+                                                <span class="pending">PENDING ⏳</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="no-record">NO RECORD</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="id-card-footer">
+                    <p>Valid for the 2026 Academic Session</p>
+                </div>
+            </div>
+        </section>
 
-    <!-- PROFILE SECTION -->
-    <section class="student-info">
-
-        <div class="profile-section">
-
-            <div class="profile-card">
-
-                {% if student.profile_picture %}
-                    <img src="{{ student.profile_picture.url }}" alt="Profile Picture">
-                {% else %}
-                    <img src="{% static 'images/default_profile.png' %}" alt="Profile Picture">
-                {% endif %}
-
-                <h3>{{ student.full_name }}</h3>
-
+        <section class="details-section">
+            <div class="details-grid">
+                <div class="detail-item">
+                    <strong>Email:</strong> <span>{{ student.user.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Phone:</strong> <span>{{ student.phone }}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>School:</strong> <span>{{ student.school }}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Department:</strong> <span>{{ student.department }}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Level:</strong> <span>{{ student.level }}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>State:</strong> <span>{{ student.state }}</span>
+                </div>
             </div>
 
-        </div>
-
-        <!-- DETAILS -->
-        <div class="student-details">
-
-            <div class="details-card">
-
-                <p><strong>Email:</strong> {{ student.user.email }}</p>
-                <p><strong>Phone:</strong> {{ student.phone }}</p>
-                <p><strong>School:</strong> {{ student.school }}</p>
-                <p><strong>Department:</strong> {{ student.department }}</p>
-                <p><strong>Level:</strong> {{ student.level }}</p>
-                <p><strong>Age:</strong> {{ student.age }}</p>
-                <p><strong>State:</strong> {{ student.state }}</p>
-                <p><strong>Nationality:</strong> {{ student.nationality }}</p>
-
+            <div class="notifications-area">
+                <h3>System Notifications</h3>
+                <div class="notify-box">
+                    <p>Welcome to the NUSSNHQ portal. Please ensure your semester dues are cleared to maintain active status.</p>
+                </div>
             </div>
-
-        </div>
-
-    </section>
-
-    <!-- NOTIFICATIONS (READY FOR FUTURE) -->
-    <section class="notifications">
-
-        <h2>Notifications</h2>
-
-        <div class="notify-box">
-            <p>No new notifications yet.</p>
-        </div>
-
-    </section>
+        </section>
+    </div>
 
 </main>
 
