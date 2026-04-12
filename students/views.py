@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -32,7 +32,7 @@ def register_student(request):
 
 
 # ---------------------------
-# LOGIN VIEW (PERMANENT FIX)
+# LOGIN VIEW (FULLY SAFE)
 # ---------------------------
 def login_view(request):
     if request.method == "POST":
@@ -40,11 +40,10 @@ def login_view(request):
         password = request.POST.get("password")
 
         user = None
-        student_obj = None
 
-        # 1. LOGIN VIA SERIAL NUMBER
+        # 1. Try serial number login
         try:
-            student_obj = Student.objects.get(serial_number=username_input)
+            student_obj = Student.objects.select_related('user').get(serial_number=username_input)
 
             if student_obj.user:
                 user = authenticate(
@@ -55,7 +54,7 @@ def login_view(request):
         except Student.DoesNotExist:
             student_obj = None
 
-        # 2. LOGIN VIA EMAIL
+        # 2. Try email login
         if user is None:
             try:
                 user_obj = User.objects.get(email=username_input)
@@ -69,21 +68,20 @@ def login_view(request):
                 user = None
 
         # ---------------------------
-        # LOGIN SUCCESS
+        # SUCCESS LOGIN
         # ---------------------------
         if user is not None:
             login(request, user)
 
-            student_obj = Student.objects.filter(user=user).first()
+            student = Student.objects.filter(user=user).first()
 
-            # 🔥 CLEAN ROLE CHECK USING MODEL METHOD
-            is_admin = (
-                user.is_staff or
-                user.is_superuser or
-                (student_obj and student_obj.is_executive())
-            )
+            # SAFE ADMIN CHECK (NO CRASH POSSIBLE)
+            is_admin = False
 
-            if is_admin:
+            if student:
+                is_admin = student.is_executive()
+
+            if user.is_staff or user.is_superuser or is_admin:
                 return redirect('admin_dashboard')
 
             return redirect('student_home')
@@ -170,10 +168,10 @@ def create_fundraising(request):
 
 
 # ---------------------------
-# MARK PAYMENT
+# MARK PAYMENT (SAFE)
 # ---------------------------
 def mark_payment(request, student_id):
-    student = Student.objects.get(id=student_id)
+    student = get_object_or_404(Student, id=student_id)
 
     payment, created = Payment.objects.get_or_create(student=student)
     payment.paid = True
@@ -192,24 +190,19 @@ def logout_view(request):
 
 
 # ---------------------------
-# DELETE STUDENT
+# DELETE STUDENT (SAFE)
 # ---------------------------
 def delete_student(request, student_id):
     if not request.user.is_authenticated or not request.user.is_staff:
         return redirect('login')
 
-    try:
-        student = Student.objects.get(id=student_id)
+    student = get_object_or_404(Student, id=student_id)
 
-        user = student.user
-        student.delete()
+    user = student.user
+    student.delete()
 
-        if user:
-            user.delete()
+    if user:
+        user.delete()
 
-        messages.success(request, "Student and associated user deleted successfully.")
-
-    except Student.DoesNotExist:
-        messages.error(request, "Student not found.")
-
+    messages.success(request, "Student and associated user deleted successfully.")
     return redirect('admin_dashboard')
