@@ -103,6 +103,15 @@ class Student(models.Model):
 
         super().save(*args, **kwargs)
 
+    # ✅ ADDED PERMANENT CLEAN LOGIC METHOD
+    def is_executive(self):
+        executive_roles = [
+            'president',
+            'treasurer',
+            'financial_secretary'
+        ]
+        return self.member_type in executive_roles
+
     def __str__(self):
         return f"{self.full_name} ({self.serial_number})"
 

@@ -13,22 +13,18 @@ def home(request):
 
 
 # ---------------------------
-# REGISTER STUDENT (FIXED SAFE VERSION)
+# REGISTER STUDENT
 # ---------------------------
 def register_student(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
 
         if form.is_valid():
-            # ❌ FIX: DO NOT create User here anymore
-            student = form.save()
-
+            form.save()
             messages.success(request, "Registration Successful! Please login.")
             return redirect('login')
-
         else:
             messages.error(request, "Please correct the errors below.")
-
     else:
         form = StudentForm()
 
@@ -36,7 +32,7 @@ def register_student(request):
 
 
 # ---------------------------
-# LOGIN VIEW (UNCHANGED LOGIC BUT SAFER)
+# LOGIN VIEW (PERMANENT FIX)
 # ---------------------------
 def login_view(request):
     if request.method == "POST":
@@ -46,7 +42,7 @@ def login_view(request):
         user = None
         student_obj = None
 
-        # 1. Try login via serial number
+        # 1. LOGIN VIA SERIAL NUMBER
         try:
             student_obj = Student.objects.get(serial_number=username_input)
 
@@ -59,7 +55,7 @@ def login_view(request):
         except Student.DoesNotExist:
             student_obj = None
 
-        # 2. Try login via email
+        # 2. LOGIN VIA EMAIL
         if user is None:
             try:
                 user_obj = User.objects.get(email=username_input)
@@ -72,26 +68,27 @@ def login_view(request):
             except User.DoesNotExist:
                 user = None
 
-        # 3. LOGIN SUCCESS
+        # ---------------------------
+        # LOGIN SUCCESS
+        # ---------------------------
         if user is not None:
             login(request, user)
 
-            if student_obj is None:
-                student_obj = Student.objects.filter(user=user).first()
+            student_obj = Student.objects.filter(user=user).first()
 
-            admin_roles = [
-                "president",
-                "treasurer",
-                "financial_secretary"
-            ]
+            # 🔥 CLEAN ROLE CHECK USING MODEL METHOD
+            is_admin = (
+                user.is_staff or
+                user.is_superuser or
+                (student_obj and student_obj.is_executive())
+            )
 
-            if user.is_staff or (student_obj and student_obj.member_type in admin_roles):
+            if is_admin:
                 return redirect('admin_dashboard')
-            else:
-                return redirect('student_home')
 
-        else:
-            messages.error(request, "Invalid email, serial number, or password.")
+            return redirect('student_home')
+
+        messages.error(request, "Invalid email, serial number, or password.")
 
     return render(request, 'login.html')
 
@@ -128,7 +125,6 @@ def admin_dashboard(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    # 🔐 ONLY staff OR superuser allowed
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('student_home')
 
@@ -140,18 +136,6 @@ def admin_dashboard(request):
         "events": Event.objects.all(),
         "fundraising": Fundraising.objects.all(),
         "admin_student": admin_student
-    })
-
-
-# ---------------------------
-# GENERAL DASHBOARD (OPTIONAL)
-# ---------------------------
-def dashboard(request):
-    return render(request, 'dashboard.html', {
-        'students': Student.objects.all(),
-        'payments': Payment.objects.all(),
-        'events': Event.objects.all(),
-        'fundraising': Fundraising.objects.all()
     })
 
 
@@ -208,7 +192,7 @@ def logout_view(request):
 
 
 # ---------------------------
-# DELETE STUDENT (SAFE)
+# DELETE STUDENT
 # ---------------------------
 def delete_student(request, student_id):
     if not request.user.is_authenticated or not request.user.is_staff:
