@@ -21,15 +21,11 @@ def register_student(request):
         form = StudentForm(request.POST, request.FILES)
 
         if form.is_valid():
-
-            # Form already handles User creation
             form.save()
-
             messages.success(request, "Registration Successful! Please login.")
             return redirect('login')
 
-        else:
-            messages.error(request, "Please correct the errors below.")
+        messages.error(request, "Please correct the errors below.")
 
     else:
         form = StudentForm()
@@ -38,7 +34,7 @@ def register_student(request):
 
 
 # ---------------------------
-# LOGIN VIEW
+# LOGIN VIEW (FIXED)
 # ---------------------------
 def login_view(request):
 
@@ -47,36 +43,34 @@ def login_view(request):
         username_input = request.POST.get("username")
         password = request.POST.get("password")
 
-        user = None
-
-        # --------------------------
-        # If serial number entered, convert to email
-        # --------------------------
+        # Convert serial number → email if needed
         try:
-            student = Student.objects.get(serial_number=username_input)
-            username_input = student.email
+            student_obj = Student.objects.get(serial_number=username_input)
+            username_input = student_obj.email
         except Student.DoesNotExist:
             pass
 
-        # --------------------------
-        # Authenticate
-        # --------------------------
-        user = authenticate(
-            request,
-            username=username_input,
-            password=password
-        )
+        user = authenticate(request, username=username_input, password=password)
 
-        # --------------------------
-        # LOGIN SUCCESS
-        # --------------------------
         if user is not None:
-
             login(request, user)
 
-            student = Student.objects.filter(user=user).first()
+            # 🔥 GUARANTEE STUDENT PROFILE EXISTS
+            student, created = Student.objects.get_or_create(
+                user=user,
+                defaults={
+                    "full_name": user.username,
+                    "email": user.email,
+                    "school": "Not set",
+                    "department": "Not set",
+                    "level": "Not set",
+                    "phone": "Not set",
+                    "member_type": "student_member"
+                }
+            )
 
-            if student and student.is_executive():
+            # Redirect based on role
+            if student.is_executive():
                 return redirect('admin_dashboard')
 
             return redirect('student_home')
@@ -87,18 +81,25 @@ def login_view(request):
 
 
 # ---------------------------
-# STUDENT HOME
+# STUDENT HOME (FIXED)
 # ---------------------------
 def student_home(request):
 
     if not request.user.is_authenticated:
         return redirect('login')
 
-    student = Student.objects.filter(user=request.user).first()
-
-    if not student:
-        messages.error(request, "Student profile not found. Please contact admin.")
-        return redirect('home')
+    student, created = Student.objects.get_or_create(
+        user=request.user,
+        defaults={
+            "full_name": request.user.username,
+            "email": request.user.email,
+            "school": "Not set",
+            "department": "Not set",
+            "level": "Not set",
+            "phone": "Not set",
+            "member_type": "student_member"
+        }
+    )
 
     payments = Payment.objects.filter(student=student)
     events = Event.objects.all()
@@ -113,7 +114,7 @@ def student_home(request):
 
 
 # ---------------------------
-# ADMIN DASHBOARD
+# ADMIN DASHBOARD (FIXED SAFETY)
 # ---------------------------
 def admin_dashboard(request):
 
@@ -122,22 +123,19 @@ def admin_dashboard(request):
 
     student = Student.objects.filter(user=request.user).first()
 
-    is_admin = False
+    is_admin = request.user.is_staff or request.user.is_superuser or (
+        student.is_executive() if student else False
+    )
 
-    if student:
-        is_admin = student.is_executive()
-
-    if not (request.user.is_staff or request.user.is_superuser or is_admin):
+    if not is_admin:
         return redirect('student_home')
-
-    admin_student = student
 
     return render(request, "admin_dashboard.html", {
         "students": Student.objects.all(),
         "payments": Payment.objects.all(),
         "events": Event.objects.all(),
         "fundraising": Fundraising.objects.all(),
-        "admin_student": admin_student
+        "admin_student": student
     })
 
 
@@ -147,7 +145,6 @@ def admin_dashboard(request):
 def create_event(request):
 
     if request.method == 'POST':
-
         form = EventForm(request.POST)
 
         if form.is_valid():
@@ -166,7 +163,6 @@ def create_event(request):
 def create_fundraising(request):
 
     if request.method == 'POST':
-
         form = FundraisingForm(request.POST)
 
         if form.is_valid():
