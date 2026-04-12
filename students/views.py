@@ -49,49 +49,34 @@ def login_view(request):
 
         user = None
 
-        # TRY SERIAL NUMBER LOGIN
+        # --------------------------
+        # If serial number entered, convert to email
+        # --------------------------
         try:
-            student_obj = Student.objects.select_related('user').get(serial_number=username_input)
-
-            if student_obj.user:
-                user = authenticate(
-                    request,
-                    username=student_obj.user.username,
-                    password=password
-                )
-
+            student = Student.objects.get(serial_number=username_input)
+            username_input = student.email
         except Student.DoesNotExist:
-            student_obj = None
+            pass
 
-        # TRY EMAIL LOGIN
-        if user is None:
+        # --------------------------
+        # Authenticate
+        # --------------------------
+        user = authenticate(
+            request,
+            username=username_input,
+            password=password
+        )
 
-            try:
-                user_obj = User.objects.get(email=username_input)
-
-                user = authenticate(
-                    request,
-                    username=user_obj.username,
-                    password=password
-                )
-
-            except User.DoesNotExist:
-                user = None
-
-
+        # --------------------------
         # LOGIN SUCCESS
+        # --------------------------
         if user is not None:
 
             login(request, user)
 
             student = Student.objects.filter(user=user).first()
 
-            is_admin = False
-
-            if student:
-                is_admin = student.is_executive()
-
-            if user.is_staff or user.is_superuser or is_admin:
+            if student and student.is_executive():
                 return redirect('admin_dashboard')
 
             return redirect('student_home')
