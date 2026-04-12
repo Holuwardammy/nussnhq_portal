@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 
 from .models import Student, Payment, Event, Fundraising
-from .forms import StudentForm, EventForm, FundraisingForm, PaymentForm
+from .forms import StudentForm, EventForm, FundraisingForm
 
 
 def home(request):
@@ -13,7 +13,7 @@ def home(request):
 
 
 # ---------------------------
-# REGISTER STUDENT
+# REGISTER (SAFE)
 # ---------------------------
 def register_student(request):
 
@@ -21,7 +21,11 @@ def register_student(request):
         form = StudentForm(request.POST, request.FILES)
 
         if form.is_valid():
-            form.save()
+            student = form.save()
+
+            # ensure profile exists
+            Student.objects.get_or_create(user=student.user)
+
             messages.success(request, "Registration Successful! Please login.")
             return redirect('login')
 
@@ -34,7 +38,7 @@ def register_student(request):
 
 
 # ---------------------------
-# LOGIN VIEW (FIXED)
+# LOGIN (CLEAN + SAFE)
 # ---------------------------
 def login_view(request):
 
@@ -43,7 +47,7 @@ def login_view(request):
         username_input = request.POST.get("username")
         password = request.POST.get("password")
 
-        # Convert serial number → email if needed
+        # serial number support
         try:
             student_obj = Student.objects.get(serial_number=username_input)
             username_input = student_obj.email
@@ -52,15 +56,15 @@ def login_view(request):
 
         user = authenticate(request, username=username_input, password=password)
 
-        if user is not None:
+        if user:
+
             login(request, user)
 
-            # 🔥 GUARANTEE STUDENT PROFILE EXISTS
             student, created = Student.objects.get_or_create(
                 user=user,
                 defaults={
                     "full_name": user.username,
-                    "email": user.email,
+                    "email": user.email or "",
                     "school": "Not set",
                     "department": "Not set",
                     "level": "Not set",
@@ -69,19 +73,18 @@ def login_view(request):
                 }
             )
 
-            # Redirect based on role
             if student.is_executive():
                 return redirect('admin_dashboard')
 
             return redirect('student_home')
 
-        messages.error(request, "Invalid email, serial number, or password.")
+        messages.error(request, "Invalid login details.")
 
     return render(request, 'login.html')
 
 
 # ---------------------------
-# STUDENT HOME (FIXED)
+# STUDENT HOME (SAFE)
 # ---------------------------
 def student_home(request):
 
@@ -92,7 +95,7 @@ def student_home(request):
         user=request.user,
         defaults={
             "full_name": request.user.username,
-            "email": request.user.email,
+            "email": request.user.email or "",
             "school": "Not set",
             "department": "Not set",
             "level": "Not set",
@@ -101,20 +104,16 @@ def student_home(request):
         }
     )
 
-    payments = Payment.objects.filter(student=student)
-    events = Event.objects.all()
-    fundraising = Fundraising.objects.all()
-
     return render(request, "student_home.html", {
         "student": student,
-        "payments": payments,
-        "events": events,
-        "fundraising": fundraising
+        "payments": Payment.objects.filter(student=student),
+        "events": Event.objects.all(),
+        "fundraising": Fundraising.objects.all(),
     })
 
 
 # ---------------------------
-# ADMIN DASHBOARD (FIXED SAFETY)
+# ADMIN DASHBOARD
 # ---------------------------
 def admin_dashboard(request):
 
@@ -140,43 +139,29 @@ def admin_dashboard(request):
 
 
 # ---------------------------
-# CREATE EVENT
+# EVENT
 # ---------------------------
 def create_event(request):
-
-    if request.method == 'POST':
-        form = EventForm(request.POST)
-
-        if form.is_valid():
-            form.save()
-            return redirect('admin_dashboard')
-
-    else:
-        form = EventForm()
-
+    form = EventForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('admin_dashboard')
     return render(request, 'create_event.html', {'form': form})
 
 
 # ---------------------------
-# CREATE FUNDRAISING
+# FUNDRAISING
 # ---------------------------
 def create_fundraising(request):
-
-    if request.method == 'POST':
-        form = FundraisingForm(request.POST)
-
-        if form.is_valid():
-            form.save()
-            return redirect('admin_dashboard')
-
-    else:
-        form = FundraisingForm()
-
+    form = FundraisingForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('admin_dashboard')
     return render(request, 'create_fundraising.html', {'form': form})
 
 
 # ---------------------------
-# MARK PAYMENT
+# PAYMENT
 # ---------------------------
 def mark_payment(request, student_id):
 
@@ -195,7 +180,6 @@ def mark_payment(request, student_id):
 # LOGOUT
 # ---------------------------
 def logout_view(request):
-
     logout(request)
     return redirect('home')
 
@@ -205,18 +189,15 @@ def logout_view(request):
 # ---------------------------
 def delete_student(request, student_id):
 
-    if not request.user.is_authenticated or not request.user.is_staff:
+    if not request.user.is_staff:
         return redirect('login')
 
     student = get_object_or_404(Student, id=student_id)
 
-    user = student.user
+    if student.user:
+        student.user.delete()
 
     student.delete()
 
-    if user:
-        user.delete()
-
-    messages.success(request, "Student and associated user deleted successfully.")
-
+    messages.success(request, "Deleted successfully.")
     return redirect('admin_dashboard')

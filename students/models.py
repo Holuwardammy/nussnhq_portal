@@ -21,7 +21,11 @@ class Student(models.Model):
         ('student_member', 'Student Member'),
     ]
 
-    EXECUTIVE_POSITION_CHOICES = MEMBER_TYPE_CHOICES
+    EXECUTIVE_ROLES = [
+        'president',
+        'treasurer',
+        'financial_secretary'
+    ]
 
     user = models.OneToOneField(
         User,
@@ -49,7 +53,6 @@ class Student(models.Model):
 
     executive_position = models.CharField(
         max_length=50,
-        choices=EXECUTIVE_POSITION_CHOICES,
         null=True,
         blank=True
     )
@@ -66,24 +69,17 @@ class Student(models.Model):
 
     def save(self, *args, **kwargs):
 
-        # sync email with auth user
+        # sync email with user
         if self.user and self.user.email:
             self.email = self.user.email
 
-        # auto assign executive position
-        executive_roles = [
-            'president', 'senate_president', 'deputy_senate_president',
-            'social_director', 'welfare', 'organising_committee',
-            'general_secretary', 'assistant_general_secretary',
-            'pro', 'pro_ii', 'treasurer', 'financial_secretary'
-        ]
-
-        if self.member_type in executive_roles:
+        # assign executive position safely
+        if self.member_type in self.EXECUTIVE_ROLES:
             self.executive_position = self.member_type
         else:
             self.executive_position = None
 
-        # auto generate serial number
+        # generate serial number safely
         if not self.serial_number:
             year = timezone.now().year
 
@@ -91,31 +87,28 @@ class Student(models.Model):
                 serial_number__startswith=f"NUSSNHQ/{year}/"
             ).order_by('id').last()
 
+            last_number = 0
+
             if last_student and last_student.serial_number:
                 try:
                     last_number = int(last_student.serial_number.split('/')[-1])
                 except:
                     last_number = 0
-            else:
-                last_number = 0
 
             self.serial_number = f"NUSSNHQ/{year}/{last_number + 1:04d}"
 
         super().save(*args, **kwargs)
 
-    # ✅ ADDED PERMANENT CLEAN LOGIC METHOD
     def is_executive(self):
-        executive_roles = [
-            'president',
-            'treasurer',
-            'financial_secretary'
-        ]
-        return self.member_type in executive_roles
+        return self.member_type in self.EXECUTIVE_ROLES
 
     def __str__(self):
         return f"{self.full_name} ({self.serial_number})"
 
 
+# ---------------------------
+# EVENT MODEL
+# ---------------------------
 class Event(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -126,6 +119,9 @@ class Event(models.Model):
         return self.title
 
 
+# ---------------------------
+# FUNDRAISING MODEL
+# ---------------------------
 class Fundraising(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -135,6 +131,9 @@ class Fundraising(models.Model):
         return self.title
 
 
+# ---------------------------
+# PAYMENT MODEL
+# ---------------------------
 class Payment(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
