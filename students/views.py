@@ -20,9 +20,23 @@ def register_student(request):
         form = StudentForm(request.POST, request.FILES)
 
         if form.is_valid():
-            form.save()
+            student = form.save(commit=False)
+
+            password = form.cleaned_data.get("password")
+
+            # Create Django user
+            user = User.objects.create_user(
+                username=student.serial_number,
+                email=student.email,
+                password=password
+            )
+
+            student.user = user
+            student.save()
+
             messages.success(request, "Registration Successful! Please login.")
             return redirect('login')
+
         else:
             messages.error(request, "Please correct the errors below.")
     else:
@@ -32,16 +46,19 @@ def register_student(request):
 
 
 # ---------------------------
-# LOGIN VIEW (FULLY SAFE)
+# LOGIN VIEW
 # ---------------------------
 def login_view(request):
+
     if request.method == "POST":
         username_input = request.POST.get("username")
         password = request.POST.get("password")
 
         user = None
 
-        # 1. Try serial number login
+        # ---------------------------
+        # TRY SERIAL NUMBER LOGIN
+        # ---------------------------
         try:
             student_obj = Student.objects.select_related('user').get(serial_number=username_input)
 
@@ -51,10 +68,13 @@ def login_view(request):
                     username=student_obj.user.username,
                     password=password
                 )
+
         except Student.DoesNotExist:
             student_obj = None
 
-        # 2. Try email login
+        # ---------------------------
+        # TRY EMAIL LOGIN
+        # ---------------------------
         if user is None:
             try:
                 user_obj = User.objects.get(email=username_input)
@@ -64,18 +84,18 @@ def login_view(request):
                     username=user_obj.username,
                     password=password
                 )
+
             except User.DoesNotExist:
                 user = None
 
         # ---------------------------
-        # SUCCESS LOGIN
+        # LOGIN SUCCESS
         # ---------------------------
         if user is not None:
             login(request, user)
 
             student = Student.objects.filter(user=user).first()
 
-            # SAFE ADMIN CHECK (NO CRASH POSSIBLE)
             is_admin = False
 
             if student:
@@ -123,10 +143,17 @@ def admin_dashboard(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    if not (request.user.is_staff or request.user.is_superuser):
+    student = Student.objects.filter(user=request.user).first()
+
+    is_admin = False
+
+    if student:
+        is_admin = student.is_executive()
+
+    if not (request.user.is_staff or request.user.is_superuser or is_admin):
         return redirect('student_home')
 
-    admin_student = Student.objects.filter(user=request.user).first()
+    admin_student = student
 
     return render(request, "admin_dashboard.html", {
         "students": Student.objects.all(),
@@ -143,9 +170,11 @@ def admin_dashboard(request):
 def create_event(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
+
         if form.is_valid():
             form.save()
             return redirect('admin_dashboard')
+
     else:
         form = EventForm()
 
@@ -158,9 +187,11 @@ def create_event(request):
 def create_fundraising(request):
     if request.method == 'POST':
         form = FundraisingForm(request.POST)
+
         if form.is_valid():
             form.save()
             return redirect('admin_dashboard')
+
     else:
         form = FundraisingForm()
 
@@ -168,12 +199,13 @@ def create_fundraising(request):
 
 
 # ---------------------------
-# MARK PAYMENT (SAFE)
+# MARK PAYMENT
 # ---------------------------
 def mark_payment(request, student_id):
     student = get_object_or_404(Student, id=student_id)
 
     payment, created = Payment.objects.get_or_create(student=student)
+
     payment.paid = True
     payment.date_paid = timezone.now()
     payment.save()
@@ -190,19 +222,22 @@ def logout_view(request):
 
 
 # ---------------------------
-# DELETE STUDENT (SAFE)
+# DELETE STUDENT
 # ---------------------------
 def delete_student(request, student_id):
+
     if not request.user.is_authenticated or not request.user.is_staff:
         return redirect('login')
 
     student = get_object_or_404(Student, id=student_id)
 
     user = student.user
+
     student.delete()
 
     if user:
         user.delete()
 
     messages.success(request, "Student and associated user deleted successfully.")
+
     return redirect('admin_dashboard')
