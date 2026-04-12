@@ -13,20 +13,14 @@ def home(request):
 
 
 # ---------------------------
-# REGISTER STUDENT (FIXED)
+# REGISTER STUDENT (FIXED SAFE VERSION)
 # ---------------------------
 def register_student(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
 
         if form.is_valid():
-            email = form.cleaned_data.get('email')
-
-            # FIX: prevent duplicate email
-            if User.objects.filter(email=email).exists():
-                messages.error(request, "Email already registered")
-                return redirect('register_student')
-
+            # ❌ FIX: DO NOT create User here anymore
             student = form.save()
 
             messages.success(request, "Registration Successful! Please login.")
@@ -42,7 +36,7 @@ def register_student(request):
 
 
 # ---------------------------
-# LOGIN VIEW (FULLY FIXED)
+# LOGIN VIEW (UNCHANGED LOGIC BUT SAFER)
 # ---------------------------
 def login_view(request):
     if request.method == "POST":
@@ -65,7 +59,7 @@ def login_view(request):
         except Student.DoesNotExist:
             student_obj = None
 
-        # 2. Try login via email (FIXED)
+        # 2. Try login via email
         if user is None:
             try:
                 user_obj = User.objects.get(email=username_input)
@@ -78,16 +72,12 @@ def login_view(request):
             except User.DoesNotExist:
                 user = None
 
-        # 3. Login success
+        # 3. LOGIN SUCCESS
         if user is not None:
             login(request, user)
 
-            # Get related student safely
             if student_obj is None:
-                try:
-                    student_obj = Student.objects.get(user=user)
-                except Student.DoesNotExist:
-                    student_obj = None
+                student_obj = Student.objects.filter(user=user).first()
 
             admin_roles = [
                 "president",
@@ -113,9 +103,9 @@ def student_home(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    try:
-        student = Student.objects.get(user=request.user)
-    except Student.DoesNotExist:
+    student = Student.objects.filter(user=request.user).first()
+
+    if not student:
         messages.error(request, "Student profile not found. Please contact admin.")
         return redirect('home')
 
@@ -141,10 +131,7 @@ def admin_dashboard(request):
     if not request.user.is_staff:
         return redirect('student_home')
 
-    try:
-        admin_student = Student.objects.get(user=request.user)
-    except Student.DoesNotExist:
-        admin_student = None
+    admin_student = Student.objects.filter(user=request.user).first()
 
     return render(request, "admin_dashboard.html", {
         "students": Student.objects.all(),

@@ -51,7 +51,7 @@ class StudentForm(forms.ModelForm):
 
         widgets = {
             'full_name': forms.TextInput(attrs={'placeholder': 'Enter your full name'}),
-            'school': forms.HiddenInput(),  # keep your original logic (IMPORTANT)
+            'school': forms.HiddenInput(),
             'department': forms.TextInput(attrs={'placeholder': 'Enter your department'}),
             'level': forms.TextInput(attrs={'placeholder': 'Enter your level'}),
             'phone': forms.TextInput(attrs={'placeholder': 'Enter your phone number'}),
@@ -65,7 +65,6 @@ class StudentForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
 
-        # FIXED SAFE CHECKS
         if Student.objects.filter(email=email).exists():
             raise forms.ValidationError("A student with this email already exists.")
 
@@ -85,25 +84,31 @@ class StudentForm(forms.ModelForm):
         admin_executives = ["president", "treasurer", "financial_secretary"]
         is_admin = member_type in admin_executives
 
-        user, created = User.objects.get_or_create(username=email, email=email)
+        # ✅ FIX: Always ensure user exists safely
+        user = User.objects.filter(username=email).first()
 
-        if created:
+        if not user:
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password
+            )
+        else:
+            # ensure password is always correct if user exists
             user.set_password(password)
-            user.first_name = full_name.split()[0]
-            user.last_name = ' '.join(full_name.split()[1:]) if len(full_name.split()) > 1 else ''
 
-            if is_admin:
-                user.is_staff = True
+        # set names safely
+        name_parts = full_name.split()
+        user.first_name = name_parts[0] if name_parts else ""
+        user.last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
 
-            user.save()
+        user.is_staff = is_admin
+        user.save()
 
+        # link student
         student.user = user
         student.member_type = member_type
-
-        if is_admin:
-            student.executive_position = member_type
-        else:
-            student.executive_position = None
+        student.executive_position = member_type if is_admin else None
 
         if commit:
             student.save()
