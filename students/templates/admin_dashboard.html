@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=2">
 </head>
 <body>
 
@@ -55,7 +55,7 @@
     <!-- ===================== ADMIN WELCOME ===================== -->
     {% if admin_student %}
         <div class="admin-welcome">
-            <h2>Welcome, Admin {{ admin_student.full_name }} 👋</h2>
+            <h2>Welcome, Admin {{ admin_student.full_name }}</h2>
             <p><strong>Email:</strong> {{ admin_student.user.email }}</p>
             <p><strong>School:</strong> {{ admin_student.school }}</p>
             <p><strong>Department:</strong> {{ admin_student.department }}</p>
