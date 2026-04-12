@@ -6,30 +6,39 @@
     <title>Login</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
+
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
-        <form method="POST" action="{% url 'login' %}">
-            {% csrf_token %}
 
-            <label for="username">Email or Serial Number</label>
-            <input type="text" name="username" id="username" placeholder="Enter your email or serial number" required>
+<div class="login-container">
 
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" placeholder="Enter your password" required>
+    <h2>Login</h2>
 
-            <button type="submit">Login</button>
+    <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </form>
+        <label>Email or Serial Number</label>
+        <input type="text" name="username" placeholder="Enter email or serial number" required>
 
-        <p>Don't have an account? <a href="{% url 'register_student' %}">Register here</a></p>
-    </div>
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter password" required>
+
+        <button type="submit">Login</button>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+    </form>
+
+    <p>Don't have an account? 
+        <a href="{% url 'register_student' %}">Register here</a>
+    </p>
+
+</div>
+
 </body>
 </html>
