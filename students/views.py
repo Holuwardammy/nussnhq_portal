@@ -128,7 +128,8 @@ def admin_dashboard(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    if not request.user.is_staff:
+    # 🔐 ONLY staff OR superuser allowed
+    if not (request.user.is_staff or request.user.is_superuser):
         return redirect('student_home')
 
     admin_student = Student.objects.filter(user=request.user).first()
