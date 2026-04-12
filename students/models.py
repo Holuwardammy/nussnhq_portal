@@ -2,10 +2,10 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-
 class Student(models.Model):
     MEMBER_TYPE_CHOICES = [
         ('student', 'Student'),
+        ('student_member', 'Student Member'),
         ('president', 'President'),
         ('senate_president', 'Senate President'),
         ('deputy_senate_president', 'Deputy Senate President'),
@@ -18,9 +18,9 @@ class Student(models.Model):
         ('pro_ii', 'PRO II'),
         ('treasurer', 'Treasurer'),
         ('financial_secretary', 'Financial Secretary'),
-        ('student_member', 'Student Member'),
     ]
 
+    # STRICT ADMIN ROLES: Only these 3 will be redirected to the Admin Dashboard
     EXECUTIVE_ROLES = [
         'president',
         'treasurer',
@@ -67,16 +67,19 @@ class Student(models.Model):
 
     registration_date = models.DateField(auto_now_add=True)
 
-    # 🔥 FIX: Added the missing is_executive method
     def is_executive(self):
-        """Checks if the student's member_type is in the executive roles list."""
+        """Used by views.py to determine if the user goes to Admin or Student home."""
         return self.member_type in self.EXECUTIVE_ROLES
 
     def save(self, *args, **kwargs):
-        # Sync email and username with the User model
+        # Force email to lowercase for consistency
+        if self.email:
+            self.email = self.email.lower()
+
+        # Sync email and username with the connected User model
         if self.user:
             update_user = False
-            if self.email and self.user.username != self.email:
+            if self.email and (self.user.username != self.email or self.user.email != self.email):
                 self.user.username = self.email
                 self.user.email = self.email
                 update_user = True
@@ -84,13 +87,13 @@ class Student(models.Model):
             if update_user:
                 self.user.save()
 
-        # Update executive_position based on member_type
+        # Update executive_position based only on the 3 admin roles
         if self.is_executive():
             self.executive_position = self.member_type
         else:
             self.executive_position = None
 
-        # Serial number generation logic
+        # Serial number generation logic (NUSSNHQ/YEAR/0001)
         if not self.serial_number:
             year = timezone.now().year
             last_student = Student.objects.filter(

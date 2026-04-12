@@ -30,11 +30,12 @@ def register_student(request):
 
 
 # ---------------------------
-# LOGIN (FIXED: Removed duplicate and added safe checks)
+# LOGIN
 # ---------------------------
 def login_view(request):
     if request.method == "POST":
-        email_input = request.POST.get("username") 
+        # Normalize email to lowercase to match the registration data
+        email_input = request.POST.get("username").lower() if request.POST.get("username") else ""
         password_input = request.POST.get("password")
 
         # Authenticate using email as username
@@ -46,10 +47,11 @@ def login_view(request):
             # Fetch student profile
             student = Student.objects.filter(user=user).first()
             
-            # Use hasattr to safely check for the executive method
+            # Safety check: is_executive() only returns True for President, Treasurer, and Fin Sec
             if student and hasattr(student, 'is_executive') and student.is_executive():
                 return redirect('admin_dashboard')
             
+            # Everyone else (Senate, PRO, Students) goes to student_home
             return redirect('student_home')
         else:
             messages.error(request, "Invalid login details. Please use your registered email.")
@@ -64,18 +66,12 @@ def student_home(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    student, created = Student.objects.get_or_create(
-        user=request.user,
-        defaults={
-            "full_name": request.user.first_name or request.user.username,
-            "email": request.user.email or "",
-            "school": "Not set",
-            "department": "Not set",
-            "level": "Not set",
-            "phone": "Not set",
-            "member_type": "student_member"
-        }
-    )
+    student = Student.objects.filter(user=request.user).first()
+    
+    # If no profile exists for some reason, we avoid a crash
+    if not student:
+        messages.error(request, "Student profile not found.")
+        return redirect('home')
 
     return render(request, "student_home.html", {
         "student": student,
@@ -94,11 +90,12 @@ def admin_dashboard(request):
 
     student = Student.objects.filter(user=request.user).first()
 
-    # Safety check for admin access
+    # Safety check for admin access based on the 3 roles defined in Models
     is_exec = False
     if student and hasattr(student, 'is_executive'):
         is_exec = student.is_executive()
 
+    # Admin access requires superuser status OR being one of the 3 specific roles
     is_admin = request.user.is_staff or request.user.is_superuser or is_exec
 
     if not is_admin:
@@ -119,6 +116,7 @@ def admin_dashboard(request):
 # ---------------------------
 def create_event(request):
     if not request.user.is_staff:
+        messages.error(request, "Only admins can create events.")
         return redirect('login')
     form = EventForm(request.POST or None)
     if form.is_valid():
@@ -132,6 +130,7 @@ def create_event(request):
 # ---------------------------
 def create_fundraising(request):
     if not request.user.is_staff:
+        messages.error(request, "Only admins can create fundraising.")
         return redirect('login')
     form = FundraisingForm(request.POST or None)
     if form.is_valid():

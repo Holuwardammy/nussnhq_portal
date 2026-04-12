@@ -2,7 +2,6 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import Student, Event, Fundraising, Payment
 
-
 class StudentForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'placeholder': 'Enter password'}),
@@ -63,24 +62,26 @@ class StudentForm(forms.ModelForm):
         }
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
+        # Normalize email to lowercase to prevent login mismatches
+        email = self.cleaned_data.get('email').lower()
 
         if Student.objects.filter(email=email).exists():
             raise forms.ValidationError("A student with this email already exists.")
 
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(username=email).exists():
             raise forms.ValidationError("This email is already registered.")
 
         return email
 
     def save(self, commit=True):
         student = super().save(commit=False)
-        email = self.cleaned_data.get('email')
+        email = self.cleaned_data.get('email').lower()
         password = self.cleaned_data.get('password')
         full_name = self.cleaned_data.get('full_name')
         member_type = self.cleaned_data.get('member_type')
 
-        admin_roles = ["president", "treasurer", "financial_secretary"]
+        # STICKING TO YOUR RULES: Only these three get Admin access
+        admin_roles = ['president', 'treasurer', 'financial_secretary']
         is_admin = member_type in admin_roles
 
         # Use email as the username
@@ -93,13 +94,18 @@ class StudentForm(forms.ModelForm):
                 password=password
             )
         
+        # Sync names
         name_parts = full_name.strip().split()
         user.first_name = name_parts[0] if name_parts else ""
         user.last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
+        
+        # ONLY True for President, Treasurer, and Fin Sec
         user.is_staff = is_admin
         user.save()
 
         student.user = user
+        student.email = email
+        
         if commit:
             student.save()
         return student
