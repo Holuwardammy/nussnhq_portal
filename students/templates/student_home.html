@@ -98,7 +98,7 @@
 
             <div class="payment-action-area">
                 {% if not payments or payments.first.status == 'pending' %}
-                    <a href="{% url 'submit_payment' %}" class="btn-pay">Make Payment / Upload Receipt</a>
+                    <a href="{% url 'payment_instructions' %}" class="btn-pay">Make Payment / Upload Receipt</a>
                 {% elif payments.first.status == 'processing' %}
                     <p class="wait-msg">Receipt Verification in Progress...</p>
                 {% endif %}

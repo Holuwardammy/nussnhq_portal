@@ -1,4 +1,4 @@
-/* Premium Payment Styles */
+/* Premium Payment Flow Styles (Merged) */
 :root {
     --primary: #1e3a8a;
     --accent: #2563eb;
@@ -7,6 +7,7 @@
     --text-main: #0f172a;
     --text-muted: #64748b;
     --bg-gray: #f1f5f9;
+    --white: #ffffff;
 }
 
 body {
@@ -26,7 +27,7 @@ body {
 }
 
 .payment-card {
-    background: white;
+    background: var(--white);
     padding: 40px;
     border-radius: 24px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
@@ -52,8 +53,8 @@ body {
 .card-header h1 { font-size: 24px; color: var(--primary); margin: 0; }
 .card-header p { font-size: 14px; color: var(--text-muted); margin-top: 5px; }
 
-/* Details Section */
-.details-section {
+/* Details & Form Section */
+.details-section, .upload-form {
     background: var(--bg-gray);
     padding: 25px;
     border-radius: 16px;
@@ -72,7 +73,7 @@ body {
     text-transform: uppercase;
     color: var(--text-muted);
     font-weight: 700;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 .detail-value {
@@ -96,9 +97,43 @@ body {
     color: var(--text-main);
 }
 
+/* Form Specific Inputs */
+.input-readonly {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+    font-weight: 700;
+    color: var(--success);
+    font-size: 18px;
+    box-sizing: border-box;
+}
+
+.file-group {
+    margin-top: 20px;
+}
+
+.file-input {
+    width: 100%;
+    padding: 15px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    background: var(--white);
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.file-input:hover {
+    border-color: var(--accent);
+    background: #f0f7ff;
+}
+
+/* Action Elements */
 .copy-btn {
     background: var(--primary);
-    color: white;
+    color: var(--white);
     border: none;
     padding: 6px 12px;
     border-radius: 6px;
@@ -131,20 +166,24 @@ body {
     line-height: 1.6;
 }
 
-/* Button & Footer */
-.btn-primary-link {
+/* Buttons */
+.btn-primary-link, .submit-btn {
     display: block;
+    width: 100%;
     text-align: center;
     text-decoration: none;
     background: var(--primary);
-    color: white;
+    color: var(--white);
     padding: 16px;
     border-radius: 12px;
     font-weight: 700;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
     transition: 0.3s;
 }
 
-.btn-primary-link:hover {
+.btn-primary-link:hover, .submit-btn:hover {
     background: var(--accent);
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
@@ -159,6 +198,7 @@ body {
     font-size: 13px;
     color: var(--text-muted);
     text-decoration: none;
+    transition: 0.2s;
 }
 
 .cancel-link:hover { color: #ef4444; }
