@@ -78,63 +78,59 @@
     </div>
 
     <!-- ===================== STUDENTS ===================== -->
-    <div id="students-tab" class="tab-content active">
-        <h2>Registered Students</h2>
-
-        <table>
-            <thead>
+<div id="students-tab" class="tab-content active">
+    <h2>Registered Students</h2>
+    <table>
+        <thead>
             <tr>
                 <th>Profile</th>
                 <th>Full Name</th>
-                <th>Email</th>
-                <th>Phone</th>
+                <th class="desktop-only">Email</th>
+                <th class="desktop-only">Phone</th>
                 <th>School</th>
-                <th>Department</th>
-                <th>Level</th>
-                <th>Age</th>
-                <th>State</th>
-                <th>Nationality</th>
-                <th>Serial</th>
+                <th class="desktop-only">Dept</th>
                 <th>Action</th>
             </tr>
-            </thead>
-
-            <tbody>
-            {% for student in students %}
-                <tr>
-                    <td>
-                        {% if student.profile_picture %}
-                            <img src="{{ student.profile_picture.url }}" class="profile-pic">
-                        {% else %}
-                            <img src="{% static 'images/default_profile.png' %}" class="profile-pic">
-                        {% endif %}
-                    </td>
-
-                    <td>{{ student.full_name }}</td>
-                    <td>{{ student.user.email }}</td>
-                    <td>{{ student.phone }}</td>
-                    <td>{{ student.school }}</td>
-                    <td>{{ student.department }}</td>
-                    <td>{{ student.level }}</td>
-                    <td>{{ student.age }}</td>
-                    <td>{{ student.state }}</td>
-                    <td>{{ student.nationality }}</td>
-                    <td>{{ student.serial_number }}</td>
-
-                    <td>
-                        <a href="{% url 'delete_student' student.id %}"
-                           onclick="return confirm('Delete this student?');"
-                           class="button delete-btn">
-                            Delete
-                        </a>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr><td colspan="12">No students found.</td></tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        </thead>
+        <tbody>
+        {% for student in students %}
+            <tr>
+                <td>
+                    {% if student.profile_picture %}
+                        <img src="{{ student.profile_picture.url }}" class="profile-pic">
+                    {% else %}
+                        <img src="{% static 'images/default_profile.png' %}" class="profile-pic">
+                    {% endif %}
+                </td>
+                <td>{{ student.full_name }}</td>
+                <td class="desktop-only">{{ student.user.email }}</td>
+                <td class="desktop-only">{{ student.phone }}</td>
+                <td>{{ student.school }}</td>
+                <td class="desktop-only">{{ student.department }}</td>
+                <td>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="button" style="background: var(--luxury-gold); color: var(--primary-blue);"
+                            onclick="openModal({
+                                'name': '{{ student.full_name }}',
+                                'email': '{{ student.user.email }}',
+                                'phone': '{{ student.phone }}',
+                                'school': '{{ student.school }}',
+                                'dept': '{{ student.department }}',
+                                'level': '{{ student.level }}',
+                                'age': '{{ student.age }}',
+                                'state': '{{ student.state }}',
+                                'nat': '{{ student.nationality }}',
+                                'serial': '{{ student.serial_number }}'
+                            })">View</button>
+                        
+                        <a href="{% url 'delete_student' student.id %}" class="button delete-btn">Del</a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 
     <!-- ===================== PAYMENTS ===================== -->
     <div id="payments-tab" class="tab-content">
@@ -245,21 +241,62 @@
 
 </div>
 
-<!-- ===================== TAB SCRIPT ===================== -->
+<div id="studentModal" class="modal-overlay">
+    <div class="modal-card">
+        <span onclick="closeModal()" class="close-x">&times;</span>
+        <h2 id="modalName"></h2>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
 <script>
-const buttons = document.querySelectorAll('.tab-btn');
-const contents = document.querySelectorAll('.tab-content');
+    // Unified Script for Tabs and Modal
+    document.addEventListener('DOMContentLoaded', () => {
+        // TAB LOGIC
+        const buttons = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
 
-buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
 
-        buttons.forEach(b => b.classList.remove('active'));
-        contents.forEach(c => c.classList.remove('active'));
-
-        btn.classList.add('active');
-        document.getElementById(btn.dataset.tab).classList.add('active');
+                btn.classList.add('active');
+                const target = btn.getAttribute('data-tab');
+                document.getElementById(target).classList.add('active');
+            });
+        });
     });
-});
+
+    // MODAL FUNCTIONS
+    function openModal(data) {
+        const modal = document.getElementById('studentModal');
+        modal.style.display = 'flex';
+        document.getElementById('modalName').innerText = data.name;
+        document.getElementById('modalContent').innerHTML = `
+            <div class="info-row"><strong>Email:</strong> ${data.email}</div>
+            <div class="info-row"><strong>Phone:</strong> ${data.phone}</div>
+            <div class="info-row"><strong>School:</strong> ${data.school}</div>
+            <div class="info-row"><strong>Dept:</strong> ${data.dept}</div>
+            <div class="info-row"><strong>Level:</strong> ${data.level}</div>
+            <div class="info-row"><strong>Age:</strong> ${data.age}</div>
+            <div class="info-row"><strong>State:</strong> ${data.state}</div>
+            <div class="info-row"><strong>Nationality:</strong> ${data.nat}</div>
+            <div class="info-row"><strong>Serial:</strong> ${data.serial}</div>
+        `;
+    }
+
+    function closeModal() {
+        document.getElementById('studentModal').style.display = 'none';
+    }
+
+    // Close on outside click
+    window.onclick = function(event) {
+        const modal = document.getElementById('studentModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
 </script>
 
 </body>
