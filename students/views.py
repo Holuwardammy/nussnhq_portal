@@ -3,6 +3,8 @@ from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.db.models import Sum
+from django.contrib.auth.decorators import login_required
 
 from .models import Student, Payment, Event, Fundraising
 from .forms import StudentForm, EventForm, FundraisingForm
@@ -19,7 +21,7 @@ def register_student(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save() # The form handles user creation and hashing
+            form.save()
             messages.success(request, "Registration Successful! Please login with your email.")
             return redirect('login')
         else:
@@ -34,27 +36,22 @@ def register_student(request):
 # ---------------------------
 def login_view(request):
     if request.method == "POST":
-        # Normalize email to lowercase to match the registration data
         email_input = request.POST.get("username").lower() if request.POST.get("username") else ""
         password_input = request.POST.get("password")
 
-        # Authenticate using email as username
         user = authenticate(request, username=email_input, password=password_input)
 
         if user:
             login(request, user)
-            
-            # Fetch student profile
             student = Student.objects.filter(user=user).first()
             
-            # Safety check: is_executive() only returns True for President, Treasurer, and Fin Sec
-            if student and hasattr(student, 'is_executive') and student.is_executive():
+            # Redirect logic based on specific Executive Roles
+            if student and student.is_executive():
                 return redirect('admin_dashboard')
             
-            # Everyone else (Senate, PRO, Students) goes to student_home
             return redirect('student_home')
         else:
-            messages.error(request, "Invalid login details. Please use your registered email.")
+            messages.error(request, "Invalid login details.")
 
     return render(request, 'login.html')
 
@@ -62,17 +59,9 @@ def login_view(request):
 # ---------------------------
 # STUDENT HOME
 # ---------------------------
+@login_required
 def student_home(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-
-    student = Student.objects.filter(user=request.user).first()
-    
-    # If no profile exists for some reason, we avoid a crash
-    if not student:
-        messages.error(request, "Student profile not found.")
-        return redirect('home')
-
+    student = get_object_or_404(Student, user=request.user)
     return render(request, "student_home.html", {
         "student": student,
         "payments": Payment.objects.filter(student=student),
@@ -82,101 +71,128 @@ def student_home(request):
 
 
 # ---------------------------
-# ADMIN DASHBOARD
+# ADMIN DASHBOARD (PRESIDENT, TREASURER, FIN SEC)
 # ---------------------------
+@login_required
 def admin_dashboard(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
+    admin_student = Student.objects.filter(user=request.user).first()
 
-    student = Student.objects.filter(user=request.user).first()
-
-    # Safety check for admin access based on the 3 roles defined in Models
-    is_exec = False
-    if student and hasattr(student, 'is_executive'):
-        is_exec = student.is_executive()
-
-    # Admin access requires superuser status OR being one of the 3 specific roles
-    is_admin = request.user.is_staff or request.user.is_superuser or is_exec
-
-    if not is_admin:
-        messages.error(request, "Access denied. Admins only.")
+    # Access Control: Only President, Treasurer, Fin Sec, or Superuser
+    if not (request.user.is_staff or (admin_student and admin_student.is_executive())):
+        messages.error(request, "Access denied. Executives only.")
         return redirect('student_home')
+
+    # --- FINANCIAL DATA (Optimized for Treasurer) ---
+    total_income = Payment.objects.filter(status='paid').aggregate(Sum('amount'))['amount__sum'] or 0
+    awaiting_verification = Payment.objects.filter(status='processing')
+    unpaid_count = Student.objects.filter(payment__status='pending').count() + Student.objects.filter(payment__isnull=True).count()
 
     return render(request, "admin_dashboard.html", {
         "students": Student.objects.all(),
-        "payments": Payment.objects.all(),
+        "total_income": total_income,
+        "unpaid_count": unpaid_count,
+        "awaiting_verification": awaiting_verification,
         "events": Event.objects.all(),
         "fundraising": Fundraising.objects.all(),
-        "admin_student": student
+        "admin_student": admin_student # Used in template to check roles
     })
 
 
 # ---------------------------
-# EVENT
+# SUBMIT PAYMENT (Student Side)
 # ---------------------------
+@login_required
+def submit_payment(request):
+    student = get_object_or_404(Student, user=request.user)
+
+    if request.method == "POST":
+        amount = request.POST.get('amount')
+        receipt = request.FILES.get('receipt')
+
+        if receipt:
+            payment, created = Payment.objects.get_or_create(student=student)
+            payment.amount = amount
+            payment.payment_receipt = receipt
+            payment.status = 'processing' 
+            payment.save()
+            
+            messages.success(request, "Payment submitted! The Financial Secretary will verify it shortly.")
+            return redirect('student_home')
+        
+    return render(request, 'submit_payment.html', {'student': student})
+
+
+# ---------------------------
+# APPROVE PAYMENT (Financial Secretary / President Only)
+# ---------------------------
+@login_required
+def approve_payment(request, payment_id):
+    admin_student = Student.objects.filter(user=request.user).first()
+    
+    # Strictly for Fin Sec or President (Full Access)
+    can_approve = request.user.is_staff or (admin_student and (admin_student.is_financial_secretary() or admin_student.is_president()))
+    
+    if not can_approve:
+        messages.error(request, "Only the Financial Secretary or President can approve payments.")
+        return redirect('admin_dashboard')
+
+    payment = get_object_or_404(Payment, id=payment_id)
+    payment.status = 'paid'
+    payment.save()
+
+    messages.success(request, f"Successfully verified payment for {payment.student.full_name}.")
+    return redirect('admin_dashboard')
+
+
+# ---------------------------
+# DELETE STUDENT (President / Staff Only)
+# ---------------------------
+@login_required
+def delete_student(request, student_id):
+    admin_student = Student.objects.filter(user=request.user).first()
+    
+    # Strictly for President or Superuser
+    if not (request.user.is_staff or (admin_student and admin_student.is_president())):
+        messages.error(request, "Only the President has authority to delete records.")
+        return redirect('admin_dashboard')
+
+    student = get_object_or_404(Student, id=student_id)
+    if student.user:
+        student.user.delete()
+    student.delete()
+    messages.success(request, "Student record deleted successfully.")
+    return redirect('admin_dashboard')
+
+
+# ---------------------------
+# EVENTS & FUNDRAISING (President / Staff Only)
+# ---------------------------
+@login_required
 def create_event(request):
-    if not request.user.is_staff:
-        messages.error(request, "Only admins can create events.")
-        return redirect('login')
+    admin_student = Student.objects.filter(user=request.user).first()
+    if not (request.user.is_staff or (admin_student and admin_student.is_president())):
+        messages.error(request, "Only the President can create events.")
+        return redirect('admin_dashboard')
+
     form = EventForm(request.POST or None)
     if form.is_valid():
         form.save()
         return redirect('admin_dashboard')
     return render(request, 'create_event.html', {'form': form})
 
-
-# ---------------------------
-# FUNDRAISING
-# ---------------------------
+@login_required
 def create_fundraising(request):
-    if not request.user.is_staff:
-        messages.error(request, "Only admins can create fundraising.")
-        return redirect('login')
+    admin_student = Student.objects.filter(user=request.user).first()
+    if not (request.user.is_staff or (admin_student and admin_student.is_president())):
+        messages.error(request, "Only the President can create fundraising campaigns.")
+        return redirect('admin_dashboard')
+
     form = FundraisingForm(request.POST or None)
     if form.is_valid():
         form.save()
         return redirect('admin_dashboard')
     return render(request, 'create_fundraising.html', {'form': form})
 
-
-# ---------------------------
-# PAYMENT
-# ---------------------------
-def mark_payment(request, student_id):
-    if not request.user.is_staff:
-        return redirect('login')
-        
-    student = get_object_or_404(Student, id=student_id)
-    payment, created = Payment.objects.get_or_create(student=student)
-
-    payment.paid = True
-    payment.date_paid = timezone.now()
-    payment.save()
-
-    return redirect('admin_dashboard')
-
-
-# ---------------------------
-# LOGOUT
-# ---------------------------
 def logout_view(request):
     logout(request)
     return redirect('home')
-
-
-# ---------------------------
-# DELETE STUDENT
-# ---------------------------
-def delete_student(request, student_id):
-    if not request.user.is_staff:
-        return redirect('login')
-
-    student = get_object_or_404(Student, id=student_id)
-
-    if student.user:
-        student.user.delete()
-
-    student.delete()
-
-    messages.success(request, "Deleted successfully.")
-    return redirect('admin_dashboard')

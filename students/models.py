@@ -67,9 +67,19 @@ class Student(models.Model):
 
     registration_date = models.DateField(auto_now_add=True)
 
+    # --- HIERARCHY HELPERS ---
     def is_executive(self):
         """Used by views.py to determine if the user goes to Admin or Student home."""
         return self.member_type in self.EXECUTIVE_ROLES
+
+    def is_president(self):
+        return self.member_type == 'president'
+
+    def is_treasurer(self):
+        return self.member_type == 'treasurer'
+
+    def is_financial_secretary(self):
+        return self.member_type == 'financial_secretary'
 
     def save(self, *args, **kwargs):
         # Force email to lowercase for consistency
@@ -140,13 +150,36 @@ class Fundraising(models.Model):
 
 
 # ---------------------------
-# PAYMENT MODEL
+# PAYMENT MODEL (UPDATED FOR NIGERIAN BANK TRANSFERS)
 # ---------------------------
 class Payment(models.Model):
+    PAYMENT_STATUS = [
+        ('pending', 'Pending'),
+        ('processing', 'Awaiting Verification'),
+        ('paid', 'Paid'),
+    ]
+
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    # NEW FIELDS FOR MANUAL TRANSFER
+    status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default='pending')
+    payment_receipt = models.ImageField(upload_to='receipts/', null=True, blank=True)
+    
+    # Legacy field support (keeps existing logic working)
     paid = models.BooleanField(default=False)
+    
     date_paid = models.DateTimeField(null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        # Automatically set 'paid' boolean based on status string
+        if self.status == 'paid':
+            self.paid = True
+            if not self.date_paid:
+                self.date_paid = timezone.now()
+        else:
+            self.paid = False
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.student.full_name} - {'Paid' if self.paid else 'Pending'}"
+        return f"{self.student.full_name} - {self.get_status_display()}"

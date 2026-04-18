@@ -2,19 +2,36 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # ==========================================
+    # CORE AUTHENTICATION & NAVIGATION
+    # ==========================================
     path('', views.home, name='home'),
     path('register/', views.register_student, name='register_student'),
     path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    
+    # ==========================================
+    # DASHBOARDS
+    # ==========================================
     path('student_home/', views.student_home, name='student_home'),
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
 
-    # path('dashboard/', views.dashboard, name='dashboard'),
-
+    # ==========================================
+    # PAYMENT & VERIFICATION SYSTEM
+    # ==========================================
+    # Student side: Upload transfer evidence
+    path('payment/submit/', views.submit_payment, name='submit_payment'),
+    
+    # Fin Sec / President side: Approve after checking bank app
+    path('payment/approve/<int:payment_id>/', views.approve_payment, name='approve_payment'),
+    
+    # ==========================================
+    # EXECUTIVE MANAGEMENT TOOLS
+    # ==========================================
+    # President only: Event & Campaign Creation
     path('create_event/', views.create_event, name='create_event'),
     path('create_fundraising/', views.create_fundraising, name='create_fundraising'),
-    path('mark_payment/<int:student_id>/', views.mark_payment, name='mark_payment'),
-    path('logout/', views.logout_view, name='logout'),
-
-    # DELETE STUDENT
+    
+    # President only: Record Management
     path('delete_student/<int:student_id>/', views.delete_student, name='delete_student'),
 ]
