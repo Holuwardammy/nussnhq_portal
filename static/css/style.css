@@ -799,3 +799,103 @@ footer {
     .footer-left p { margin: 0 auto; }
     .social-links { justify-content: center; }
 }
+
+/* =========================================
+   STRICT MOBILE "BOLD" VIEW (Home Page)
+   ========================================= */
+@media (max-width: 850px) {
+    /* 1. Navbar Bold Fix */
+    #navbar {
+        padding: 0 20px;
+        height: 70px;
+    }
+
+    #navbar h2 {
+        font-size: 1.4rem;
+        width: 100%;
+        text-align: center; /* Center the brand on mobile */
+    }
+
+    /* 2. Hero Section - Full Screen Impact */
+    .hero {
+        padding: 0 15px;
+        background-attachment: scroll; /* Fixes laggy background on mobile */
+    }
+
+    .hero h1 {
+        font-size: 2.8rem; /* Large and bold */
+        line-height: 1.1;
+        margin-bottom: 15px;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+    }
+
+    .btn-hero {
+        width: 90%; /* Wide, bold button */
+        padding: 20px;
+        font-size: 1.1rem;
+        border-radius: 15px;
+    }
+
+    /* 3. Section Headers */
+    .about h2, .programs h2, .events h2, .gallery h2, .contact h2 {
+        font-size: 2.2rem;
+        width: 100%;
+    }
+
+    /* 4. Bold Cards (1 Column) */
+    .about-cards, .programs-container, .events-container, .gallery-container {
+        grid-template-columns: 1fr !important; 
+        gap: 25px;
+    }
+
+    .card, .program, .event-card {
+        padding: 40px 25px;
+        border-radius: 20px;
+        width: 100%;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .program:hover {
+        transform: translateY(-5px); /* Simple vertical pop for mobile */
+    }
+
+    /* 5. Gallery - Make items larger */
+    .gallery-item {
+        height: 350px;
+    }
+
+    /* 6. Contact Form - Full Width */
+    .contact-container {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .contact-form {
+        width: 100%;
+        padding: 30px 20px;
+    }
+
+    .contact-form button {
+        padding: 20px;
+        font-size: 1.2rem;
+    }
+
+    /* 7. Footer */
+    footer {
+        padding: 60px 20px 30px;
+        text-align: center;
+    }
+
+    .footer-left p {
+        margin: 0 auto;
+    }
+
+    .social-links {
+        justify-content: center;
+        margin-top: 25px;
+    }
+}

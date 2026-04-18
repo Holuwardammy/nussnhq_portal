@@ -175,26 +175,50 @@ button[type="submit"]:hover {
 }
 
 /* ==========================
-   MOBILE RESPONSIVENESS
+   STRICT MOBILE "BOLD" VIEW
    ========================== */
-
-@media (max-width: 480px) {
+@media (max-width: 850px) {
     body {
-        align-items: flex-start; /* Start from top on small phones */
-        padding-top: 40px;
+        /* Centering the card vertically for a cleaner look */
+        align-items: center; 
+        padding: 20px 0;
     }
 
     .login-container {
-        padding: 40px 25px;
+        /* This creates the "Bold" centered card feel */
+        width: 92%; 
+        max-width: 400px;
+        padding: 45px 30px; 
         border-radius: 20px;
-        width: 85%; /* Adds a bit of space on the sides */
+        margin: auto;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); /* Stronger shadow for depth */
+        border: 2px solid rgba(255, 215, 0, 0.4); /* Thicker gold border */
     }
 
     .login-container h2 {
-        font-size: 1.8rem;
+        font-size: 2rem;
+        margin-bottom: 25px;
     }
 
+    /* Bolder Inputs */
     input {
-        font-size: 16px; /* Prevents auto-zoom on iOS */
+        padding: 16px; /* Taller touch target */
+        font-size: 16px; /* Critical: stops iPhone zoom-in glitch */
+        border-radius: 14px;
+        margin-bottom: 25px; /* More breathing room */
+    }
+
+    /* Bolder Button */
+    button[type="submit"] {
+        padding: 18px;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Make links easier to tap */
+    .login-container p {
+        margin-top: 30px;
+        font-size: 1rem;
     }
 }

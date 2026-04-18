@@ -304,3 +304,65 @@ tbody td {
     cursor: pointer;
     color: #ef4444;
 }
+
+/* =========================================
+   STRICT MOBILE "BOLD" VIEW (Under 850px)
+   ========================================= */
+@media (max-width: 850px) {
+    /* 1. Make the main container take up the full width */
+    .container {
+        padding: 15px 10px; /* Thinner padding for more room */
+        width: 100%;
+    }
+
+    /* 2. Stack Stats - 1 Column for that "Bold" look */
+    .stats-grid {
+        grid-template-columns: 1fr !important; 
+        gap: 15px;
+    }
+
+    .stat-card {
+        padding: 25px; /* Bigger padding for a bolder feel */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card p {
+        font-size: 2rem; /* Make numbers pop more */
+    }
+
+    /* 3. Force Admin Welcome and Tab Content to center bold */
+    .admin-welcome, .tab-content {
+        width: 100%;
+        margin: 0 auto 20px auto;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+
+    /* 4. Tab Buttons - Make them bigger for thumbs */
+    .tab-btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        flex: 1; /* Stretch them to fill the bar */
+        text-align: center;
+    }
+
+    /* 5. The Table - Add a clear 'Swipe' indicator feel */
+    table {
+        border-radius: 8px;
+    }
+
+    /* 6. Buttons - Make them touch-friendly and bold */
+    .button, .logout-btn a {
+        display: block;
+        text-align: center;
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    /* Ensure Modal stays centered and bold on small screens */
+    .modal-card {
+        width: 95%;
+        margin: 10px;
+        padding: 20px;
+    }
+}
