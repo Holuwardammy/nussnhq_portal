@@ -99,15 +99,23 @@ def admin_dashboard(request):
 
 
 # ---------------------------
-# SUBMIT PAYMENT (Student Side)
+# PAYMENT FLOW (Student Side)
 # ---------------------------
+
+@login_required
+def payment_instructions(request):
+    """Step 1: Show the student where to send the money"""
+    student = get_object_or_404(Student, user=request.user)
+    return render(request, 'payment_instructions.html', {'student': student})
+
 @login_required
 def submit_payment(request):
+    """Step 2: Student uploads the screenshot of the transfer"""
     student = get_object_or_404(Student, user=request.user)
 
     if request.method == "POST":
         amount = request.POST.get('amount')
-        receipt = request.FILES.get('receipt')
+        receipt = request.FILES.get('payment_receipt') # Ensure this matches the HTML name attribute
 
         if receipt:
             payment, created = Payment.objects.get_or_create(student=student)

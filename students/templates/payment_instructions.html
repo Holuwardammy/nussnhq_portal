@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Instructions | NUSSNHQ</title>
+    <link rel="stylesheet" href="{% static 'css/submit_payment.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="payment-card">
+            <div class="card-header">
+                <div class="lock-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                </div>
+                <h1>Step 1: Transfer</h1>
+                <p>Please pay into the account details below</p>
+            </div>
+
+            <div class="details-section">
+                <div class="detail-group">
+                    <label>Bank Name</label>
+                    <div class="detail-value bank-name">United Bank for Africa (UBA)</div>
+                </div>
+
+                <div class="detail-group">
+                    <label>Account Number</label>
+                    <div class="acc-row">
+                        <span id="acc-num">2371510908</span>
+                        <button onclick="copyAcc()" class="copy-btn">Copy</button>
+                    </div>
+                </div>
+
+                <div class="detail-group">
+                    <label>Account Name</label>
+                    <div class="detail-value">NUSS National Headquarters</div>
+                </div>
+
+                <div class="detail-group">
+                    <label>Amount To Pay</label>
+                    <div class="amount-value">₦5,000.00</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <p>
+                    <strong>Crucial:</strong> Take a clear screenshot of your successful transaction receipt before proceeding to the next step.
+                </p>
+            </div>
+
+            <a href="{% url 'submit_payment' %}" class="btn-primary-link">
+                I Have Made the Transfer
+            </a>
+
+            <div class="card-footer">
+                <a href="{% url 'student_home' %}" class="cancel-link">Cancel Payment</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyAcc() {
+            const acc = document.getElementById('acc-num').innerText;
+            navigator.clipboard.writeText(acc);
+            alert("Account number copied to clipboard!");
+        }
+    </script>
+</body>
+</html>

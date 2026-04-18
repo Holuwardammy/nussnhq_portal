@@ -19,10 +19,13 @@ urlpatterns = [
     # ==========================================
     # PAYMENT & VERIFICATION SYSTEM
     # ==========================================
-    # Student side: Upload transfer evidence
+    # 1. Show Bank Details First
+    path('payment/instructions/', views.payment_instructions, name='payment_instructions'),
+    
+    # 2. Student side: Upload transfer evidence
     path('payment/submit/', views.submit_payment, name='submit_payment'),
     
-    # Fin Sec / President side: Approve after checking bank app
+    # 3. Fin Sec / President side: Approve after checking bank app
     path('payment/approve/<int:payment_id>/', views.approve_payment, name='approve_payment'),
     
     # ==========================================

@@ -1,19 +1,18 @@
+/* Premium Payment Styles */
 :root {
     --primary: #1e3a8a;
     --accent: #2563eb;
-    --text-main: #1e293b;
+    --success: #059669;
+    --warning: #f59e0b;
+    --text-main: #0f172a;
     --text-muted: #64748b;
-    --bg-page: #f8fafc;
-    --glass-bg: rgba(255, 255, 255, 0.95);
+    --bg-gray: #f1f5f9;
 }
-
-* { box-sizing: border-box; }
 
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background-color: var(--bg-page);
-    color: var(--text-main);
+    background-color: #f8fafc;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -22,22 +21,21 @@ body {
 
 .page-wrapper {
     width: 100%;
+    max-width: 480px;
     padding: 20px;
-    display: flex;
-    justify-content: center;
 }
 
 .payment-card {
-    background: var(--glass-bg);
-    width: 100%;
-    max-width: 480px;
+    background: white;
     padding: 40px;
     border-radius: 24px;
-    box-shadow: 0 20px 50px rgba(30, 58, 138, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
 }
 
-.card-header { text-align: center; margin-bottom: 30px; }
+.card-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
 
 .lock-icon {
     background: #eff6ff;
@@ -51,78 +49,116 @@ body {
     margin: 0 auto 15px;
 }
 
-.card-header h1 { font-size: 24px; margin: 0; color: var(--primary); }
+.card-header h1 { font-size: 24px; color: var(--primary); margin: 0; }
 .card-header p { font-size: 14px; color: var(--text-muted); margin-top: 5px; }
 
-.input-group { margin-bottom: 25px; }
-.input-group label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; color: var(--text-main); }
+/* Details Section */
+.details-section {
+    background: var(--bg-gray);
+    padding: 25px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+}
 
-.input-wrapper { position: relative; }
-.currency { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-weight: bold; color: var(--primary); }
+.detail-group {
+    margin-bottom: 20px;
+}
 
-input[type="number"] {
-    width: 100%;
-    padding: 14px 14px 14px 35px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
+.detail-group:last-child { margin-bottom: 0; }
+
+.detail-group label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.detail-value {
     font-size: 16px;
-    transition: 0.3s;
-    outline: none;
+    font-weight: 600;
+    color: var(--primary);
 }
 
-input[type="number"]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+.bank-name { font-size: 18px; }
 
-/* Custom File Upload Styling */
-.file-upload-zone {
-    border: 2px dashed #cbd5e1;
-    border-radius: 12px;
-    padding: 30px 20px;
-    text-align: center;
-    position: relative;
-    background: #fdfdfd;
-    transition: 0.3s;
+.acc-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.file-upload-zone:hover { border-color: var(--accent); background: #f0f7ff; }
+#acc-num {
+    font-family: 'Courier New', monospace;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
 
-.file-upload-zone input[type="file"] {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0; left: 0;
-    opacity: 0;
+.copy-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
     cursor: pointer;
+    transition: 0.2s;
 }
 
-.upload-content svg { color: var(--text-muted); margin-bottom: 10px; }
-.upload-content p { font-size: 14px; margin: 5px 0; color: var(--text-main); }
-.upload-content span { font-size: 11px; color: var(--text-muted); }
+.copy-btn:hover { background: var(--accent); }
 
-.btn-primary {
-    width: 100%;
+.amount-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--success);
+}
+
+/* Alert Box */
+.warning-box {
+    background: #fffbeb;
+    border-left: 4px solid var(--warning);
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: 4px;
+}
+
+.warning-box p {
+    font-size: 13px;
+    color: #92400e;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Button & Footer */
+.btn-primary-link {
+    display: block;
+    text-align: center;
+    text-decoration: none;
     background: var(--primary);
     color: white;
     padding: 16px;
-    border: none;
     border-radius: 12px;
-    font-size: 16px;
     font-weight: 700;
-    cursor: pointer;
     transition: 0.3s;
-    margin-top: 10px;
 }
 
-.btn-primary:hover { 
-    background: var(--accent); 
-    transform: translateY(-1px); 
-    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
-
-.card-footer { text-align: center; margin-top: 25px; }
-.back-btn { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: 0.2s; }
-.back-btn:hover { color: #ef4444; }
-
-/* Mobile Optimizations */
-@media (max-width: 480px) {
-    .payment-card { padding: 30px 20px; border-radius: 0; box-shadow: none; }
-    body { background-color: white; }
+.btn-primary-link:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
 }
+
+.card-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.cancel-link {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+.cancel-link:hover { color: #ef4444; }
