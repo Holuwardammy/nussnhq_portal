@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment Portal | NUSSNHQ</title>
+    <link rel="stylesheet" href="{% static 'css/submit_payment.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <div class="payment-card">
+            <div class="card-header">
+                <div class="lock-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <h1>Secure Payment</h1>
+                <p>Upload your transfer receipt for verification</p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" class="payment-form">
+                {% csrf_token %}
+
+                <div class="input-group">
+                    <label for="amount">Transaction Amount</label>
+                    <div class="input-wrapper">
+                        <span class="currency">₦</span>
+                        <input type="number" name="amount" id="amount" placeholder="0.00" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="receipt">Evidence of Payment</label>
+                    <div class="file-upload-zone" id="drop-zone">
+                        <input type="file" name="payment_receipt" id="receipt" accept="image/*" required>
+                        <div class="upload-content">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            <p id="file-name">Click to browse or drag receipt here</p>
+                            <span>PNG, JPG or JPEG up to 5MB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Confirm & Submit Receipt
+                </button>
+            </form>
+
+            <div class="card-footer">
+                <a href="{% url 'student_home' %}" class="back-btn">Cancel and return to dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to show selected file name
+        const fileInput = document.getElementById('receipt');
+        const fileNameDisplay = document.getElementById('file-name');
+        
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files.length > 0) {
+                fileNameDisplay.innerText = e.target.files[0].name;
+                fileNameDisplay.style.color = "#2563eb";
+                fileNameDisplay.style.fontWeight = "bold";
+            }
+        });
+    </script>
+</body>
+</html>
