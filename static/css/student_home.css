@@ -137,6 +137,11 @@ body {
 .no-record { color: #dc2626; }
 .paid { color: #059669; }
 
+/* ADDED PAYMENT STATUS CLASSES */
+.status-paid { color: #059669; font-weight: 800; }
+.status-processing { color: #f59e0b; font-weight: 800; }
+.status-unpaid { color: #dc2626; font-weight: 800; }
+
 .id-card-footer {
     background: #f8fafc;
     padding: 12px;
@@ -144,6 +149,39 @@ body {
     font-size: 11px;
     color: #64748b;
     border-top: 1px solid #e2e8f0;
+}
+
+/* ADDED PAYMENT ACTION AREA & BUTTON */
+.payment-action-area {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.btn-pay {
+    display: inline-block;
+    background: #1e3a8a;
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: 0.3s;
+    box-shadow: 0 4px 6px rgba(30, 58, 138, 0.2);
+}
+
+.btn-pay:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+}
+
+.wait-msg {
+    font-size: 13px;
+    color: #f59e0b;
+    font-weight: 600;
+    background: #fffbeb;
+    padding: 8px;
+    border-radius: 6px;
 }
 
 /* Right side Data Cards */

@@ -23,6 +23,13 @@
 
     <div class="welcome-section">
         <h1>Student Dashboard</h1>
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <p class="message {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 
     <div class="main-layout">
@@ -67,13 +74,15 @@
                                 <label>STATUS</label>
                                 <p class="status-text">
                                     {% if payments %}
-                                        {% for p in payments %}
-                                            {% if p.paid %}
-                                                <span class="paid">PAID ✔</span>
+                                        {% with latest_payment=payments.first %}
+                                            {% if latest_payment.status == 'paid' %}
+                                                <span class="status-paid">PAID ✔</span>
+                                            {% elif latest_payment.status == 'processing' %}
+                                                <span class="status-processing">PENDING ⏳</span>
                                             {% else %}
-                                                <span class="pending">PENDING ⏳</span>
+                                                <span class="status-unpaid">UNPAID ❌</span>
                                             {% endif %}
-                                        {% endfor %}
+                                        {% endwith %}
                                     {% else %}
                                         <span class="no-record">NO RECORD</span>
                                     {% endif %}
@@ -85,6 +94,14 @@
                 <div class="id-card-footer">
                     <p>Valid for the 2026 Academic Session</p>
                 </div>
+            </div>
+
+            <div class="payment-action-area">
+                {% if not payments or payments.first.status == 'pending' %}
+                    <a href="{% url 'submit_payment' %}" class="btn-pay">Make Payment / Upload Receipt</a>
+                {% elif payments.first.status == 'processing' %}
+                    <p class="wait-msg">Receipt Verification in Progress...</p>
+                {% endif %}
             </div>
         </section>
 
@@ -113,7 +130,11 @@
             <div class="notifications-area">
                 <h3>System Notifications</h3>
                 <div class="notify-box">
-                    <p>Welcome to the NUSSNHQ portal. Please ensure your semester dues are cleared to maintain active status.</p>
+                    {% if payments.first.status == 'paid' %}
+                        <p>Your membership is active. You have full access to NUSSNHQ resources.</p>
+                    {% else %}
+                        <p>Welcome to the NUSSNHQ portal. Please ensure your semester dues are cleared to maintain active status.</p>
+                    {% endif %}
                 </div>
             </div>
         </section>
