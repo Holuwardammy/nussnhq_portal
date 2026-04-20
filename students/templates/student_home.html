@@ -97,10 +97,20 @@
             </div>
 
             <div class="payment-action-area">
-                {% if not payments or payments.first.status == 'pending' %}
-                    <a href="{% url 'payment_instructions' %}" class="btn-pay">Make Payment / Upload Receipt</a>
-                {% elif payments.first.status == 'processing' %}
-                    <p class="wait-msg">Receipt Verification in Progress...</p>
+                <a href="{% url 'payment_instructions' %}" class="btn-pay">Make New Payment / Upload Receipt</a>
+
+                {% if payments %}
+                    {% with latest=payments.first %}
+                        {% if latest.status == 'processing' %}
+                            <p class="wait-msg">
+                                ⏳ Your last receipt (₦{{ latest.amount }}) is currently being verified.
+                            </p>
+                        {% elif latest.status == 'paid' %}
+                            <p class="success-msg">
+                                ✔ Your last payment was successfully verified!
+                            </p>
+                        {% endif %}
+                    {% endwith %}
                 {% endif %}
             </div>
         </section>

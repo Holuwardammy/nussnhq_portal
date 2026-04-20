@@ -134,14 +134,17 @@ def submit_payment(request):
 
     if request.method == "POST":
         amount = request.POST.get('amount')
-        receipt = request.FILES.get('payment_receipt') # Ensure this matches the HTML name attribute
+        receipt = request.FILES.get('payment_receipt')
 
         if receipt:
-            payment, created = Payment.objects.get_or_create(student=student)
-            payment.amount = amount
-            payment.payment_receipt = receipt
-            payment.status = 'processing' 
-            payment.save()
+            # CHANGE: Use .create() instead of .get_or_create()
+            # This ensures every payment is a unique record in the database
+            Payment.objects.create(
+                student=student,
+                amount=amount,
+                payment_receipt=receipt,
+                status='processing'
+            )
             
             messages.success(request, "Payment submitted! The Financial Secretary will verify it shortly.")
             return redirect('student_home')
