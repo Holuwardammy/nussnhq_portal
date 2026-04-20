@@ -5,8 +5,9 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
-from .models import Student, Payment, Event, Fundraising
+from .models import Student, Payment, Event, Fundraising, School
 from .forms import StudentForm, EventForm, FundraisingForm
 
 
@@ -21,7 +22,17 @@ def register_student(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            student = form.save(commit=False)
+            
+            # --- SELF-LEARNING LOGIC ---
+            # Get the school name from the hidden input in your HTML
+            school_name = request.POST.get('school', '').strip()
+            if school_name:
+                # This saves the school to the database if it doesn't exist yet
+                School.objects.get_or_create(name=school_name)
+                student.school = school_name
+            
+            student.save()
             messages.success(request, "Registration Successful! Please login with your email.")
             return redirect('login')
         else:
@@ -29,6 +40,14 @@ def register_student(request):
     else:
         form = StudentForm()
     return render(request, 'register_student.html', {'form': form})
+
+# ADD THIS NEW VIEW HERE:
+def school_autocomplete(request):
+    query = request.GET.get('term', '')
+    # This finds schools that contain the letters the student typed
+    schools = School.objects.filter(name__icontains=query)[:10]
+    results = [school.name for school in schools]
+    return JsonResponse(results, safe=False)
 
 
 # ---------------------------

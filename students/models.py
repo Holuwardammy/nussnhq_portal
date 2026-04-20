@@ -2,6 +2,15 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+# ---------------------------
+# SCHOOL MODEL (Self-Learning List)
+# ---------------------------
+class School(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+
+    def __str__(self):
+        return self.name
+
 class Student(models.Model):
     MEMBER_TYPE_CHOICES = [
         ('student', 'Student'),

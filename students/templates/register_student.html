@@ -41,22 +41,11 @@
         <div class="searchable-select">
             <input type="text" 
                    id="school-search" 
-                   placeholder="Search or type your school..." 
+                   placeholder="Start typing your school name..." 
                    autocomplete="off" 
                    required>
 
-            <ul id="school-list" style="display: none;">
-                <li>University of Lagos</li>
-                <li>Obafemi Awolowo University</li>
-                <li>University of Ibadan</li>
-                <li>Lagos State University</li>
-                <li>Polytechnic Ibadan</li>
-                <li>Yaba College of Technology</li>
-                <li>Bauchi State University</li>
-                <li>Federal University of Technology Minna</li>
-                <li>Federal University of Agriculture Abeokuta</li>
-                <li>The Oke Ogun Polytechnic Saki</li>
-            </ul>
+            <ul id="school-list" style="display: none;"></ul>
 
             <input type="hidden" 
                    name="school" 
@@ -94,43 +83,58 @@ const searchInput = document.getElementById('school-search');
 const schoolList = document.getElementById('school-list');
 const selectedSchool = document.getElementById('school-selected');
 
-// 1. Filter list AND sync value while typing
-searchInput.addEventListener('input', () => {
-    const filter = searchInput.value.toLowerCase();
-    let visible = false;
+// Fetch matching schools from the database as the user types
+searchInput.addEventListener('input', async () => {
+    const query = searchInput.value;
+    
+    // Always keep the hidden field in sync with the input
+    selectedSchool.value = query;
 
-    // IMPORTANT: Keep the hidden field updated even if they don't click a list item
-    selectedSchool.value = searchInput.value;
-
-    Array.from(schoolList.getElementsByTagName('li')).forEach(li => {
-        if (li.textContent.toLowerCase().includes(filter)) {
-            li.style.display = '';
-            visible = true;
-        } else {
-            li.style.display = 'none';
-        }
-    });
-
-    schoolList.style.display = (visible && filter.length > 0) ? 'block' : 'none';
-});
-
-// 2. Select school from list
-Array.from(schoolList.getElementsByTagName('li')).forEach(li => {
-    li.addEventListener('click', () => {
-        searchInput.value = li.textContent;
-        selectedSchool.value = li.textContent; 
+    // Only search if the user has typed at least 2 characters
+    if (query.length < 2) {
         schoolList.style.display = 'none';
-    });
+        return;
+    }
+
+    try {
+        // Call the school_autocomplete view we created
+        const response = await fetch(`/school-autocomplete/?term=${encodeURIComponent(query)}`);
+        const schools = await response.json();
+
+        if (schools.length > 0) {
+            schoolList.innerHTML = ''; // Clear the current list
+            
+            schools.forEach(schoolName => {
+                const li = document.createElement('li');
+                li.textContent = schoolName;
+                li.style.cursor = 'pointer';
+                
+                // When a student clicks a suggestion from the database
+                li.addEventListener('click', () => {
+                    searchInput.value = schoolName;
+                    selectedSchool.value = schoolName;
+                    schoolList.style.display = 'none';
+                });
+                
+                schoolList.appendChild(li);
+            });
+            schoolList.style.display = 'block';
+        } else {
+            schoolList.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error fetching schools:', error);
+    }
 });
 
-// 3. Close dropdown when clicking outside
+// Close the dropdown list if the user clicks anywhere else on the screen
 document.addEventListener('click', (e) => {
     if (!searchInput.contains(e.target) && !schoolList.contains(e.target)) {
         schoolList.style.display = 'none';
     }
 });
 
-// 4. Pre-fill if validation fails and page reloads
+// Pre-fill the search box if the form fails validation and reloads
 window.addEventListener('load', () => {
     if (selectedSchool.value) {
         searchInput.value = selectedSchool.value;

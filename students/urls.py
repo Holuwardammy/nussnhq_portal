@@ -37,4 +37,7 @@ urlpatterns = [
     
     # President only: Record Management
     path('delete_student/<int:student_id>/', views.delete_student, name='delete_student'),
+    
+    # school-autocomplete
+    path('school-autocomplete/', views.school_autocomplete, name='school_autocomplete'),
 ]
