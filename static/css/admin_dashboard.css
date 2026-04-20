@@ -215,6 +215,14 @@ tbody td {
     border: 1px solid var(--luxury-gold);
 }
 
+.action-container { 
+    display: flex; 
+    gap: 8px; 
+    justify-content: center; 
+    align-items: center; 
+    min-width: 120px; 
+}
+
 .button {
     background: var(--accent-blue);
     color: white;
@@ -224,6 +232,8 @@ tbody td {
     font-size: 0.75rem;
     font-weight: 600;
     display: inline-block;
+    border: none;
+    cursor: pointer;
 }
 
 .delete-btn { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
@@ -251,10 +261,25 @@ tbody td {
         display: none !important;
     }
     
+    /* This container allows the table to scroll sideways on phones */
+    .tab-content {
+        overflow-x: auto !important; 
+        -webkit-overflow-scrolling: touch;
+        padding: 10px; /* Slimmer padding for mobile */
+    }
+
     table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
+        display: table !important; /* Force it back to table mode */
+        width: 100%;
+        min-width: 600px; /* Forces a scrollbar if the screen is too small */
+    }
+
+    /* Make buttons slightly larger for thumb-tapping on mobile */
+    .button {
+        padding: 10px 15px;
+        font-size: 0.8rem;
+        min-width: 60px;
+        text-align: center;
     }
 }
 
@@ -417,7 +442,7 @@ tbody td {
     border: 1px solid #ffcdd2;
 }
 
-/* 4. Action Buttons */
+/* 4. Action Buttons & Helpers */
 .approve-btn {
     background-color: #2e7d32 !important;
     color: white !important;

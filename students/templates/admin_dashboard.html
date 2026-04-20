@@ -14,13 +14,21 @@
         .income-card { border-left: 5px solid #22c55e !important; }
         .notification-dot { background: #ef4444; color: white; padding: 2px 6px; border-radius: 50%; font-size: 10px; margin-left: 5px; vertical-align: middle; }
         .profile-pic { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+
+        /* Action Container to replace messy inline styles */
+        .action-container { 
+            display: flex; 
+            gap: 8px; 
+            justify-content: center; 
+            align-items: center; 
+            min-width: 120px; 
+        }
     </style>
 </head>
 <body>
 
 <header>
     <h1>Admin Dashboard</h1>
-
     <div class="logout-btn">
         <a href="{% url 'logout' %}">Logout</a>
     </div>
@@ -37,7 +45,6 @@
     {% endif %}
 
     <section class="stats-grid">
-
         <div class="stat-card income-card">
             <h3>Total Income (Verified)</h3>
             <p>₦{{ total_income }}</p>
@@ -62,7 +69,6 @@
             <h3>Fundraising</h3>
             <p>{{ fundraising|length }}</p>
         </div>
-
     </section>
 
     {% if admin_student %}
@@ -115,20 +121,20 @@
             <tbody>
             {% for student in students %}
                 <tr>
-                    <td>
+                    <td data-label="Profile">
                         {% if student.profile_picture %}
                             <img src="{{ student.profile_picture.url }}" class="profile-pic">
                         {% else %}
                             <img src="{% static 'images/default_profile.png' %}" class="profile-pic">
                         {% endif %}
                     </td>
-                    <td>{{ student.full_name }}</td>
-                    <td class="desktop-only">{{ student.user.email }}</td>
-                    <td class="desktop-only">{{ student.phone }}</td>
-                    <td>{{ student.school }}</td>
-                    <td class="desktop-only">{{ student.department }}</td>
-                    <td>
-                        <div style="display: flex; gap: 5px;">
+                    <td data-label="Full Name">{{ student.full_name }}</td>
+                    <td data-label="Email" class="desktop-only">{{ student.user.email }}</td>
+                    <td data-label="Phone" class="desktop-only">{{ student.phone }}</td>
+                    <td data-label="School">{{ student.school }}</td>
+                    <td data-label="Dept" class="desktop-only">{{ student.department }}</td>
+                    <td data-label="Action">
+                        <div class="action-container">
                             <button class="button" style="background: #FFD700; color: #1A237E;"
                                 onclick="openModal({
                                     'name': '{{ student.full_name|escapejs }}',
@@ -156,56 +162,49 @@
 
     <div id="payments-tab" class="tab-content">
         <h2>Manual Payment Verification</h2>
-
         <table>
             <thead>
-            <tr>
-                <th>Student</th>
-                <th>Amount</th>
-                <th>Receipt (Screenshot)</th>
-                <th>Status</th>
-                <th>Date Paid</th>
-                <th>Action</th>
-            </tr>
+                <tr>
+                    <th>Student</th>
+                    <th>Amount</th>
+                    <th>Receipt (Screenshot)</th>
+                    <th>Status</th>
+                    <th>Date Paid</th>
+                    <th>Action</th>
+                </tr>
             </thead>
-
             <tbody>
             {% for payment in awaiting_verification %}
                 <tr>
-                    <td>{{ payment.student.full_name }}</td>
-                    <td>₦{{ payment.amount }}</td>
-                    <td>
+                    <td data-label="Student">{{ payment.student.full_name }}</td>
+                    <td data-label="Amount">₦{{ payment.amount }}</td>
+                    <td data-label="Receipt">
                         {% if payment.payment_receipt %}
                             <a href="{{ payment.payment_receipt.url }}" target="_blank" class="button" style="background:#1A237E; padding: 5px 10px; font-size: 0.8em;">View Receipt</a>
                         {% else %}
                             <span style="color: #94a3b8; font-style: italic;">No receipt</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td data-label="Status">
                         <span class="status-badge {{ payment.status }}">
                             {{ payment.get_status_display }}
                         </span>
                     </td>
-                    <td>{{ payment.date_paid|default:"—" }}</td>
-
-                    <td>
+                    <td data-label="Date Paid">{{ payment.date_paid|default:"—" }}</td>
+                    <td data-label="Action">
+                        <div class="action-container">
                         {% if admin_student.is_financial_secretary or admin_student.is_president or user.is_staff %}
                             {% if payment.status == 'processing' %}
-                                <a href="{% url 'approve_payment' payment.id %}"
-                                   class="button" style="background: #2e7d32;">
-                                     Approve Payment
-                                </a>
+                                <a href="{% url 'approve_payment' payment.id %}" class="button" style="background: #2e7d32;">Approve</a>
                             {% elif payment.status == 'pending' %}
-                                <a href="{% url 'mark_payment' payment.student.id %}"
-                                   class="button">
-                                     Mark Paid
-                                </a>
+                                <a href="{% url 'mark_payment' payment.student.id %}" class="button">Mark Paid</a>
                             {% else %}
                                  <span style="color: #2e7d32; font-weight: bold;">✔ Verified</span>
                             {% endif %}
                         {% else %}
                              <span style="color: gray; font-size: 0.8em;">Viewing Only</span>
                         {% endif %}
+                        </div>
                     </td>
                 </tr>
             {% empty %}
@@ -216,7 +215,7 @@
     </div>
 
     <div id="events-tab" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h2>Events</h2>
             {% if admin_student.is_president or user.is_staff %}
                 <a href="{% url 'create_event' %}" class="button">Create Event</a>
@@ -225,21 +224,20 @@
 
         <table>
             <thead>
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Date</th>
-                <th>Location</th>
-            </tr>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                </tr>
             </thead>
-
             <tbody>
             {% for event in events %}
                 <tr>
-                    <td>{{ event.title }}</td>
-                    <td>{{ event.description }}</td>
-                    <td>{{ event.date }}</td>
-                    <td>{{ event.location }}</td>
+                    <td data-label="Title">{{ event.title }}</td>
+                    <td data-label="Description">{{ event.description }}</td>
+                    <td data-label="Date">{{ event.date }}</td>
+                    <td data-label="Location">{{ event.location }}</td>
                 </tr>
             {% empty %}
                 <tr><td colspan="4">No events yet.</td></tr>
@@ -249,7 +247,7 @@
     </div>
 
     <div id="fundraising-tab" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h2>Fundraising</h2>
             {% if admin_student.is_president or user.is_staff %}
                 <a href="{% url 'create_fundraising' %}" class="button">Create Fundraising</a>
@@ -258,19 +256,18 @@
 
         <table>
             <thead>
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Goal</th>
-            </tr>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Goal</th>
+                </tr>
             </thead>
-
             <tbody>
             {% for fund in fundraising %}
                 <tr>
-                    <td>{{ fund.title }}</td>
-                    <td>{{ fund.description }}</td>
-                    <td>₦{{ fund.goal }}</td>
+                    <td data-label="Title">{{ fund.title }}</td>
+                    <td data-label="Description">{{ fund.description }}</td>
+                    <td data-label="Goal">₦{{ fund.goal }}</td>
                 </tr>
             {% empty %}
                 <tr><td colspan="3">No campaigns yet.</td></tr>
