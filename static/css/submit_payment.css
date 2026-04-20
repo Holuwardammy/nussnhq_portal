@@ -1,11 +1,10 @@
 /* =====================================
-   Premium Payment Flow - Combined
+   Submit Payment - Proof of Payment View
    ===================================== */
 :root {
     --primary: #1e3a8a;
     --accent: #2563eb;
     --success: #059669;
-    --warning: #f59e0b;
     --text-main: #0f172a;
     --text-muted: #64748b;
     --bg-gray: #f1f5f9;
@@ -55,8 +54,7 @@ body {
 .card-header h1 { font-size: 24px; color: var(--primary); margin: 0; }
 .card-header p { font-size: 14px; color: var(--text-muted); margin-top: 5px; }
 
-/* Shared Details & Form Container */
-.details-section, .payment-form {
+.payment-form {
     background: var(--bg-gray);
     padding: 25px;
     border-radius: 16px;
@@ -73,7 +71,7 @@ body {
     margin-bottom: 8px;
 }
 
-/* --- Submit Payment Page Specifics --- */
+/* Input & Currency Positioning */
 .input-wrapper {
     position: relative;
     display: flex;
@@ -98,6 +96,7 @@ body {
     box-sizing: border-box;
 }
 
+/* File Upload Styles */
 .file-upload-zone {
     position: relative;
     border: 2px dashed #cbd5e1;
@@ -128,40 +127,9 @@ body {
 .upload-content p { font-size: 14px; font-weight: 600; color: var(--text-main); margin: 5px 0; }
 .upload-content span { font-size: 11px; color: var(--text-muted); }
 
-/* --- Payment Instructions Page Specifics --- */
-#acc-num {
-    font-family: 'Courier New', monospace;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--text-main);
-}
-
-.acc-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.detail-value { font-size: 16px; font-weight: 600; color: var(--primary); }
-.amount-value { font-size: 24px; font-weight: 800; color: var(--success); }
-
-/* Alerts & Warning */
-.warning-box {
-    background: #fffbeb;
-    border-left: 4px solid var(--warning);
-    padding: 15px;
-    margin-bottom: 25px;
-    border-radius: 4px;
-}
-
-.warning-box p { font-size: 13px; color: #92400e; margin: 0; line-height: 1.6; }
-
-/* Buttons */
-.btn-primary-link, .btn-primary {
+.btn-primary {
     display: block;
     width: 100%;
-    text-align: center;
-    text-decoration: none;
     background: var(--primary);
     color: var(--white);
     padding: 16px;
@@ -171,31 +139,19 @@ body {
     border: none;
     cursor: pointer;
     transition: 0.3s;
-    box-sizing: border-box;
 }
 
-.btn-primary-link:hover, .btn-primary:hover {
+.btn-primary:hover {
     background: var(--accent);
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
 }
 
 .card-footer { text-align: center; margin-top: 20px; }
-.cancel-link, .back-btn {
+.cancel-link {
     font-size: 13px;
     color: var(--text-muted);
     text-decoration: none;
     transition: 0.2s;
 }
-
-.cancel-link:hover, .back-btn:hover { color: #ef4444; }
-
-.copy-btn {
-    background: var(--primary);
-    color: var(--white);
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 11px;
-    cursor: pointer;
-}
+.cancel-link:hover { color: #ef4444; }
