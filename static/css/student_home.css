@@ -269,3 +269,78 @@ body {
         text-align: center;
     }
 }
+
+/* ===================== STUDENT EVENTS UI ===================== */
+.events-container {
+    margin-top: 30px;
+    padding: 20px;
+}
+
+.section-title {
+    color: #1A237E;
+    border-bottom: 3px solid #FFD700;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.event-card {
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    transition: transform 0.2s;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+}
+
+.event-date-badge {
+    background: #1A237E;
+    color: #FFD700;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: bold;
+    min-width: 60px;
+    font-size: 0.9rem;
+}
+
+.event-info {
+    padding: 15px;
+}
+
+.event-info h3 {
+    margin: 0 0 10px 0;
+    color: #1A237E;
+}
+
+.location {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.description {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    grid-column: 1 / -1;
+}
