@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Fundraising Campaign</title>
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+</head>
+<body>
+
+<header>
+    <h1>New Fundraising Campaign</h1>
+    <div class="header-actions">
+        <a href="{% url 'admin_dashboard' %}" class="switch-btn">Back to Dashboard</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="form-card">
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error-text">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="submit-btn">Launch Campaign</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
