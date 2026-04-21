@@ -10,6 +10,15 @@
 
 <body>
 
+    {% if student.member_type == 'president' or student.member_type == 'financial_secretary' or student.member_type == 'treasurer' %}
+<div class="admin-toggle-bar">
+    <span>Logged in as {{ student.get_member_type_display }} (Executive View)</span>
+    <a href="{% url 'admin_dashboard' %}" class="back-to-admin">
+        Return to Admin Dashboard
+    </a>
+</div>
+{% endif %}
+
 <header class="header">
     <div class="logo-area">
         <h2>NUSSN Student Portal</h2>

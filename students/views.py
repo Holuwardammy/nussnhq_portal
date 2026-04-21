@@ -80,6 +80,7 @@ def login_view(request):
 # ---------------------------
 @login_required
 def student_home(request):
+    # We find the student profile linked to the logged-in user
     student = get_object_or_404(Student, user=request.user)
     return render(request, "student_home.html", {
         "student": student,

@@ -36,7 +36,7 @@ body::before {
     z-index: -1;
 }
 
-/* ===================== HEADER ===================== */
+/* ===================== HEADER & NAVIGATION ===================== */
 header {
     background: rgba(13, 18, 65, 0.8);
     backdrop-filter: blur(15px);
@@ -61,15 +61,63 @@ header h1 {
     margin: 0;
 }
 
-.logout-btn a {
-    background: linear-gradient(135deg, #ef4444, #991b1b);
-    color: white;
-    padding: 8px 15px;
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.switch-btn {
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--luxury-gold);
+    border: 1px solid var(--luxury-gold);
+    padding: 8px 16px;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
     font-size: 0.8rem;
     transition: 0.3s;
+}
+
+.switch-btn:hover {
+    background: var(--luxury-gold);
+    color: var(--primary-blue);
+}
+
+.logout-btn-link {
+    background: linear-gradient(135deg, #ef4444, #991b1b);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
+.logout-btn-link:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Mobile Header Adjustment */
+@media (max-width: 850px) {
+    header {
+        padding: 10px 15px;
+    }
+
+    header h1 {
+        font-size: 1rem;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .switch-btn, .logout-btn-link {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
 }
 
 /* ===================== CONTAINER ===================== */

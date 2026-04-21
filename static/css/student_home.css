@@ -236,3 +236,36 @@ body {
     .main-layout { grid-template-columns: 1fr; }
     .id-card { max-width: 400px; margin: 0 auto; }
 }
+
+/* ===================== VIEW SWITCHER STYLES ===================== */
+
+.admin-toggle-bar {
+    background: linear-gradient(to right, #0d1241, #1A237E);
+    color: #FFD700;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #FFD700;
+    font-size: 0.85rem;
+}
+
+.back-to-admin {
+    background: #FFD700;
+    color: #0d1241;
+    padding: 5px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+/* Mobile Adjustment */
+@media (max-width: 850px) {
+    .admin-toggle-bar {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+}
