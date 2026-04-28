@@ -133,14 +133,17 @@ class Student(models.Model):
         return f"{self.full_name} ({self.serial_number})"
 
 
-# ---------------------------
-# EVENT MODEL
-# ---------------------------
 class Event(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     date = models.DateField()
     location = models.CharField(max_length=100)
+    # New Field: upload_to creates a folder inside your media directory
+    image = models.ImageField(upload_to='event_flyers/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-date'] # This makes sure upcoming events show first
 
     def __str__(self):
         return self.title

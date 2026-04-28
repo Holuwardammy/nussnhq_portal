@@ -33,6 +33,8 @@ urlpatterns = [
     # ==========================================
     # President only: Event & Campaign Creation
     path('create_event/', views.create_event, name='create_event'),
+    path('event/edit/<int:event_id>/', views.create_event, name='edit_event'),
+    path('event/delete/<int:event_id>/', views.delete_event, name='delete_event'),
     path('create_fundraising/', views.create_fundraising, name='create_fundraising'),
     
     # President only: Record Management

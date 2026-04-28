@@ -11,7 +11,7 @@
 <body>
 
 <header>
-    <h1>Create New Event</h1>
+    <h1>{% if edit_mode %}Edit Event{% else %}Create New Event{% endif %}</h1>
     <div class="header-actions">
         <a href="{% url 'admin_dashboard' %}" class="switch-btn">Back to Dashboard</a>
     </div>
@@ -19,13 +19,16 @@
 
 <div class="container">
     <div class="form-card">
-        <form method="POST">
+        <!-- CRITICAL CHANGE: Added enctype for image uploads -->
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             
             {% for field in form %}
                 <div class="form-group">
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <!-- Django will now render the 'image' field here automatically -->
                     {{ field }}
+                    
                     {% if field.errors %}
                         <div class="error-text">{{ field.errors }}</div>
                     {% endif %}

@@ -12,7 +12,9 @@ from .forms import StudentForm, EventForm, FundraisingForm
 
 
 def home(request):
-    return render(request, 'home.html')
+    # This grabs EVERYTHING and puts the newest dates first
+    events = Event.objects.all().order_by('-date') 
+    return render(request, 'home.html', {'events': events})
 
 
 # ---------------------------
@@ -198,18 +200,47 @@ def delete_student(request, student_id):
 # ---------------------------
 # EVENTS & FUNDRAISING (President / Staff Only)
 # ---------------------------
+
 @login_required
-def create_event(request):
+def create_event(request, event_id=None):
     admin_student = Student.objects.filter(user=request.user).first()
+    
+    # Permission Check
     if not (request.user.is_staff or (admin_student and admin_student.is_president())):
-        messages.error(request, "Only the President can create events.")
+        messages.error(request, "Only the President can manage events.")
         return redirect('admin_dashboard')
 
-    form = EventForm(request.POST or None)
-    if form.is_valid():
-        form.save()
+    # If event_id is provided, we are EDITING; otherwise, we are CREATING
+    event = get_object_or_404(Event, id=event_id) if event_id else None
+
+    if request.method == 'POST':
+        # Added instance=event to update the existing record if it exists
+        form = EventForm(request.POST, request.FILES, instance=event)
+        if form.is_valid():
+            form.save()
+            msg = "Event updated successfully!" if event else "Event announced successfully!"
+            messages.success(request, msg)
+            return redirect('admin_dashboard')
+    else:
+        form = EventForm(instance=event)
+        
+    return render(request, 'create_event.html', {
+        'form': form, 
+        'edit_mode': bool(event)
+    })
+
+@login_required
+def delete_event(request, event_id):
+    admin_student = Student.objects.filter(user=request.user).first()
+    
+    if not (request.user.is_staff or (admin_student and admin_student.is_president())):
+        messages.error(request, "Permission denied.")
         return redirect('admin_dashboard')
-    return render(request, 'create_event.html', {'form': form})
+
+    event = get_object_or_404(Event, id=event_id)
+    event.delete()
+    messages.success(request, "Event deleted successfully.")
+    return redirect('admin_dashboard')
 
 @login_required
 def create_fundraising(request):

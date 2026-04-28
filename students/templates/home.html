@@ -129,46 +129,32 @@
 </section>
 
 <!-- EVENTS SECTION -->
-
 <section id="events" class="events">
-
     <h2>Upcoming Events</h2>
-
     <p class="events-intro">
         Join our events to learn, connect, and grow with fellow Saki students.
     </p>
 
     <div class="events-container">
-
-        <div class="event-card">
-            <h3>Leadership Workshop</h3>
-            <p class="event-date">July 25, 2026</p>
-            <p>
-                A leadership training workshop designed to help students
-                develop leadership and communication skills.
-            </p>
-        </div>
-
-        <div class="event-card">
-            <h3>Career Networking Event</h3>
-            <p class="event-date">August 10, 2026</p>
-            <p>
-                Meet professionals and alumni who will share advice
-                about career opportunities and internships.
-            </p>
-        </div>
-
-        <div class="event-card">
-            <h3>Student Welcome Meetup</h3>
-            <p class="event-date">September 5, 2026</p>
-            <p>
-                A friendly gathering to welcome new Saki students
-                and help them connect with the community.
-            </p>
-        </div>
-
+        {% for event in events %}
+            <div class="event-card">
+                {% if event.image %}
+                    <div class="event-image-wrapper">
+                        <img src="{{ event.image.url }}" alt="{{ event.title }}" class="event-flyer-img">
+                    </div>
+                {% endif %}
+                
+                <h3>{{ event.title }}</h3>
+                <p class="event-date">{{ event.date|date:"F d, Y" }}</p>
+                <p class="event-location"><strong>{{ event.location }}</strong></p>
+                <p>{{ event.description|truncatewords:25 }}</p>
+            </div>
+        {% empty %}
+            <div class="no-events">
+                <p>No upcoming events at the moment. Check back soon!</p>
+            </div>
+        {% endfor %}
     </div>
-
 </section>
 
 <!-- GALLERY SECTION -->

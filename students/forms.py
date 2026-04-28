@@ -114,12 +114,15 @@ class StudentForm(forms.ModelForm):
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'date', 'location']
+        # Added 'image' to the list below
+        fields = ['title', 'description', 'date', 'location', 'image']
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Event title'}),
             'description': forms.Textarea(attrs={'placeholder': 'Event description'}),
             'date': forms.DateInput(attrs={'type': 'date'}),
-            'location': forms.TextInput(attrs={'placeholder': 'Event location'})
+            'location': forms.TextInput(attrs={'placeholder': 'Event location'}),
+            # New widget for the image upload
+            'image': forms.FileInput(attrs={'accept': 'image/*'})
         }
 
 
