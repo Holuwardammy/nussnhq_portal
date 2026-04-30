@@ -300,17 +300,19 @@ body {
 
 .events-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    width: 100%;
 }
 
 .event-card {
     background: white;
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     border: 1px solid #eee;
+    max-width: 100%;
     transition: transform 0.2s;
 }
 
@@ -338,6 +340,17 @@ body {
 .event-info h3 {
     margin: 0 0 10px 0;
     color: #1A237E;
+}
+
+.event-flyer {
+    width: 100%;
+    height: 150px; /* Slightly smaller for the dashboard */
+}
+
+.event-flyer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Keeps image contained */
 }
 
 .location {

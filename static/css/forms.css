@@ -41,6 +41,8 @@
     font-size: 1rem;
     transition: border-color 0.3s ease;
     box-sizing: border-box;
+    min-height: 120px;
+    resize: vertical;
 }
 
 .form-group input:focus, 
@@ -76,10 +78,11 @@
 input[type="file"] {
     padding: 10px;
     background: #f9f9f9;
-    border: 1px dashed #1A237E; /* Using your Premium Blue */
-    border-radius: 5px;
+    border: 2px dashed #1A237E; /* Using your Premium Blue */
+    border-radius: 8px;
     width: 100%;
     cursor: pointer;
+    font-size: 0.85rem;
 }
 
 input[type="file"]:hover {
@@ -125,4 +128,12 @@ input[type="file"]:hover {
 
 .event-info {
     padding: 15px;
+}
+
+/* Mobile Tweak for the form card */
+@media (max-width: 480px) {
+    .form-card {
+        padding: 20px;
+        margin: 20px 10px;
+    }
 }

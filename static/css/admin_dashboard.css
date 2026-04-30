@@ -153,6 +153,10 @@ header h1 {
     color: #cbd5e1;
 }
 
+h2 {
+    color: var(--luxury-gold);
+}
+
 /* ===================== STATS GRID ===================== */
 .stats-grid {
     display: grid;
@@ -235,29 +239,105 @@ header h1 {
     display: block;
 }
 
+/* 1. Table Container (Add <div class="table-container"> around your <table> in HTML) */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+}
+
+/* 2. Main Table Setup */
 table {
     width: 100%;
     border-collapse: collapse;
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
+    table-layout: auto;
+    background: transparent;
 }
 
+/* 3. Header Styling */
 thead th {
     color: var(--accent-blue);
     text-transform: uppercase;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 700;
     padding: 12px;
-    border-bottom: 2px solid #f1f5f9;
+    border-bottom: 2px solid rgba(26, 35, 126, 0.1);
     text-align: left;
 }
 
+/* 4. Cell Styling & Text Wrapping */
 tbody td {
     padding: 15px 12px;
     color: var(--primary-blue);
     font-size: 0.85rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid rgba(241, 245, 249, 0.5);
+    
+    /* Forces text to wrap and prevents "longing" */
+    white-space: normal !important;
+    word-wrap: break-word;
+    word-break: break-word;
+    vertical-align: middle;
+}
+
+/* 5. Column Width Constraints (Title & Description) */
+tbody td:nth-child(2),
+tbody td:nth-child(3) {
+    max-width: 250px;
+    min-width: 150px;
+    line-height: 1.5;
+}
+
+/* 6. Action Buttons Styling */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit, .btn-delete {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-edit {
+    background: var(--primary-blue);
+    color: var(--gold-accent) !important;
+    border: 1px solid var(--gold-accent);
+}
+
+.btn-edit:hover {
+    background: var(--gold-accent);
+    color: var(--primary-blue) !important;
+}
+
+.btn-delete {
+    background: #d9534f;
+    color: white !important;
+}
+
+.btn-delete:hover {
+    background: #c9302c;
+    transform: translateY(-1px);
+}
+
+/* 7. Flyer Thumbnail */
+.admin-event-thumb {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 160, 23, 0.3);
+}
+
+.no-image-text {
+    font-size: 0.7rem;
+    color: #1A237E;
+    font-style: italic;
 }
 
 /* ===================== PROFILE & BUTTONS ===================== */
