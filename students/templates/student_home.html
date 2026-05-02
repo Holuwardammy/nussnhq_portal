@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Portal | {{ student.full_name }}</title>
-    <link rel="stylesheet" href="{% static 'css/student_home.css' %}?v=4">
-    <!-- Add this script to your head -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/student_home.css' %}?v=8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
 <body>
 
-    {% if student.member_type == 'president' or student.member_type == 'financial_secretary' or student.member_type == 'treasurer' %}
+{% if student.member_type == 'president' or student.member_type == 'financial_secretary' or student.member_type == 'treasurer' %}
 <div class="admin-toggle-bar">
     <span>Logged in as {{ student.get_member_type_display }} (Executive View)</span>
     <a href="{% url 'admin_dashboard' %}" class="back-to-admin">Return to Admin Dashboard</a>
@@ -25,34 +25,37 @@
             <h2>NUSSN Student Portal</h2>
         </div>
 
-        <!-- Hamburger Icon -->
-        <div class="hamburger" id="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+        <!-- Group hamburger + logout together -->
+        <div class="header-right">
+            <!-- Hamburger Icon -->
+            <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <!-- Desktop Logout -->
+            <div class="logout-btn desktop-only">
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
         </div>
 
         <!-- Navigation Links -->
         <nav class="nav-menu" id="nav-menu">
             <ul class="nav-links">
-                <li><a href="{% url 'student_home' %}">Home</a></li>
-                <li><a href="#events-section">Events</a></li> <!-- Anchor to your events section -->
-                <li><a href="{% url 'payment_instructions' %}">Payments</a></li>
+                <li><a href="#" onclick="showSection('home')">Home</a></li>
+                <li><a href="#" onclick="showSection('events')">Events</a></li>
+                <li><a href="#" onclick="showSection('payments')">Payments</a></li>
                 <li class="mobile-logout"><a href="{% url 'logout' %}">Logout</a></li>
             </ul>
         </nav>
-
-        <!-- Desktop Logout -->
-        <div class="logout-btn desktop-only">
-            <a href="{% url 'logout' %}">Logout</a>
-        </div>
     </div>
 </header>
 
 <main class="container">
 
     <div class="welcome-section">
-        <h1>Student Dashboard</h1>
+        <h1 id="page-title">Student Dashboard</h1>
         {% if messages %}
             <div class="messages-container">
                 {% for message in messages %}
@@ -62,205 +65,255 @@
         {% endif %}
     </div>
 
-    <div class="main-layout">
-        
-        <section class="id-card-container">
-    <!-- Added id="membership-card" for the screenshot tool -->
-    <div class="id-card" id="membership-card" style="background: white;"> 
-        <div class="id-card-header">
-            <div class="header-text">
-                <h4>NUSS NATIONAL HQ</h4>
-                <p>Official Membership Card</p>
-            </div>
-        </div>
-
-        <div class="id-card-body">
-            <div class="photo-area">
-                {% if student.profile_picture %}
-                    <!-- Added crossorigin="anonymous" to allow image capture -->
-                    <img src="{{ student.profile_picture.url }}" alt="Profile Picture" crossorigin="anonymous">
-                {% else %}
-                    <img src="{% static 'images/default_profile.png' %}" alt="Default" crossorigin="anonymous">
-                {% endif %}
-            </div>
-            
-            <div class="id-details">
-                <div class="detail-group">
-                    <label>FULL NAME</label>
-                    <p class="name-text">{{ student.full_name|upper }}</p>
-                </div>
-                
-                <div class="detail-group">
-                    <label>STUDENT ID</label>
-                    <p class="id-text">{{ student.serial_number }}</p>
-                </div>
-
-                <div class="id-row">
-                    <div class="detail-group">
-                        <label>MEMBER TYPE</label>
-                        <p class="badge {{ student.member_type }}">
-                            {{ student.get_member_type_display }}
-                        </p>
+    <!-- HOME SECTION (ID Card & Info) -->
+    <div id="home-section" class="main-layout display-section">
+        <!-- LEFT COLUMN: ID Card only -->
+        <div class="left-column">
+            <section class="id-card-container">
+                <div class="id-card" id="membership-card">
+                    <div class="id-card-header">
+                        <div class="header-text">
+                            <h4>NUSS NATIONAL HQ</h4>
+                            <p>Official Membership Card</p>
+                        </div>
                     </div>
-                    <div class="detail-group">
-                        <label>STATUS</label>
-                        <p class="status-text">
-                            {% if payments %}
-                                {% with latest_payment=payments.first %}
-                                    {% if latest_payment.status == 'paid' %}
-                                        <span class="status-paid">PAID ✔</span>
-                                    {% elif latest_payment.status == 'processing' %}
-                                        <span class="status-processing">PENDING ⏳</span>
-                                    {% else %}
-                                        <span class="status-unpaid">UNPAID ❌</span>
-                                    {% endif %}
-                                {% endwith %}
+
+                    <div class="id-card-body">
+                        <div class="photo-area">
+                            {% if student.profile_picture %}
+                                <img src="{{ student.profile_picture.url }}" alt="Profile Picture" crossorigin="anonymous">
                             {% else %}
-                                <span class="no-record">NO RECORD</span>
+                                <img src="{% static 'images/default_profile.png' %}" alt="Default" crossorigin="anonymous">
                             {% endif %}
-                        </p>
+                        </div>
+
+                        <div class="id-details">
+                            <div class="detail-group">
+                                <label>FULL NAME</label>
+                                <p class="name-text">{{ student.full_name|upper }}</p>
+                            </div>
+
+                            <div class="detail-group">
+                                <label>STUDENT ID</label>
+                                <p class="id-text">{{ student.serial_number }}</p>
+                            </div>
+
+                            <div class="id-row">
+                                <div class="detail-group">
+                                    <label>MEMBER TYPE</label>
+                                    <p class="badge {{ student.member_type }}">
+                                        {{ student.get_member_type_display }}
+                                    </p>
+                                </div>
+                                <div class="detail-group">
+                                    <label>STATUS</label>
+                                    <p class="status-text">
+                                        {% if payments %}
+                                            {% with latest_payment=payments.first %}
+                                                {% if latest_payment.status == 'paid' %}
+                                                    <span class="status-paid">PAID ✔</span>
+                                                {% elif latest_payment.status == 'processing' %}
+                                                    <span class="status-processing">PENDING ⏳</span>
+                                                {% else %}
+                                                    <span class="status-unpaid">UNPAID ❌</span>
+                                                {% endif %}
+                                            {% endwith %}
+                                        {% else %}
+                                            <span class="no-record">NO RECORD</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    <div class="id-card-footer">
+                        <p>Valid for the 2026 Academic Session</p>
                     </div>
                 </div>
+            </section>
+        </div>
+
+        <!-- RIGHT COLUMN: Buttons + Student Info -->
+        <div class="right-column">
+            <div class="action-buttons-row">
+                <div class="download-action">
+                    <button id="download-id-btn" class="btn-pay download-btn-style">
+                        📥 Download ID Card (Image)
+                    </button>
+                    <p id="download-status" class="status-msg-style" style="display: none;">
+                        Generating high-quality image...
+                    </p>
+                </div>
+
+                <div class="payment-action-area">
+                    <a href="{% url 'payment_instructions' %}" class="btn-pay">Make New Payment / Upload Receipt</a>
+                </div>
             </div>
-        </div>
-        <div class="id-card-footer">
-            <p>Valid for the 2026 Academic Session</p>
-        </div>
-    </div>
 
-            <!-- New Download Button Section -->
-        <div class="download-action">
-            <button id="download-id-btn" class="btn-pay download-btn-style">
-                📥 Download ID Card (Image)
-            </button>
-            <p id="download-status" class="status-msg-style">
-                Generating high-quality image...
-            </p>
-        </div>
+            <section class="details-section">
+                <div class="details-grid">
+                    <div class="detail-item"><strong>Email:</strong> <span>{{ student.user.email }}</span></div>
+                    <div class="detail-item"><strong>Phone:</strong> <span>{{ student.phone }}</span></div>
+                    <div class="detail-item"><strong>School:</strong> <span>{{ student.school }}</span></div>
+                    <div class="detail-item"><strong>Department:</strong> <span>{{ student.department }}</span></div>
+                    <div class="detail-item"><strong>Level:</strong> <span>{{ student.level }}</span></div>
+                    <div class="detail-item"><strong>State:</strong> <span>{{ student.state }}</span></div>
+                </div>
 
-            <div class="payment-action-area">
-                <a href="{% url 'payment_instructions' %}" class="btn-pay">Make New Payment / Upload Receipt</a>
-
-                {% if payments %}
-                    {% with latest=payments.first %}
-                        {% if latest.status == 'processing' %}
-                            <p class="wait-msg">
-                                ⏳ Your last receipt (₦{{ latest.amount }}) is currently being verified.
-                            </p>
-                        {% elif latest.status == 'paid' %}
-                            <p class="success-msg">
-                                ✔ Your last payment was successfully verified!
-                            </p>
+                <div class="notifications-area">
+                    <h3>System Notifications</h3>
+                    <div class="notify-box">
+                        {% if payments.first.status == 'paid' %}
+                            <p>Your membership is active. You have full access to NUSSNHQ resources.</p>
+                        {% else %}
+                            <p>Welcome to the NUSSNHQ portal. Please ensure your semester dues are cleared to maintain active status.</p>
                         {% endif %}
-                    {% endwith %}
-                {% endif %}
-            </div>
-        </section>
-
-        <section class="details-section">
-            <div class="details-grid">
-                <div class="detail-item">
-                    <strong>Email:</strong> <span>{{ student.user.email }}</span>
-                </div>
-                <div class="detail-item">
-                    <strong>Phone:</strong> <span>{{ student.phone }}</span>
-                </div>
-                <div class="detail-item">
-                    <strong>School:</strong> <span>{{ student.school }}</span>
-                </div>
-                <div class="detail-item">
-                    <strong>Department:</strong> <span>{{ student.department }}</span>
-                </div>
-                <div class="detail-item">
-                    <strong>Level:</strong> <span>{{ student.level }}</span>
-                </div>
-                <div class="detail-item">
-                    <strong>State:</strong> <span>{{ student.state }}</span>
-                </div>
-            </div>
-
-        <section class="events-container" id="events-section">
-    <h2 class="section-title">Upcoming Events</h2>
-    <div class="events-grid">
-        {% for event in events %}
-            <div class="event-card">
-                <!-- Flyer Image Section -->
-                {% if event.image %}
-                    <div class="event-flyer">
-                        <img src="{{ event.image.url }}" alt="{{ event.title }} Flyer">
                     </div>
-                {% endif %}
-
-                <div class="event-date-badge">{{ event.date|date:"M d" }}</div>
-                
-                <div class="event-info">
-                    <h3>{{ event.title }}</h3>
-                    <p class="location"><strong>Location:</strong> {{ event.location }}</p>
-                    <p class="description">{{ event.description|truncatewords:20 }}</p>
                 </div>
-            </div>
-        {% empty %}
-            <div class="empty-state">
-                <p>No upcoming events at the moment. Check back soon!</p>
-            </div>
-        {% endfor %}
+            </section>
+        </div>
     </div>
 
-            <div class="notifications-area">
-                <h3>System Notifications</h3>
-                <div class="notify-box">
-                    {% if payments.first.status == 'paid' %}
-                        <p>Your membership is active. You have full access to NUSSNHQ resources.</p>
-                    {% else %}
-                        <p>Welcome to the NUSSNHQ portal. Please ensure your semester dues are cleared to maintain active status.</p>
-                    {% endif %}
+    <!-- EVENTS SECTION (Hidden by default) -->
+    <div id="events-section" class="display-section" style="display: none;">
+        <h2 class="section-title">Upcoming Events</h2>
+        <div class="events-grid">
+            {% for event in events %}
+                <div class="event-card-horizontal">
+                    <div class="event-date-strip">
+                        <span class="month">{{ event.date|date:"M" }}</span>
+                        <span class="day">{{ event.date|date:"d" }}</span>
+                    </div>
+                    <div class="event-flyer-thumb">
+                        {% if event.image %}
+                            <img src="{{ event.image.url }}" alt="Flyer">
+                        {% endif %}
+                    </div>
+                    <div class="event-info">
+                        <h3>{{ event.title }}</h3>
+                        <p class="location">📍 {{ event.location }}</p>
+                        <p class="description">{{ event.description|truncatewords:20 }}</p>
+                    </div>
                 </div>
-            </div>
-        </section>
+            {% empty %}
+                <div class="empty-state">
+                    <p>No upcoming events at the moment.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- PAYMENTS SECTION (Hidden by default) -->
+    <div id="payments-section" class="display-section" style="display: none;">
+        <h2 class="section-title">Payment History</h2>
+        <div class="table-container">
+            {% if payments %}
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Reference</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                            <tr>
+                                <td>{{ payment.created_at|date:"d M, Y" }}</td>
+                                <td>₦{{ payment.amount }}</td>
+                                <td>{{ payment.reference_id }}</td>
+                                <td>{{ payment.get_status_display }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>You have no payment records yet.</p>
+            {% endif %}
+        </div>
     </div>
 
 </main>
 
 <script>
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('nav-menu');
+    // 1. Navigation Menu Toggle
+    function toggleMenu() {
+        const navMenu = document.getElementById('nav-menu');
+        const hamburger = document.getElementById('hamburger');
+        const body = document.body;
 
-    hamburger.addEventListener('click', () => {
         navMenu.classList.toggle('active');
         hamburger.classList.toggle('toggle');
+        body.classList.toggle('menu-open');
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const navMenu = document.getElementById('nav-menu');
+        const hamburger = document.getElementById('hamburger');
+        const body = document.body;
+        const isClickInside = navMenu.contains(event.target) || hamburger.contains(event.target);
+
+        if (!isClickInside && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            hamburger.classList.remove('toggle');
+            body.classList.remove('menu-open');
+        }
     });
-</script>
 
-<script>
-    document.getElementById('download-id-btn').addEventListener('click', function() {
-        const card = document.getElementById('membership-card');
-        const statusMsg = document.getElementById('download-status');
-        const btn = this;
+    // 2. Section Switching Logic
+    function showSection(sectionId) {
+        const sections = document.querySelectorAll('.display-section');
+        sections.forEach(sec => sec.style.display = 'none');
 
-        // Visual feedback
-        btn.innerText = "Processing...";
-        statusMsg.style.display = "block";
+        const targetSection = document.getElementById(sectionId + '-section');
+        if (targetSection) targetSection.style.display = 'flex';
 
-        html2canvas(card, {
-            useCORS: true,       // Critical for images on external hosting
-            scale: 3,            // Higher quality for printing
-            logging: false,
-            letterRendering: 1,
-            allowTaint: false
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'NUSSN_ID_{{ student.serial_number }}.png';
-            link.href = canvas.toDataURL('image/png', 1.0);
-            link.click();
-            
-            // Reset button
-            btn.innerText = "📥 Download ID Card (Image)";
-            statusMsg.style.display = "none";
-        }).catch(err => {
-            alert("Error generating image. Try using a modern browser.");
-            btn.innerText = "📥 Download ID Card (Image)";
-            statusMsg.style.display = "none";
-        });
+        const titles = { 'home': 'Student Dashboard', 'events': 'Events & Flyers', 'payments': 'Payment History' };
+        document.getElementById('page-title').innerText = titles[sectionId];
+
+        // Close menu
+        document.getElementById('nav-menu').classList.remove('active');
+        document.getElementById('hamburger').classList.remove('toggle');
+        document.body.classList.remove('menu-open');
+    }
+
+    // 3. ID Card Download Logic - wrapped in DOMContentLoaded for safety
+    document.addEventListener('DOMContentLoaded', function() {
+        const downloadBtn = document.getElementById('download-id-btn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function() {
+                const card = document.getElementById('membership-card');
+                const statusMsg = document.getElementById('download-status');
+                const btn = this;
+
+                btn.innerText = "Processing...";
+                btn.disabled = true;
+                statusMsg.style.display = "block";
+
+                html2canvas(card, {
+                    useCORS: true,
+                    scale: 3,
+                    logging: false,
+                    letterRendering: 1,
+                    allowTaint: false
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'NUSSN_ID_{{ student.serial_number }}.png';
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.click();
+
+                    btn.innerText = "📥 Download ID Card (Image)";
+                    btn.disabled = false;
+                    statusMsg.style.display = "none";
+                }).catch(err => {
+                    alert("Error generating image. Please try again.");
+                    btn.innerText = "📥 Download ID Card (Image)";
+                    btn.disabled = false;
+                    statusMsg.style.display = "none";
+                });
+            });
+        }
     });
 </script>
 
