@@ -7,18 +7,29 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background: #f8fafc;
     color: #1e293b;
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    padding-top: 75px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
 }
 
 /* =========================================
    2. PREMIUM STICKY NAVBAR
    ========================================= */
 #navbar {
-    position: fixed; /* Keeps it locked at the top */
+    position: fixed;
     top: 0;
     width: 100%;
     height: 75px;
@@ -32,11 +43,10 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Effect when you scroll down */
 #navbar.scrolled {
     height: 60px;
-    background-color: rgba(26, 35, 126, 0.95); /* Slight transparency */
-    backdrop-filter: blur(10px); /* Modern blur effect */
+    background-color: rgba(26, 35, 126, 0.95);
+    backdrop-filter: blur(10px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
@@ -46,6 +56,7 @@ body {
     font-weight: 800;
     letter-spacing: 1px;
     cursor: pointer;
+    z-index: 1001;
 }
 
 #navbar ul {
@@ -68,7 +79,6 @@ body {
     position: relative;
 }
 
-/* Gold Underline Animation */
 #navbar ul li a::after {
     content: '';
     position: absolute;
@@ -91,6 +101,39 @@ body {
     width: 100%;
 }
 
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.nav-toggle span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+.nav-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(7px, 7px);
+}
+
+.nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
 /* =========================================
    3. GLOBAL SECTION REVEAL
    ========================================= */
@@ -107,11 +150,46 @@ section.visible {
 
 /* Responsive fix for Nav */
 @media (max-width: 768px) {
+    body {
+        padding-top: 70px;
+    }
+    
     #navbar {
         padding: 0 5%;
+        height: 70px;
     }
+    
+    .nav-toggle {
+        display: flex;
+    }
+    
     #navbar ul {
-        display: none; /* We can add a mobile toggle later */
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: #1A237E;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 40px;
+        gap: 30px;
+        transform: translateX(100%);
+        transition: transform 0.4s ease;
+    }
+    
+    #navbar ul.active {
+        transform: translateX(0);
+    }
+    
+    #navbar ul li {
+        margin-left: 0;
+    }
+    
+    #navbar ul li a {
+        font-size: 1.2rem;
+        padding: 12px 20px;
     }
 }
 
@@ -120,7 +198,7 @@ section.visible {
    ========================================= */
 .hero {
     position: relative;
-    height: 100vh;
+    min-height: calc(100vh - 75px);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -128,13 +206,13 @@ section.visible {
     text-align: center;
     color: #ffffff;
     background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3)), 
-                url('/static/images/bac.jpg') center/cover no-repeat fixed;
+                url('/static/images/bac.jpg') center/cover no-repeat;
     z-index: 1;
     overflow: hidden;
     animation: heroPop 1.2s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+    padding: 40px 20px;
 }
 
-/* Sub-elements animation setup */
 .hero h1, .hero p, .btn-hero {
     position: relative;
     z-index: 2;
@@ -144,25 +222,25 @@ section.visible {
 }
 
 .hero h1 {
-    font-size: 4.5rem;
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
     font-weight: 900;
     margin-bottom: 20px;
     letter-spacing: -1px;
     text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    animation-delay: 0.3s; /* Heading appears first */
+    animation-delay: 0.3s;
 }
 
 .hero p {
-    font-size: 1.8rem;
+    font-size: clamp(1.1rem, 3vw, 1.8rem);
     font-weight: 400;
     max-width: 800px;
     margin-bottom: 40px;
     line-height: 1.4;
     text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    animation-delay: 0.5s; /* Paragraph follows */
+    animation-delay: 0.5s;
+    padding: 0 20px;
 }
 
-/* THE GOLDEN BUTTON */
 .btn-hero {
     display: inline-block;
     background: linear-gradient(135deg, #FFD700 0%, #D4A017 100%);
@@ -176,7 +254,9 @@ section.visible {
     text-decoration: none;
     box-shadow: 0 10px 30px rgba(212, 160, 23, 0.3);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation-delay: 0.7s; /* Button follows last */
+    animation-delay: 0.7s;
+    min-width: 200px;
+    min-height: 44px;
 }
 
 .btn-hero:hover {
@@ -186,7 +266,6 @@ section.visible {
     background: #FFD700;
 }
 
-/* ANIMATION KEYFRAMES */
 @keyframes heroPop {
     0% { transform: scale(1.1); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
@@ -199,17 +278,23 @@ section.visible {
     }
 }
 
-/* RESPONSIVE DESIGN */
 @media (max-width: 1024px) {
-    .hero h1 { font-size: 3.5rem; }
-    .hero p { font-size: 1.4rem; padding: 0 20px; }
+    .hero {
+        min-height: calc(100vh - 70px);
+    }
 }
 
 @media (max-width: 768px) {
-    .hero { background-attachment: scroll; /* Smoother on mobile */ }
-    .hero h1 { font-size: 2.5rem; }
-    .hero p { font-size: 1.1rem; }
-    .btn-hero { padding: 14px 35px; font-size: 1rem; }
+    .hero { 
+        background-attachment: scroll;
+        min-height: calc(100vh - 70px);
+    }
+    .btn-hero { 
+        padding: 16px 35px; 
+        font-size: 1rem;
+        width: min(90%, 300px);
+        margin-bottom: 10px;
+    }
 }
 
 /* =========================================
@@ -222,14 +307,13 @@ section.visible {
 }
 
 .about h2 {
-    font-size: 2.8rem;
-    color: #1A237E; /* Consistent deep blue */
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    color: #1A237E;
     margin-bottom: 25px;
     position: relative;
     display: inline-block;
 }
 
-/* Decorative line under the heading */
 .about h2::after {
     content: '';
     display: block;
@@ -246,11 +330,12 @@ section.visible {
     font-size: 1.15rem;
     color: #546e7a;
     line-height: 1.8;
+    padding: 0 15px;
 }
 
 .about-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
     gap: 30px;
     justify-items: center;
 }
@@ -261,10 +346,11 @@ section.visible {
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     border: 1px solid #eef2f6;
-    border-top: 4px solid #D4A017; /* The "Premium" gold touch */
+    border-top: 4px solid #D4A017;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     position: relative;
     overflow: hidden;
+    width: 100%;
 }
 
 .card:hover {
@@ -286,13 +372,9 @@ section.visible {
     line-height: 1.6;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .about {
         padding: 70px 5%;
-    }
-    .about h2 {
-        font-size: 2.2rem;
     }
 }
 
@@ -301,12 +383,12 @@ section.visible {
    ========================================= */
 .programs {
     padding: 100px 8%;
-    background: #f1f4f9; /* Soft contrast background */
+    background: #f1f4f9;
     text-align: center;
 }
 
 .programs h2 {
-    font-size: 2.8rem;
+    font-size: clamp(2rem, 5vw, 2.8rem);
     color: #1A237E;
     margin-bottom: 25px;
     position: relative;
@@ -329,11 +411,12 @@ section.visible {
     font-size: 1.15rem;
     color: #475569;
     line-height: 1.8;
+    padding: 0 15px;
 }
 
 .programs-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 35px;
 }
 
@@ -341,14 +424,15 @@ section.visible {
     background: #ffffff;
     padding: 45px 35px;
     border-radius: 20px;
-    text-align: left; /* Left-aligned for a more academic/professional feel */
+    text-align: left;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    border-left: 5px solid #D4A017; /* Unique accent for Programs */
+    border-left: 5px solid #D4A017;
     transition: all 0.4s ease;
+    width: 100%;
 }
 
 .program:hover {
-    transform: translateX(10px); /* Slides right instead of up for variety */
+    transform: translateX(10px);
     background: #ffffff;
     box-shadow: 0 20px 25px -5px rgba(26, 35, 126, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
@@ -366,13 +450,15 @@ section.visible {
     line-height: 1.7;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .programs {
         padding: 70px 5%;
     }
     .program:hover {
-        transform: translateY(-5px); /* Stick to vertical hover on mobile */
+        transform: translateY(-5px);
+    }
+    .program {
+        padding: 35px 25px;
     }
 }
 
@@ -381,15 +467,15 @@ section.visible {
    ========================================= */
 .events {
     width: 100%;
-    max-width: 1200px; /* Prevents it from going too wide on big screens */
-    margin: 0 auto;    /* Centers the entire section */
-    padding: 20px;
-    box-sizing: border-box; /* Ensures padding doesn't add to width */
-    overflow: hidden;  /* Safety net for horizontal scrolling */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 20px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .events h2 {
-    font-size: 2.8rem;
+    font-size: clamp(2rem, 5vw, 2.8rem);
     color: #1A237E;
     margin-bottom: 25px;
     position: relative;
@@ -411,11 +497,12 @@ section.visible {
     margin: 0 auto 60px;
     font-size: 1.1rem;
     color: #546e7a;
+    padding: 0 15px;
 }
 
 .events-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
     gap: 20px;
     width: 100%;
 }
@@ -442,8 +529,8 @@ section.visible {
 
 .event-date {
     display: inline-block;
-    background: #1A237E; /* Deep blue background for the date */
-    color: #D4A017;      /* Golden text */
+    background: #1A237E;
+    color: #D4A017;
     padding: 8px 20px;
     border-radius: 50px;
     font-size: 0.9rem;
@@ -469,7 +556,7 @@ section.visible {
 
 .event-image-wrapper {
     width: 100%;
-    height: 200px; /* Forces a consistent height */
+    height: 200px;
     overflow: hidden;
     border-radius: 8px 8px 0 0;
 }
@@ -487,19 +574,28 @@ section.visible {
 
 .event-location {
     font-size: 0.9rem;
-    color: #1A237E; /* Your Premium Blue */
+    color: #1A237E;
     margin-bottom: 10px;
 }
 
-/* Responsive adjustments */
+.no-events {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+}
+
 @media (max-width: 768px) {
     .events {
         padding: 70px 5%;
     }
+    .event-card {
+        padding: 30px 20px;
+    }
 }
 @media (max-width: 480px) {
     .events-container {
-        grid-template-columns: 1fr; /* Single column on phones */
+        grid-template-columns: 1fr;
     }
 }
 
@@ -513,7 +609,7 @@ section.visible {
 }
 
 .gallery h2 {
-    font-size: 2.8rem;
+    font-size: clamp(2rem, 5vw, 2.8rem);
     color: #1A237E;
     margin-bottom: 25px;
     position: relative;
@@ -536,11 +632,12 @@ section.visible {
     font-size: 1.1rem;
     color: #546e7a;
     line-height: 1.7;
+    padding: 0 15px;
 }
 
 .gallery-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
     gap: 20px;
 }
 
@@ -548,9 +645,9 @@ section.visible {
     position: relative;
     overflow: hidden;
     border-radius: 15px;
-    height: 280px; /* Increased height for impact */
+    height: 280px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-    background: #1A237E; /* Fallback background */
+    background: #1A237E;
     cursor: pointer;
 }
 
@@ -562,9 +659,8 @@ section.visible {
     transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
 }
 
-/* Golden Overlay Effect on Hover */
 .gallery-item::after {
-    content: '\271B'; /* Optional: Plus icon or just leave empty */
+    content: '\271B';
     display: flex;
     justify-content: center;
     align-items: center;
@@ -573,7 +669,7 @@ section.visible {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(26, 35, 126, 0.6); /* Translucent Blue */
+    background: rgba(26, 35, 126, 0.6);
     opacity: 0;
     transition: opacity 0.4s ease;
 }
@@ -587,13 +683,12 @@ section.visible {
     opacity: 1;
 }
 
-/* Responsive Grid */
 @media (max-width: 768px) {
     .gallery {
         padding: 70px 5%;
     }
     .gallery-container {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
         gap: 15px;
     }
     .gallery-item {
@@ -606,12 +701,12 @@ section.visible {
    ========================================= */
 .contact {
     padding: 100px 8%;
-    background: #f8fafc; /* Lighter, cleaner feel than pure off-white */
+    background: #f8fafc;
     text-align: center;
 }
 
 .contact h2 {
-    font-size: 2.8rem;
+    font-size: clamp(2rem, 5vw, 2.8rem);
     color: #1A237E;
     margin-bottom: 25px;
     position: relative;
@@ -633,6 +728,7 @@ section.visible {
     margin: 0 auto 60px;
     font-size: 1.1rem;
     color: #546e7a;
+    padding: 0 15px;
 }
 
 .contact-container {
@@ -641,16 +737,16 @@ section.visible {
     gap: 60px;
     justify-content: center;
     align-items: flex-start;
-    text-align: left; /* Better for forms and info blocks */
+    text-align: left;
 }
 
-/* FORM STYLING */
 .contact-form {
     flex: 1 1 450px;
     background: #ffffff;
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+    min-width: 0;
 }
 
 .contact-form input,
@@ -660,7 +756,7 @@ section.visible {
     margin-bottom: 20px;
     border: 2px solid #e2e8f0;
     border-radius: 12px;
-    font-size: 1rem;
+    font-size: 16px;
     transition: all 0.3s ease;
     outline: none;
     font-family: inherit;
@@ -674,8 +770,8 @@ section.visible {
 }
 
 .contact-form button {
-    background: #1A237E; /* Changed to Blue for more authority */
-    color: #D4A017;      /* Gold text */
+    background: #1A237E;
+    color: #D4A017;
     border: none;
     width: 100%;
     padding: 16px;
@@ -686,6 +782,7 @@ section.visible {
     text-transform: uppercase;
     letter-spacing: 1px;
     transition: 0.3s;
+    min-height: 44px;
 }
 
 .contact-form button:hover {
@@ -694,10 +791,10 @@ section.visible {
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-/* CONTACT INFO STYLING */
 .contact-info {
     flex: 1 1 300px;
     padding-top: 20px;
+    min-width: 0;
 }
 
 .contact-info h3 {
@@ -714,6 +811,7 @@ section.visible {
     display: flex;
     align-items: center;
     gap: 15px;
+    word-break: break-word;
 }
 
 .contact-info a {
@@ -727,7 +825,6 @@ section.visible {
     color: #D4A017;
 }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
     .contact { padding: 70px 5%; }
     .contact-form { padding: 30px 20px; }
@@ -737,23 +834,22 @@ section.visible {
    10. PREMIUM FOOTER
    ========================================= */
 footer {
-    background: #0d1241; /* Slightly darker than Navbar for depth */
+    background: #0d1241;
     color: #e2e8f0;
     padding: 80px 8% 30px;
     font-family: inherit;
     position: relative;
-    border-top: 4px solid #D4A017; /* Strong golden top border */
+    border-top: 4px solid #D4A017;
 }
 
 .footer-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
     gap: 40px;
     max-width: 1300px;
     margin: 0 auto;
 }
 
-/* Footer Left: Brand/About */
 .footer-left h3 {
     font-size: 1.8rem;
     color: #D4A017;
@@ -769,7 +865,6 @@ footer {
     max-width: 400px;
 }
 
-/* Footer Right: Socials & Links */
 .footer-right h4 {
     font-size: 1.2rem;
     color: #FFFFFF;
@@ -783,6 +878,7 @@ footer {
     display: flex;
     gap: 15px;
     margin-top: 10px;
+    flex-wrap: wrap;
 }
 
 .social-links a {
@@ -794,26 +890,26 @@ footer {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 50%;
     transition: all 0.3s ease;
+    min-width: 44px;
+    min-height: 44px;
 }
 
 .social-links img {
     width: 22px;
     height: 22px;
-    filter: brightness(0) invert(1); /* Keeps icons white */
+    filter: brightness(0) invert(1);
     transition: 0.3s;
 }
 
-/* Hover Effect: Turns Gold */
 .social-links a:hover {
     background: #D4A017;
     transform: translateY(-5px);
 }
 
 .social-links a:hover img {
-    filter: brightness(0) invert(0); /* Turns icon dark on gold background */
+    filter: brightness(0) invert(0);
 }
 
-/* Footer Bottom: Copyright */
 .footer-bottom {
     text-align: center;
     margin-top: 60px;
@@ -827,7 +923,6 @@ footer {
     letter-spacing: 0.5px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     footer { padding: 60px 5% 30px; }
     .footer-container { text-align: center; justify-items: center; }
@@ -836,52 +931,26 @@ footer {
 }
 
 /* =========================================
-   STRICT MOBILE "BOLD" VIEW (Home Page)
+   STRICT MOBILE "BOLD" VIEW
    ========================================= */
 @media (max-width: 850px) {
-    /* 1. Navbar Bold Fix */
-    #navbar {
-        padding: 0 20px;
-        height: 70px;
-    }
-
     #navbar h2 {
         font-size: 1.4rem;
-        width: 100%;
-        text-align: center; /* Center the brand on mobile */
+        text-align: left;
     }
 
-    /* 2. Hero Section - Full Screen Impact */
     .hero {
         padding: 0 15px;
-        background-attachment: scroll; /* Fixes laggy background on mobile */
-    }
-
-    .hero h1 {
-        font-size: 2.8rem; /* Large and bold */
-        line-height: 1.1;
-        margin-bottom: 15px;
-    }
-
-    .hero p {
-        font-size: 1.2rem;
-        margin-bottom: 30px;
     }
 
     .btn-hero {
-        width: 90%; /* Wide, bold button */
-        padding: 20px;
-        font-size: 1.1rem;
         border-radius: 15px;
     }
 
-    /* 3. Section Headers */
     .about h2, .programs h2, .events h2, .gallery h2, .contact h2 {
-        font-size: 2.2rem;
         width: 100%;
     }
 
-    /* 4. Bold Cards (1 Column) */
     .about-cards, .programs-container, .events-container, .gallery-container {
         grid-template-columns: 1fr !important; 
         gap: 25px;
@@ -895,15 +964,13 @@ footer {
     }
 
     .program:hover {
-        transform: translateY(-5px); /* Simple vertical pop for mobile */
+        transform: translateY(-5px);
     }
 
-    /* 5. Gallery - Make items larger */
     .gallery-item {
         height: 350px;
     }
 
-    /* 6. Contact Form - Full Width */
     .contact-container {
         flex-direction: column;
         gap: 40px;
@@ -919,7 +986,6 @@ footer {
         font-size: 1.2rem;
     }
 
-    /* 7. Footer */
     footer {
         padding: 60px 20px 30px;
         text-align: center;

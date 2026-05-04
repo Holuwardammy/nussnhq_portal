@@ -1,12 +1,12 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NUSS Website</title>
-
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4">
 </head>
 
 <body>
@@ -14,6 +14,12 @@
 <!-- NAVBAR -->
 <nav id="navbar">
     <h2>NUSS</h2>
+    
+    <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
 
     <ul>
         <li><a href="#about">About</a></li>
@@ -24,7 +30,6 @@
     </ul>
 </nav>
 
-
 <!-- HERO SECTION -->
 <section class="hero">
     <h1>Welcome to NUSSNHQ</h1>
@@ -34,23 +39,17 @@
     <a href="{% url 'login' %}" class="btn-hero">Login</a>
 </section>
 
-
 <script src="{% static 'js/script.js' %}"></script>
 
 <!-- ABOUT SECTION -->
-
 <section id="about" class="about">
-
     <h2>About NUSS</h2>
-
     <p class="about-intro">
         The National Union of Saki Students National Headquarter (NUSSNHQ) is dedicated to supporting
         Saki students through education, leadership, and community development.
         We aim to empower the next generation of leaders.
     </p>
-
     <div class="about-cards">
-
         <div class="card">
             <h3>Our Mission</h3>
             <p>
@@ -58,7 +57,6 @@
                 and leadership opportunities.
             </p>
         </div>
-
         <div class="card">
             <h3>Our Vision</h3>
             <p>
@@ -66,7 +64,6 @@
                 positively to society.
             </p>
         </div>
-
         <div class="card">
             <h3>Our Community</h3>
             <p>
@@ -74,24 +71,17 @@
                 for collaboration and growth.
             </p>
         </div>
-
     </div>
-
 </section>
 
 <!-- PROGRAMS SECTION -->
-
 <section id="programs" class="programs">
-
     <h2>Our Programs</h2>
-
     <p class="programs-intro">
         NUSS offers several programs designed to support Saki students
         academically, professionally, and socially.
     </p>
-
     <div class="programs-container">
-
         <div class="program">
             <h3>Leadership Training</h3>
             <p>
@@ -99,7 +89,6 @@
                 seminars, and leadership opportunities.
             </p>
         </div>
-
         <div class="program">
             <h3>Student Mentorship</h3>
             <p>
@@ -107,7 +96,6 @@
                 to guide them through university life.
             </p>
         </div>
-
         <div class="program">
             <h3>Academic Support</h3>
             <p>
@@ -115,7 +103,6 @@
                 to help students succeed academically.
             </p>
         </div>
-
         <div class="program">
             <h3>Networking Events</h3>
             <p>
@@ -123,9 +110,7 @@
                 with professionals and industry leaders.
             </p>
         </div>
-
     </div>
-
 </section>
 
 <!-- EVENTS SECTION -->
@@ -134,7 +119,6 @@
     <p class="events-intro">
         Join our events to learn, connect, and grow with fellow Saki students.
     </p>
-
     <div class="events-container">
         {% for event in events %}
             <div class="event-card">
@@ -158,46 +142,34 @@
 </section>
 
 <!-- GALLERY SECTION -->
-
 <section id="gallery" class="gallery">
-
     <h2>Gallery</h2>
     <p class="gallery-intro">
         Take a look at some moments from our events and activities.
     </p>
-
     <div class="gallery-container">
-
         <div class="gallery-item">
             <img src="{% static 'images/gallery1.jpg' %}" alt="Event 1">
         </div>
-
         <div class="gallery-item">
             <img src="{% static 'images/gallery2.jpg' %}" alt="Event 2">
         </div>
-
         <div class="gallery-item">
             <img src="{% static 'images/gallery3.jpg' %}" alt="Event 3">
         </div>
-
         <div class="gallery-item">
             <img src="{% static 'images/gallery4.jpg' %}" alt="Event 4">
         </div>
-
     </div>
-
 </section>
 
 <!-- CONTACT SECTION -->
-
 <section id="contact" class="contact">
     <h2>Contact Us</h2>
     <p class="contact-intro">
         Have questions or suggestions? Reach out to us anytime!
     </p>
-
     <div class="contact-container">
-
         <!-- Contact Form -->
         <div class="contact-form">
             <form action="#" method="post">
@@ -208,7 +180,6 @@
                 <button type="submit">Send Message</button>
             </form>
         </div>
-
         <!-- Contact Info -->
         <div class="contact-info">
             <h3>Our Office</h3>
@@ -225,7 +196,6 @@
                 loading="lazy">
             </iframe>
         </div>
-
     </div>
 </section>
 
@@ -236,7 +206,6 @@
             <h3>National Union of Saki Students</h3>
             <p>Connecting students, sharing knowledge, and celebrating unity.</p>
         </div>
-
         <div class="footer-right">
             <h4>Follow Us</h4>
             <div class="social-links">
@@ -246,8 +215,6 @@
                 <a href="#" target="_blank"><img src="{% static 'images/linkedin.png' %}" alt="LinkedIn"></a>
             </div>
         </div>
-    </div>
-
     <div class="footer-bottom">
         <p>&copy; 2026 National Union of Saki Students. All rights reserved.</p>
     </div>
@@ -257,13 +224,29 @@
 const sections = document.querySelectorAll("section");
 const navLinks = document.querySelectorAll("nav ul li a");
 const navbar = document.getElementById("navbar");
+const navToggle = document.querySelector(".nav-toggle");
+const navMenu = document.querySelector("#navbar ul");
+
+// Mobile hamburger toggle
+navToggle.addEventListener("click", () => {
+    navMenu.classList.toggle("active");
+    navToggle.classList.toggle("active");
+});
+
+// Close mobile menu when link clicked
+navLinks.forEach(link => {
+    link.addEventListener("click", () => {
+        navMenu.classList.remove("active");
+        navToggle.classList.remove("active");
+    });
+});
 
 window.addEventListener("scroll", () => {
     let current = "";
 
-    // ---------- Highlight active nav link ----------
+    // Highlight active nav link
     sections.forEach(section => {
-        const sectionTop = section.offsetTop - 60; // adjust for navbar
+        const sectionTop = section.offsetTop - 80;
         if (pageYOffset >= sectionTop) {
             current = section.getAttribute("id");
         }
@@ -276,17 +259,16 @@ window.addEventListener("scroll", () => {
         }
     });
 
-    // ---------- Shrink navbar when scrolling ----------
+    // Shrink navbar when scrolling
     if (window.scrollY > 50) {
         navbar.classList.add("scrolled");
     } else {
         navbar.classList.remove("scrolled");
     }
 
-    // ---------- Fade-in sections ----------
+    // Fade-in sections
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.offsetHeight;
         if (window.scrollY >= sectionTop - window.innerHeight + 50) {
             section.classList.add("visible");
         }
@@ -295,5 +277,4 @@ window.addEventListener("scroll", () => {
 </script>
 
 </body>
-
 </html>
