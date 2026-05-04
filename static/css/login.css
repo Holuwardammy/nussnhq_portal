@@ -11,13 +11,20 @@
     --error-red: #d32f2f;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    padding: 0;
+    padding: 20px; /* CHANGED: Added breathing room for short screens */
     font-family: 'Poppins', sans-serif;
-    background: url('/static/images/bac.jpg') no-repeat center center fixed;
+    background: url('/static/images/bac.jpg') no-repeat center center;
     background-size: cover;
+    background-attachment: scroll; /* CHANGED: fixed breaks flex center on desktop */
     min-height: 100vh;
+    min-height: 100dvh; /* CHANGED: Dynamic viewport - fixes laptop centering */
+    min-height: -webkit-fill-available;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -48,6 +55,9 @@ body::before {
     position: relative;
     z-index: 1;
     animation: loginFadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    margin: auto; /* ADDED: Extra centering guarantee */
+    max-height: calc(100dvh - 40px); /* ADDED: Prevent overflow on laptops */
+    overflow-y: auto; /* ADDED: Scroll inside if too tall */
 }
 
 .login-container h2 {
@@ -83,11 +93,12 @@ input {
     border: 2px solid #eef2f6;
     border-radius: 12px;
     font-family: 'Poppins', sans-serif;
-    font-size: 0.95rem;
+    font-size: 16px;
     color: var(--primary-blue);
     background: #fff;
     transition: all 0.3s ease;
-    box-sizing: border-box; /* Fixes mobile width issues */
+    box-sizing: border-box;
+    touch-action: manipulation;
 }
 
 input:focus {
@@ -112,12 +123,18 @@ button[type="submit"] {
     cursor: pointer;
     box-shadow: 0 10px 20px rgba(184, 134, 11, 0.3);
     transition: all 0.3s ease;
+    min-height: 48px;
+    touch-action: manipulation;
 }
 
 button[type="submit"]:hover {
     transform: translateY(-3px);
     box-shadow: 0 15px 30px rgba(184, 134, 11, 0.5);
     filter: brightness(1.1);
+}
+
+button[type="submit"]:active {
+    transform: translateY(-1px);
 }
 
 /* Registration Link styling */
@@ -133,6 +150,7 @@ button[type="submit"]:hover {
     font-weight: 700;
     text-decoration: none;
     transition: color 0.3s ease;
+    padding: 4px;
 }
 
 .login-container a:hover {
@@ -148,6 +166,7 @@ button[type="submit"]:hover {
     font-size: 0.85rem;
     text-align: center;
     font-weight: 600;
+    word-break: break-word;
 }
 
 .alert.error {
@@ -179,20 +198,20 @@ button[type="submit"]:hover {
    ========================== */
 @media (max-width: 850px) {
     body {
-        /* Centering the card vertically for a cleaner look */
         align-items: center; 
-        padding: 20px 0;
+        padding: 20px;
+        background-attachment: scroll; /* ADDED: Better mobile perf */
     }
 
     .login-container {
-        /* This creates the "Bold" centered card feel */
         width: 92%; 
         max-width: 400px;
         padding: 45px 30px; 
         border-radius: 20px;
         margin: auto;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); /* Stronger shadow for depth */
-        border: 2px solid rgba(255, 215, 0, 0.4); /* Thicker gold border */
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        border: 2px solid rgba(255, 215, 0, 0.4);
+        max-height: calc(100dvh - 40px);
     }
 
     .login-container h2 {
@@ -200,15 +219,13 @@ button[type="submit"]:hover {
         margin-bottom: 25px;
     }
 
-    /* Bolder Inputs */
     input {
-        padding: 16px; /* Taller touch target */
-        font-size: 16px; /* Critical: stops iPhone zoom-in glitch */
+        padding: 16px;
+        font-size: 16px;
         border-radius: 14px;
-        margin-bottom: 25px; /* More breathing room */
+        margin-bottom: 25px;
     }
 
-    /* Bolder Button */
     button[type="submit"] {
         padding: 18px;
         font-size: 1.2rem;
@@ -216,9 +233,19 @@ button[type="submit"]:hover {
         box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
     }
 
-    /* Make links easier to tap */
     .login-container p {
         margin-top: 30px;
         font-size: 1rem;
+    }
+}
+
+/* Extra small phones */
+@media (max-width: 380px) {
+    .login-container {
+        padding: 35px 20px;
+    }
+    
+    .login-container h2 {
+        font-size: 1.8rem;
     }
 }
