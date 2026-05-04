@@ -17,13 +17,13 @@
 
 body {
     margin: 0;
-    padding: 20px; /* CHANGED: Added breathing room for short screens */
+    padding: 0; /* CHANGED: Removed padding, we'll handle it on container */
     font-family: 'Poppins', sans-serif;
     background: url('/static/images/bac.jpg') no-repeat center center;
     background-size: cover;
-    background-attachment: scroll; /* CHANGED: fixed breaks flex center on desktop */
+    background-attachment: scroll;
     min-height: 100vh;
-    min-height: 100dvh; /* CHANGED: Dynamic viewport - fixes laptop centering */
+    min-height: 100svh; /* CHANGED: svh = small viewport, stable on mobile */
     min-height: -webkit-fill-available;
     display: flex;
     align-items: center;
@@ -55,9 +55,9 @@ body::before {
     position: relative;
     z-index: 1;
     animation: loginFadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-    margin: auto; /* ADDED: Extra centering guarantee */
-    max-height: calc(100dvh - 40px); /* ADDED: Prevent overflow on laptops */
-    overflow-y: auto; /* ADDED: Scroll inside if too tall */
+    margin: 20px; /* CHANGED: Use margin instead of body padding */
+    max-height: calc(100svh - 40px); /* CHANGED: svh instead of dvh */
+    overflow-y: auto;
 }
 
 .login-container h2 {
@@ -67,7 +67,9 @@ body::before {
     margin-bottom: 30px;
     background: linear-gradient(to right, var(--primary-blue), var(--deep-gold));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+    color: transparent;
     letter-spacing: -0.5px;
 }
 
@@ -199,8 +201,8 @@ button[type="submit"]:active {
 @media (max-width: 850px) {
     body {
         align-items: center; 
-        padding: 20px;
-        background-attachment: scroll; /* ADDED: Better mobile perf */
+        justify-content: center; /* ADDED: Explicit center */
+        padding: 0; /* CHANGED: Remove body padding on mobile */
     }
 
     .login-container {
@@ -208,10 +210,10 @@ button[type="submit"]:active {
         max-width: 400px;
         padding: 45px 30px; 
         border-radius: 20px;
-        margin: auto;
+        margin: 20px; /* CHANGED: Use margin for spacing */
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
         border: 2px solid rgba(255, 215, 0, 0.4);
-        max-height: calc(100dvh - 40px);
+        max-height: none; /* CHANGED: Remove max-height on mobile */
     }
 
     .login-container h2 {
@@ -243,6 +245,7 @@ button[type="submit"]:active {
 @media (max-width: 380px) {
     .login-container {
         padding: 35px 20px;
+        margin: 15px; /* ADDED: Smaller margin */
     }
     
     .login-container h2 {
