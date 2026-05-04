@@ -15,29 +15,29 @@
     box-sizing: border-box;
 }
 
+html, body {
+    height: 100%; /* ADDED: Critical for mobile */
+}
+
 body {
     margin: 0;
-    padding: 0; /* CHANGED: Removed padding, we'll handle it on container */
+    padding: 0;
     font-family: 'Poppins', sans-serif;
     background: url('/static/images/bac.jpg') no-repeat center center;
     background-size: cover;
-    background-attachment: scroll;
-    min-height: 100vh;
-    min-height: 100svh; /* CHANGED: svh = small viewport, stable on mobile */
-    min-height: -webkit-fill-available;
+    background-attachment: fixed; /* CHANGED: Back to fixed */
+    min-height: 100%; /* CHANGED: Use % not vh */
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    overflow-x: hidden;
 }
 
 /* Darkened Luxury Overlay */
 body::before {
     content: '';
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    top: 0; left: 0; right: 0; bottom: 0; /* CHANGED: Use all 4 sides */
     background: linear-gradient(135deg, rgba(26, 35, 126, 0.8), rgba(0, 0, 0, 0.7));
     z-index: 0;
 }
@@ -55,9 +55,7 @@ body::before {
     position: relative;
     z-index: 1;
     animation: loginFadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-    margin: 20px; /* CHANGED: Use margin instead of body padding */
-    max-height: calc(100svh - 40px); /* CHANGED: svh instead of dvh */
-    overflow-y: auto;
+    margin: 20px auto; /* CHANGED: auto for horizontal center */
 }
 
 .login-container h2 {
@@ -196,13 +194,22 @@ button[type="submit"]:active {
 }
 
 /* ==========================
-   STRICT MOBILE "BOLD" VIEW
+   MOBILE FIX - NO FLEX CENTER
    ========================== */
 @media (max-width: 850px) {
+    html, body {
+        height: auto; /* CHANGED: Let it grow */
+        min-height: 100%;
+    }
+    
     body {
-        align-items: center; 
-        justify-content: center; /* ADDED: Explicit center */
-        padding: 0; /* CHANGED: Remove body padding on mobile */
+        display: block; /* CHANGED: Kill flex on mobile */
+        padding: 40px 0; /* CHANGED: Padding for spacing */
+        background-attachment: scroll;
+    }
+
+    body::before {
+        height: 100vh; /* CHANGED: Force full height */
     }
 
     .login-container {
@@ -210,10 +217,10 @@ button[type="submit"]:active {
         max-width: 400px;
         padding: 45px 30px; 
         border-radius: 20px;
-        margin: 20px; /* CHANGED: Use margin for spacing */
+        margin: 0 auto; /* CHANGED: Center horizontally only */
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
         border: 2px solid rgba(255, 215, 0, 0.4);
-        max-height: none; /* CHANGED: Remove max-height on mobile */
+        /* REMOVED: max-height completely */
     }
 
     .login-container h2 {
@@ -245,7 +252,7 @@ button[type="submit"]:active {
 @media (max-width: 380px) {
     .login-container {
         padding: 35px 20px;
-        margin: 15px; /* ADDED: Smaller margin */
+        width: 94%;
     }
     
     .login-container h2 {
