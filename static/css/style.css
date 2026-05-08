@@ -831,25 +831,27 @@ section.visible {
 }
 
 /* =========================================
-   10. PREMIUM FOOTER
+   10. PREMIUM FOOTER - FINAL FIXED VERSION
    ========================================= */
 footer {
     background: #0d1241;
     color: #e2e8f0;
     padding: 80px 8% 30px;
-    font-family: inherit;
+    font-family: 'Inter', sans-serif;
     position: relative;
     border-top: 4px solid #D4A017;
 }
 
 .footer-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+    /* Updated to 3 columns to fit the new Map section */
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 40px;
     max-width: 1300px;
     margin: 0 auto;
 }
 
+/* LEFT COLUMN: BRANDING */
 .footer-left h3 {
     font-size: 1.8rem;
     color: #D4A017;
@@ -863,9 +865,25 @@ footer {
     line-height: 1.8;
     color: #cbd5e1;
     max-width: 400px;
+    margin-bottom: 15px;
 }
 
-.footer-right h4 {
+/* Official HQ Email Link */
+.footer-email {
+    color: #D4A017;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+    word-break: break-all;
+}
+
+.footer-email:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* RIGHT COLUMN: SOCIALS & MAP */
+.footer-right h4, .footer-right h3 {
     font-size: 1.2rem;
     color: #FFFFFF;
     margin-bottom: 20px;
@@ -874,11 +892,14 @@ footer {
     letter-spacing: 1px;
 }
 
+/* SOCIAL LINKS FIX */
 .social-links {
     display: flex;
     gap: 15px;
-    margin-top: 10px;
+    margin-top: 20px;
+    margin-bottom: 30px;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .social-links a {
@@ -887,29 +908,37 @@ footer {
     justify-content: center;
     width: 45px;
     height: 45px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
-    transition: all 0.3s ease;
-    min-width: 44px;
-    min-height: 44px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
 }
 
 .social-links img {
-    width: 22px;
-    height: 22px;
-    filter: brightness(0) invert(1);
+    /* Critical Fix for Large Files */
+    width: 24px !important;
+    height: 24px !important;
+    max-width: 24px;
+    max-height: 24px;
+    display: block;
+    object-fit: contain;
     transition: 0.3s;
 }
 
 .social-links a:hover {
     background: #D4A017;
-    transform: translateY(-5px);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(212, 160, 23, 0.4);
 }
 
-.social-links a:hover img {
-    filter: brightness(0) invert(0);
+/* MAP STYLING */
+.footer-right iframe {
+    border-radius: 12px;
+    border: 1px solid rgba(212, 160, 23, 0.3);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
+/* BOTTOM BAR */
 .footer-bottom {
     text-align: center;
     margin-top: 60px;
@@ -919,15 +948,13 @@ footer {
     color: #94a3b8;
 }
 
-.footer-bottom p {
-    letter-spacing: 0.5px;
-}
-
+/* RESPONSIVE FIXES */
 @media (max-width: 768px) {
     footer { padding: 60px 5% 30px; }
     .footer-container { text-align: center; justify-items: center; }
-    .footer-left p { margin: 0 auto; }
+    .footer-left p { margin: 0 auto 15px; }
     .social-links { justify-content: center; }
+    .footer-right iframe { max-width: 100%; }
 }
 
 /* =========================================
