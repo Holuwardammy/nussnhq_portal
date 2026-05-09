@@ -16,24 +16,40 @@ def home(request):
     events = Event.objects.all().order_by('-date') 
     return render(request, 'home.html', {'events': events})
 
-
 # ---------------------------
-# REGISTER
+# REGISTER (With Executive Role Lockout)
 # ---------------------------
 def register_student(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
         if form.is_valid():
+            # 1. Temporarily hold the student data
             student = form.save(commit=False)
             
-            # --- SELF-LEARNING LOGIC ---
-            # Get the school name from the hidden input in your HTML
+            # 2. ROLE LOCKOUT LOGIC
+            # We check the member_type from the submitted form
+            selected_role = form.cleaned_data.get('member_type')
+            
+            # These are the roles defined in your Student model's EXECUTIVE_ROLES
+            restricted_roles = ['president', 'treasurer', 'financial_secretary']
+            
+            if selected_role in restricted_roles:
+                # Check if anyone is already registered with this specific role
+                role_exists = Student.objects.filter(member_type=selected_role).exists()
+                
+                if role_exists:
+                    # Clean the role name for the message (e.g., 'financial_secretary' -> 'Financial Secretary')
+                    display_role = selected_role.replace('_', ' ').title()
+                    messages.error(request, f"Access Denied: The position of {display_role} is already occupied.")
+                    return render(request, 'register_student.html', {'form': form})
+
+            # 3. SELF-LEARNING LOGIC (Your existing code)
             school_name = request.POST.get('school', '').strip()
             if school_name:
-                # This saves the school to the database if it doesn't exist yet
                 School.objects.get_or_create(name=school_name)
                 student.school = school_name
             
+            # 4. Final Save
             student.save()
             messages.success(request, "Registration Successful! Please login with your email.")
             return redirect('login')
