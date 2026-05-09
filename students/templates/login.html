@@ -5,18 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Login</title>
-    <link rel="stylesheet" href="{% static 'css/login.css' %}?v=4">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}?v=5">
 </head>
 
 <body>
 
+<!-- Back Button Navigation -->
+<div class="back-nav">
+    <a href="{% url 'home' %}" class="back-btn">
+        <span class="arrow">&larr;</span> Back to Home
+    </a>
+</div>
+
 <div class="login-container">
-
     <h2>Login</h2>
-
     <form method="POST" action="{% url 'login' %}">
         {% csrf_token %}
-
         <label for="username">Email or Serial Number</label>
         <input type="text" id="username" name="username" placeholder="Enter email or serial number" autocomplete="username" required>
 
@@ -32,13 +36,11 @@
                 </div>
             {% endfor %}
         {% endif %}
-
     </form>
 
     <p>Don't have an account? 
         <a href="{% url 'register_student' %}">Register here</a>
     </p>
-
 </div>
 
 </body>

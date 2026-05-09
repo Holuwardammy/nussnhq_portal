@@ -3,11 +3,15 @@ Django settings for nuss_webapp project.
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
 import os
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-95=8gc$s8_70$q5l$9ohez!!y3&ut*lt+_wc*ht1l8#^=tzeh8'
@@ -85,7 +89,7 @@ WSGI_APPLICATION = 'nuss_webapp.wsgi.application'
 # Database
 DATABASES = {
     'default': dj_database_url.parse(
-        os.environ.get("DATABASE_URL")
+        os.getenv("DATABASE_URL")
     )
 }
 

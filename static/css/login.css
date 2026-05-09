@@ -259,3 +259,57 @@ button[type="submit"]:active {
         font-size: 1.8rem;
     }
 }
+
+/* Back Button Container */
+.back-nav {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #1A237E; /* Deep Blue */
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 10px 18px;
+    background: #ffffff;
+    border: 2px solid #D4A017; /* Gold Border */
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.back-btn .arrow {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+/* Hover State */
+.back-btn:hover {
+    background: #D4A017; /* Gold Background */
+    color: #ffffff;
+    transform: translateX(-5px);
+    box-shadow: 0 6px 12px rgba(212, 160, 23, 0.3);
+}
+
+.back-btn:hover .arrow {
+    transform: translateX(-3px);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+    .back-nav {
+        top: 15px;
+        left: 15px;
+    }
+    
+    .back-btn {
+        padding: 8px 14px;
+        font-size: 0.9rem;
+    }
+}
