@@ -3,13 +3,12 @@ from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.db.models import Sum
+from django.db.models import Sum, Case, When, Value, IntegerField
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
 from .models import Student, Payment, Event, Fundraising, School
 from .forms import StudentForm, EventForm, FundraisingForm
-
 
 def home(request):
     # This grabs EVERYTHING and puts the newest dates first
@@ -131,19 +130,32 @@ def admin_dashboard(request):
         messages.error(request, "Access denied. Executives only.")
         return redirect('student_home')
 
-    # --- FINANCIAL DATA (Optimized for Treasurer) ---
+    # --- FINANCIAL DATA ---
+    # Total income now only counts 'paid' status
     total_income = Payment.objects.filter(status='paid').aggregate(Sum('amount'))['amount__sum'] or 0
-    awaiting_verification = Payment.objects.filter(status='processing')
-    unpaid_count = Student.objects.filter(payment__status='pending').count() + Student.objects.filter(payment__isnull=True).count()
+    
+    # NEW LOGIC: This gets ALL payments but puts 'processing' at the top
+    # Once you approve them, they stay in this list but move down
+    all_payments = Payment.objects.annotate(
+        priority=Case(
+            When(status='processing', then=Value(1)), # New payments first
+            When(status='paid', then=Value(2)),       # History second
+            default=Value(3),
+            output_field=IntegerField(),
+        )
+    ).order_by('priority', '-date') # Newest date within those groups
+
+    unpaid_count = Student.objects.filter(payment__status='pending').count() + \
+                   Student.objects.filter(payment__isnull=True).count()
 
     return render(request, "admin_dashboard.html", {
         "students": Student.objects.all(),
         "total_income": total_income,
         "unpaid_count": unpaid_count,
-        "awaiting_verification": awaiting_verification,
+        "all_payments": all_payments,  # Use this in your template loop
         "events": Event.objects.all(),
         "fundraising": Fundraising.objects.all(),
-        "admin_student": admin_student # Used in template to check roles
+        "admin_student": admin_student 
     })
 
 

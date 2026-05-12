@@ -160,43 +160,56 @@
                 </tr>
             </thead>
             <tbody>
-            {% for payment in awaiting_verification %}
-                <tr>
-                    <td data-label="Student">{{ payment.student.full_name }}</td>
-                    <td data-label="Amount">₦{{ payment.amount }}</td>
-                    <td data-label="Receipt">
-                        {% if payment.payment_receipt %}
-                            <a href="{{ payment.payment_receipt.url }}" target="_blank" class="button" style="background:#1A237E; padding: 5px 10px; font-size: 0.8em;">View Receipt</a>
-                        {% else %}
-                            <span style="color: #94a3b8; font-style: italic;">No receipt</span>
-                        {% endif %}
-                    </td>
-                    <td data-label="Status">
-                        <span class="status-badge {{ payment.status }}">
-                            {{ payment.get_status_display }}
+    {% for payment in all_payments %}
+        <tr {% if payment.status == 'processing' %}style="background-color: rgba(212, 160, 23, 0.05);"{% endif %}>
+            <td data-label="Student">{{ payment.student.full_name }}</td>
+            <td data-label="Amount">₦{{ payment.amount }}</td>
+            <td data-label="Receipt">
+                {% if payment.payment_receipt %}
+                    <a href="{{ payment.payment_receipt.url }}" target="_blank" class="button" style="background:#1A237E; padding: 5px 10px; font-size: 0.8em;">View Receipt</a>
+                {% else %}
+                    <span style="color: #94a3b8; font-style: italic;">No receipt</span>
+                {% endif %}
+            </td>
+            <td data-label="Status">
+                <!-- Uses the "Premium" status badges defined in your CSS -->
+                <span class="status-badge {{ payment.status }}">
+                    {{ payment.get_status_display }}
+                </span>
+            </td>
+            <td data-label="Date Paid">{{ payment.date_paid|default:"—" }}</td>
+            <td data-label="Action">
+                <div class="action-container">
+                {# Check if user has permission to manage finances #}
+                {% if admin_student.is_financial_secretary or admin_student.is_president or admin_student.is_treasurer or user.is_staff %}
+                    
+                    {% if payment.status == 'processing' %}
+                        {# Action for new payments waiting for approval #}
+                        <a href="{% url 'approve_payment' payment.id %}" class="button" style="background: #2e7d32;">Approve Now</a>
+                    
+                    {% elif payment.status == 'paid' %}
+                        {# This is the 'History' view - shows they are already done #}
+                        <span style="color: #2e7d32; font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                            <i class="fas fa-check-circle"></i> Verified
                         </span>
-                    </td>
-                    <td data-label="Date Paid">{{ payment.date_paid|default:"—" }}</td>
-                    <td data-label="Action">
-                        <div class="action-container">
-                        {% if admin_student.is_financial_secretary or admin_student.is_president or user.is_staff %}
-                            {% if payment.status == 'processing' %}
-                                <a href="{% url 'approve_payment' payment.id %}" class="button" style="background: #2e7d32;">Approve</a>
-                            {% elif payment.status == 'pending' %}
-                                <a href="{% url 'approve_payment' payment.id %}" class="button">Mark Paid</a>
-                            {% else %}
-                                 <span style="color: #2e7d32; font-weight: bold;">✔ Verified</span>
-                            {% endif %}
-                        {% else %}
-                             <span style="color: gray; font-size: 0.8em;">Viewing Only</span>
-                        {% endif %}
-                        </div>
-                    </td>
-                </tr>
+
+                    {% elif payment.status == 'pending' %}
+                        {# For manual entries not yet processed #}
+                        <a href="{% url 'approve_payment' payment.id %}" class="button">Mark Paid</a>
+                    
+                    {% endif %}
+
+                {% else %}
+                    {# View-only mode for other executives like Social Director #}
+                    <span style="color: gray; font-size: 0.8em;">Viewing Only</span>
+                {% endif %}
+                </div>
+            </td>
+        </tr>
             {% empty %}
-                <tr><td colspan="6">No payments found.</td></tr>
+            <tr><td colspan="6" style="text-align: center; padding: 20px;">No payment records found.</td></tr>
             {% endfor %}
-            </tbody>
+        </tbody>
         </table>
     </div>
 
