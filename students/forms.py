@@ -1,12 +1,16 @@
+import re
 from django import forms
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from .models import Student, Event, Fundraising, Payment
 
 class StudentForm(forms.ModelForm):
+    # 1. Single Password Field with both Styling and Help Text
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'placeholder': 'Enter password'}),
+        widget=forms.PasswordInput(attrs={'placeholder': 'Enter a strong password'}),
         required=True,
-        label="Password"
+        label="Password",
+        help_text="Min. 8 chars, 1 uppercase, 1 number, 1 symbol"
     )
 
     MEMBERSHIP_CHOICES = [
@@ -47,7 +51,7 @@ class StudentForm(forms.ModelForm):
             'nationality',
             'member_type'
         ]
-
+        # 2. Corrected Widgets Placement (Inside Meta)
         widgets = {
             'full_name': forms.TextInput(attrs={'placeholder': 'Enter your full name'}),
             'school': forms.TextInput(attrs={'placeholder': 'Enter your school'}),
@@ -61,15 +65,32 @@ class StudentForm(forms.ModelForm):
             'profile_picture': forms.FileInput()
         }
 
+    # --- PASSWORD STRENGTH VALIDATION ---
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        
+        if len(password) < 8:
+            raise ValidationError("Password must be at least 8 characters long.")
+        if not re.search(r'[A-Z]', password):
+            raise ValidationError("Password must contain at least one uppercase letter.")
+        if not re.search(r'[0-9]', password):
+            raise ValidationError("Password must contain at least one number.")
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>+=\-_]', password):
+            raise ValidationError("Password must contain at least one special character (symbol).")
+        
+        return password
+
+    # --- EMAIL VALIDATION ---
     def clean_email(self):
-        # Normalize email to lowercase to prevent login mismatches
         email = self.cleaned_data.get('email').lower()
 
+        # Check Student model
         if Student.objects.filter(email=email).exists():
-            raise forms.ValidationError("A student with this email already exists.")
+            raise ValidationError("A student with this email already exists.")
 
+        # Check Django User model (for login conflicts)
         if User.objects.filter(username=email).exists():
-            raise forms.ValidationError("This email is already registered.")
+            raise ValidationError("This email is already registered as a user.")
 
         return email
 
@@ -80,26 +101,25 @@ class StudentForm(forms.ModelForm):
         full_name = self.cleaned_data.get('full_name')
         member_type = self.cleaned_data.get('member_type')
 
-        # STICKING TO YOUR RULES: Only these three get Admin access
+        # EXECUTIVE ROLES check
         admin_roles = ['president', 'treasurer', 'financial_secretary']
         is_admin = member_type in admin_roles
 
-        # Use email as the username
+        # Create/Update the associated User
         user = User.objects.filter(username=email).first()
         if user is None:
-            # create_user automatically hashes the password correctly
             user = User.objects.create_user(
                 username=email, 
                 email=email,
                 password=password
             )
         
-        # Sync names
+        # Sync Profile names to the User account
         name_parts = full_name.strip().split()
         user.first_name = name_parts[0] if name_parts else ""
         user.last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
         
-        # ONLY True for President, Treasurer, and Fin Sec
+        # Grant staff access ONLY to the big 3 roles
         user.is_staff = is_admin
         user.save()
 

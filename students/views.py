@@ -22,41 +22,52 @@ def home(request):
 def register_student(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
+        
+        # form.is_valid() now automatically checks for:
+        # 1. Real email format & uniqueness
+        # 2. Strong password (Uppercase, Symbol, Number)
         if form.is_valid():
-            # 1. Temporarily hold the student data
-            student = form.save(commit=False)
             
-            # 2. ROLE LOCKOUT LOGIC
-            # We check the member_type from the submitted form
+            # --- 1. EXECUTIVE ROLE LOCKOUT LOGIC ---
             selected_role = form.cleaned_data.get('member_type')
-            
-            # These are the roles defined in your Student model's EXECUTIVE_ROLES
             restricted_roles = ['president', 'treasurer', 'financial_secretary']
             
             if selected_role in restricted_roles:
-                # Check if anyone is already registered with this specific role
+                # Check if this executive position is already taken in the database
                 role_exists = Student.objects.filter(member_type=selected_role).exists()
                 
                 if role_exists:
-                    # Clean the role name for the message (e.g., 'financial_secretary' -> 'Financial Secretary')
                     display_role = selected_role.replace('_', ' ').title()
                     messages.error(request, f"Access Denied: The position of {display_role} is already occupied.")
+                    # Return the form so they can change the role without losing data
                     return render(request, 'register_student.html', {'form': form})
 
-            # 3. SELF-LEARNING LOGIC (Your existing code)
+            # --- 2. SCHOOL SELF-LEARNING LOGIC ---
+            # We call form.save(commit=False) to get the student object 
+            # so we can manually set the school before the final save.
+            student = form.save(commit=False)
+            
             school_name = request.POST.get('school', '').strip()
             if school_name:
+                # Add to our School list if it's a new one
                 School.objects.get_or_create(name=school_name)
                 student.school = school_name
             
-            # 4. Final Save
+            # --- 3. FINAL SAVE ---
+            # This triggers the StudentForm.save() method we just updated,
+            # which handles User creation and Password hashing.
             student.save()
+            
             messages.success(request, "Registration Successful! Please login with your email.")
             return redirect('login')
+            
         else:
+            # If email is taken or password is weak, Django shows the errors from forms.py
             messages.error(request, "Please correct the errors below.")
+            
     else:
         form = StudentForm()
+        
     return render(request, 'register_student.html', {'form': form})
 
 # ADD THIS NEW VIEW HERE:
