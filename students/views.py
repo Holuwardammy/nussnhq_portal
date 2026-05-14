@@ -6,6 +6,8 @@ from django.contrib import messages
 from django.db.models import Sum, Case, When, Value, IntegerField
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.core.mail import send_mail
+from django.conf import settings
 
 from .models import Student, Payment, Event, Fundraising, School
 from .forms import StudentForm, EventForm, FundraisingForm
@@ -179,15 +181,31 @@ def submit_payment(request):
         receipt = request.FILES.get('payment_receipt')
 
         if receipt:
-            # CHANGE: Use .create() instead of .get_or_create()
-            # This ensures every payment is a unique record in the database
-            Payment.objects.create(
+            # Create unique payment record
+            payment = Payment.objects.create(
                 student=student,
                 amount=amount,
                 payment_receipt=receipt,
                 status='processing'
             )
             
+            # EMAIL NOTIFICATION: Payment Received
+            try:
+                send_mail(
+                    subject="Payment Received - Awaiting Verification",
+                    message=(
+                        f"Hello {student.full_name},\n\n"
+                        f"Your payment of ₦{amount} has been received and is currently being "
+                        "verified by the Financial Secretary.\n\n"
+                        "You will receive another notification once your payment has been approved."
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[student.email],
+                    fail_silently=True,
+                )
+            except Exception as e:
+                print(f"Payment submission email failed: {e}")
+
             messages.success(request, "Payment submitted! The Financial Secretary will verify it shortly.")
             return redirect('student_home')
         
@@ -211,6 +229,23 @@ def approve_payment(request, payment_id):
     payment = get_object_or_404(Payment, id=payment_id)
     payment.status = 'paid'
     payment.save()
+
+    # EMAIL NOTIFICATION: Payment Approved
+    try:
+        send_mail(
+            subject="Payment Verified Successfully!",
+            message=(
+                f"Hello {payment.student.full_name},\n\n"
+                f"Your payment of ₦{payment.amount} has been verified.\n\n"
+                "You now have full access to your student portal features. "
+                "Thank you for your commitment to NUSS!"
+            ),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[payment.student.email],
+            fail_silently=True,
+        )
+    except Exception as e:
+        print(f"Approval email failed: {e}")
 
     messages.success(request, f"Successfully verified payment for {payment.student.full_name}.")
     return redirect('admin_dashboard')
@@ -251,13 +286,38 @@ def create_event(request, event_id=None):
 
     # If event_id is provided, we are EDITING; otherwise, we are CREATING
     event = get_object_or_404(Event, id=event_id) if event_id else None
+    is_new_event = event is None  # Check if this is a fresh announcement
 
     if request.method == 'POST':
-        # Added instance=event to update the existing record if it exists
         form = EventForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
-            form.save()
-            msg = "Event updated successfully!" if event else "Event announced successfully!"
+            # 1. Save the event
+            saved_event = form.save()
+            
+            # 2. Only send email blast if it's a NEW event
+            if is_new_event:
+                # Get all registered student emails
+                recipient_emails = list(Student.objects.values_list('email', flat=True))
+                
+                if recipient_emails:
+                    try:
+                        send_mail(
+                            subject=f"NUSS Announcement: {saved_event.title}",
+                            message=(
+                                f"Hello Students,\n\n"
+                                f"A new event has been posted to the NUSS Portal: {saved_event.title}\n"
+                                f"Date: {saved_event.date}\n\n"
+                                f"Log in to the portal to see full details and location.\n\n"
+                                f"Best Regards,\nNUSS Executive Team"
+                            ),
+                            from_email=settings.DEFAULT_FROM_EMAIL,
+                            recipient_list=recipient_emails,
+                            fail_silently=True,
+                        )
+                    except Exception as e:
+                        print(f"Event blast email failed: {e}")
+
+            msg = "Event updated successfully!" if not is_new_event else "Event announced successfully and students notified!"
             messages.success(request, msg)
             return redirect('admin_dashboard')
     else:

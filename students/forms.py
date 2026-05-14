@@ -1,7 +1,10 @@
 import re
+import os
 from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.conf import settings
 from .models import Student, Event, Fundraising, Payment
 
 class StudentForm(forms.ModelForm):
@@ -128,6 +131,27 @@ class StudentForm(forms.ModelForm):
         
         if commit:
             student.save()
+            
+            # --- SEND WELCOME EMAIL ---
+            try:
+                send_mail(
+                    subject="Congratulations on Your Registration!",
+                    message=(
+                        f"Hello {full_name},\n\n"
+                        f"Welcome to the National Union of Saki Students (NUSS) Portal! "
+                        f"Your registration was successful.\n\n"
+                        f"You can now log in to pay your dues and access your dashboard.\n"
+                        f"Login Email: {email}\n\n"
+                        f"Best Regards,\nNUSS Executive Team"
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[email],
+                    fail_silently=True,
+                )
+            except Exception as e:
+                # Log the error but don't break the registration process
+                print(f"Registration email failed: {e}")
+                
         return student
 
 
