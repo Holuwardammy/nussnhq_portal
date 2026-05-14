@@ -141,6 +141,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# Email Configuration for Password Reset and Notifications
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com' 
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Security: Pulling from Render Environment Variables
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
+
+# Fallback display name logic
+DEFAULT_FROM_EMAIL = f"NUSS Portal <{EMAIL_HOST_USER}>"
+
 # Authentication Redirection
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
