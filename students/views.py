@@ -246,6 +246,7 @@ def approve_payment(request, payment_id):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[payment.student.email],
             fail_silently=True,
+            timeout=10,  # Added timeout to prevent hanging if email server is slow
         )
     except Exception as e:
         print(f"Approval email failed: {e}")
@@ -316,6 +317,7 @@ def create_event(request, event_id=None):
                             from_email=settings.DEFAULT_FROM_EMAIL,
                             recipient_list=recipient_emails,
                             fail_silently=True,
+                            timeout=10,  # Added timeout to prevent hanging if email server is slow
                         )
                     except Exception as e:
                         print(f"Event blast email failed: {e}")
