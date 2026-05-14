@@ -144,15 +144,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email Configuration for Password Reset and Notifications
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com' 
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
 
-# Security: Pulling from Render Environment Variables
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS') == 'True'
+
+# Pulling specific User/Pass keys from Render Environment
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
 
 # Fallback display name logic
+# Using a f-string ensures the email is properly formatted for Gmail
 DEFAULT_FROM_EMAIL = f"NUSS Portal <{EMAIL_HOST_USER}>"
 
 # Authentication Redirection
