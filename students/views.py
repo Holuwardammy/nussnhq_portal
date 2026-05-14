@@ -1,3 +1,5 @@
+from socket import timeout
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
@@ -202,6 +204,7 @@ def submit_payment(request):
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[student.email],
                     fail_silently=True,
+                    timeout=10,  # Added timeout to prevent hanging if email server is slow
                 )
             except Exception as e:
                 print(f"Payment submission email failed: {e}")
