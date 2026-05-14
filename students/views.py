@@ -145,7 +145,7 @@ def admin_dashboard(request):
             default=Value(3),
             output_field=IntegerField(),
         )
-    ).order_by('priority', '-date') # Newest date within those groups
+    ).order_by('priority', '-date_paid') # Newest date within those groups
 
     unpaid_count = Student.objects.filter(payment__status='pending').count() + \
                    Student.objects.filter(payment__isnull=True).count()
