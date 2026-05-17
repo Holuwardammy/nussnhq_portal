@@ -10,32 +10,21 @@ from .models import Student, Event, Fundraising, Payment
 class StudentForm(forms.ModelForm):
     # 1. Single Password Field with both Styling and Help Text
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'placeholder': 'Enter a strong password'}),
+        widget=forms.PasswordInput(attrs={'placeholder': 'Enter a strong password', 'class': 'form-control'}),
         required=True,
         label="Password",
         help_text="Min. 8 chars, 1 uppercase, 1 number, 1 symbol"
     )
 
+    # REMOVED Executive dropdown choices to protect structural architecture
     MEMBERSHIP_CHOICES = [
-        ('student', 'Student'),
-        ('student_member', 'Student Member'),
-        ('president', 'President'),
-        ('senate_president', 'Senate President'),
-        ('deputy_senate_president', 'Deputy Senate President'),
-        ('social_director', 'Social Director'),
-        ('welfare', 'Welfare'),
-        ('organising_committee', 'Organising Committee'),
-        ('general_secretary', 'General Secretary'),
-        ('assistant_general_secretary', 'Assistant General Secretary'),
-        ('pro', 'PRO'),
-        ('pro_ii', 'PRO II'),
-        ('treasurer', 'Treasurer'),
-        ('financial_secretary', 'Financial Secretary'),
+        ('student', 'Regular Student'),
+        ('student_member', 'Financial Student Member'),
     ]
 
     member_type = forms.ChoiceField(
         choices=MEMBERSHIP_CHOICES,
-        widget=forms.Select(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
         label="Membership Type"
     )
 
@@ -56,16 +45,16 @@ class StudentForm(forms.ModelForm):
         ]
         # 2. Corrected Widgets Placement (Inside Meta)
         widgets = {
-            'full_name': forms.TextInput(attrs={'placeholder': 'Enter your full name'}),
-            'school': forms.TextInput(attrs={'placeholder': 'Enter your school'}),
-            'department': forms.TextInput(attrs={'placeholder': 'Enter your department'}),
-            'level': forms.TextInput(attrs={'placeholder': 'Enter your level'}),
-            'phone': forms.TextInput(attrs={'placeholder': 'Enter your phone number'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'Enter your email'}),
-            'age': forms.NumberInput(attrs={'placeholder': 'Enter your age'}),
-            'state': forms.TextInput(attrs={'placeholder': 'Enter your state'}),
-            'nationality': forms.TextInput(attrs={'placeholder': 'Enter your nationality'}),
-            'profile_picture': forms.FileInput()
+            'full_name': forms.TextInput(attrs={'placeholder': 'Enter your full name', 'class': 'form-control'}),
+            'school': forms.TextInput(attrs={'placeholder': 'Enter your school', 'class': 'form-control'}),
+            'department': forms.TextInput(attrs={'placeholder': 'Enter your department', 'class': 'form-control'}),
+            'level': forms.TextInput(attrs={'placeholder': 'Enter your level', 'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'placeholder': 'Enter your phone number', 'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Enter your email', 'class': 'form-control'}),
+            'age': forms.NumberInput(attrs={'placeholder': 'Enter your age', 'class': 'form-control'}),
+            'state': forms.TextInput(attrs={'placeholder': 'Enter your state', 'class': 'form-control'}),
+            'nationality': forms.TextInput(attrs={'placeholder': 'Enter your nationality', 'class': 'form-control'}),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control-file'})
         }
 
     # --- PASSWORD STRENGTH VALIDATION ---
@@ -102,11 +91,6 @@ class StudentForm(forms.ModelForm):
         email = self.cleaned_data.get('email').lower()
         password = self.cleaned_data.get('password')
         full_name = self.cleaned_data.get('full_name')
-        member_type = self.cleaned_data.get('member_type')
-
-        # EXECUTIVE ROLES check
-        admin_roles = ['president', 'treasurer', 'financial_secretary']
-        is_admin = member_type in admin_roles
 
         # Create/Update the associated User
         user = User.objects.filter(username=email).first()
@@ -122,8 +106,8 @@ class StudentForm(forms.ModelForm):
         user.first_name = name_parts[0] if name_parts else ""
         user.last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
         
-        # Grant staff access ONLY to the big 3 roles
-        user.is_staff = is_admin
+        # All web registrations default to standard non-staff access for structural safety
+        user.is_staff = False
         user.save()
 
         student.user = user
@@ -149,7 +133,6 @@ class StudentForm(forms.ModelForm):
                     fail_silently=True,
                 )
             except Exception as e:
-                # Log the error but don't break the registration process
                 print(f"Registration email failed: {e}")
                 
         return student
@@ -158,15 +141,13 @@ class StudentForm(forms.ModelForm):
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        # Added 'image' to the list below
         fields = ['title', 'description', 'date', 'location', 'image']
         widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'Event title'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Event description'}),
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'location': forms.TextInput(attrs={'placeholder': 'Event location'}),
-            # New widget for the image upload
-            'image': forms.FileInput(attrs={'accept': 'image/*'})
+            'title': forms.TextInput(attrs={'placeholder': 'Event title', 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Event description', 'class': 'form-control', 'rows': 3}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'placeholder': 'Event location', 'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'accept': 'image/*', 'class': 'form-control-file'})
         }
 
 
@@ -175,9 +156,9 @@ class FundraisingForm(forms.ModelForm):
         model = Fundraising
         fields = ['title', 'description', 'goal']
         widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'Fundraising title'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Fundraising description'}),
-            'goal': forms.NumberInput(attrs={'placeholder': 'Target amount'})
+            'title': forms.TextInput(attrs={'placeholder': 'Fundraising title', 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Fundraising description', 'class': 'form-control', 'rows': 3}),
+            'goal': forms.NumberInput(attrs={'placeholder': 'Target amount', 'class': 'form-control'})
         }
 
 
@@ -186,7 +167,7 @@ class PaymentForm(forms.ModelForm):
         model = Payment
         fields = ['student', 'amount', 'paid']
         widgets = {
-            'student': forms.Select(),
-            'amount': forms.NumberInput(attrs={'placeholder': 'Payment amount'}),
-            'paid': forms.CheckboxInput()
+            'student': forms.Select(attrs={'class': 'form-control'}),
+            'amount': forms.NumberInput(attrs={'placeholder': 'Payment amount', 'class': 'form-control'}),
+            'paid': forms.CheckboxInput(attrs={'class': 'form-check-input'})
         }

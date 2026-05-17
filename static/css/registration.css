@@ -267,3 +267,21 @@ button[type="submit"]:active {
         font-size: 1.6rem;
     }
 }
+
+/* --- DJANGO FORM ERROR & HELP TEXT SYNC --- */
+.field-error {
+    color: var(--error-red);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 4px;
+    margin-left: 5px;
+    animation: containerSlideUp 0.3s ease;
+}
+
+.help-text {
+    color: #777777;
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 2px;
+    margin-left: 5px;
+}

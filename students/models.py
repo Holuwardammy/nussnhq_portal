@@ -11,29 +11,15 @@ class School(models.Model):
     def __str__(self):
         return self.name
 
-class Student(models.Model):
-    MEMBER_TYPE_CHOICES = [
-        ('student', 'Student'),
-        ('student_member', 'Student Member'),
-        ('president', 'President'),
-        ('senate_president', 'Senate President'),
-        ('deputy_senate_president', 'Deputy Senate President'),
-        ('social_director', 'Social Director'),
-        ('welfare', 'Welfare'),
-        ('organising_committee', 'Organising Committee'),
-        ('general_secretary', 'General Secretary'),
-        ('assistant_general_secretary', 'Assistant General Secretary'),
-        ('pro', 'PRO'),
-        ('pro_ii', 'PRO II'),
-        ('treasurer', 'Treasurer'),
-        ('financial_secretary', 'Financial Secretary'),
-    ]
 
-    # STRICT ADMIN ROLES: Only these 3 will be redirected to the Admin Dashboard
-    EXECUTIVE_ROLES = [
-        'president',
-        'treasurer',
-        'financial_secretary'
+# ---------------------------
+# STUDENT MODEL 
+# ---------------------------
+class Student(models.Model):
+    # Matches forms.py perfectly. Public dropdown cannot assign admin rights.
+    MEMBER_TYPE_CHOICES = [
+        ('student', 'Regular Student'),
+        ('student_member', 'Financial Student Member'),
     ]
 
     user = models.OneToOneField(
@@ -60,12 +46,6 @@ class Student(models.Model):
         default='student_member'
     )
 
-    executive_position = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True
-    )
-
     serial_number = models.CharField(max_length=20, unique=True, blank=True)
 
     profile_picture = models.ImageField(
@@ -76,19 +56,19 @@ class Student(models.Model):
 
     registration_date = models.DateField(auto_now_add=True)
 
-    # --- HIERARCHY HELPERS ---
+    # --- HIERARCHY HELPERS (Saves views.py from breaking) ---
     def is_executive(self):
-        """Used by views.py to determine if the user goes to Admin or Student home."""
-        return self.member_type in self.EXECUTIVE_ROLES
+        """Checks if this student has a record in the ExecutiveRole table."""
+        return hasattr(self, 'executive_role')
 
     def is_president(self):
-        return self.member_type == 'president'
+        return hasattr(self, 'executive_role') and self.executive_role.title == 'president'
 
     def is_treasurer(self):
-        return self.member_type == 'treasurer'
+        return hasattr(self, 'executive_role') and self.executive_role.title == 'treasurer'
 
     def is_financial_secretary(self):
-        return self.member_type == 'financial_secretary'
+        return hasattr(self, 'executive_role') and self.executive_role.title == 'financial_secretary'
 
     def save(self, *args, **kwargs):
         # Force email to lowercase for consistency
@@ -105,12 +85,6 @@ class Student(models.Model):
             
             if update_user:
                 self.user.save()
-
-        # Update executive_position based only on the 3 admin roles
-        if self.is_executive():
-            self.executive_position = self.member_type
-        else:
-            self.executive_position = None
 
         # Serial number generation logic (NUSSNHQ/YEAR/0001)
         if not self.serial_number:
@@ -133,17 +107,50 @@ class Student(models.Model):
         return f"{self.full_name} ({self.serial_number})"
 
 
+# ---------------------------
+# EXECUTIVE ROLE MODEL (The Secure Vault)
+# ---------------------------
+class ExecutiveRole(models.Model):
+    EXECUTIVE_CHOICES = [
+        ('president', 'President'),
+        ('senate_president', 'Senate President'),
+        ('deputy_senate_president', 'Deputy Senate President'),
+        ('social_director', 'Social Director'),
+        ('welfare', 'Welfare'),
+        ('organising_committee', 'Organising Committee'),
+        ('general_secretary', 'General Secretary'),
+        ('assistant_general_secretary', 'Assistant General Secretary'),
+        ('pro', 'PRO'),
+        ('pro_ii', 'PRO II'),
+        ('treasurer', 'Treasurer'),
+        ('financial_secretary', 'Financial Secretary'),
+    ]
+
+    # Links 1-to-1 to an existing student profile. One student can only occupy one office.
+    student = models.OneToOneField(Student, on_delete=models.CASCADE, related_name='executive_role')
+    
+    # unique=True guarantees you can never have two active officeholders at once
+    title = models.CharField(max_length=50, choices=EXECUTIVE_CHOICES, unique=True)
+    tenure = models.CharField(max_length=20, default="2026/2027")
+    assigned_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_title_display()} - {self.student.full_name}"
+
+
+# ---------------------------
+# EVENT MODEL
+# ---------------------------
 class Event(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     date = models.DateField()
     location = models.CharField(max_length=100)
-    # New Field: upload_to creates a folder inside your media directory
     image = models.ImageField(upload_to='event_flyers/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-date'] # This makes sure upcoming events show first
+        ordering = ['-date']
 
     def __str__(self):
         return self.title
@@ -162,7 +169,7 @@ class Fundraising(models.Model):
 
 
 # ---------------------------
-# PAYMENT MODEL (UPDATED FOR NIGERIAN BANK TRANSFERS)
+# PAYMENT MODEL
 # ---------------------------
 class Payment(models.Model):
     PAYMENT_STATUS = [
@@ -173,18 +180,12 @@ class Payment(models.Model):
 
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    
-    # NEW FIELDS FOR MANUAL TRANSFER
     status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default='pending')
     payment_receipt = models.ImageField(upload_to='receipts/', null=True, blank=True)
-    
-    # Legacy field support (keeps existing logic working)
     paid = models.BooleanField(default=False)
-    
     date_paid = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        # Automatically set 'paid' boolean based on status string
         if self.status == 'paid':
             self.paid = True
             if not self.date_paid:
