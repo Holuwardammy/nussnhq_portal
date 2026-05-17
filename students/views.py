@@ -1,5 +1,3 @@
-from socket import timeout
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
@@ -11,43 +9,25 @@ from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.conf import settings
 
-from .models import Student, Payment, Event, Fundraising, School
+from .models import Student, Payment, Event, Fundraising, School, ExecutiveRole
 from .forms import StudentForm, EventForm, FundraisingForm
+
 
 def home(request):
     # This grabs EVERYTHING and puts the newest dates first
     events = Event.objects.all().order_by('-date') 
     return render(request, 'home.html', {'events': events})
 
+
 # ---------------------------
-# REGISTER (With Executive Role Lockout)
+# REGISTER STUDENT
 # ---------------------------
 def register_student(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
         
-        # form.is_valid() now automatically checks for:
-        # 1. Real email format & uniqueness
-        # 2. Strong password (Uppercase, Symbol, Number)
         if form.is_valid():
-            
-            # --- 1. EXECUTIVE ROLE LOCKOUT LOGIC ---
-            selected_role = form.cleaned_data.get('member_type')
-            restricted_roles = ['president', 'treasurer', 'financial_secretary']
-            
-            if selected_role in restricted_roles:
-                # Check if this executive position is already taken in the database
-                role_exists = Student.objects.filter(member_type=selected_role).exists()
-                
-                if role_exists:
-                    display_role = selected_role.replace('_', ' ').title()
-                    messages.error(request, f"Access Denied: The position of {display_role} is already occupied.")
-                    # Return the form so they can change the role without losing data
-                    return render(request, 'register_student.html', {'form': form})
-
-            # --- 2. SCHOOL SELF-LEARNING LOGIC ---
-            # We call form.save(commit=False) to get the student object 
-            # so we can manually set the school before the final save.
+            # --- SCHOOL SELF-LEARNING LOGIC ---
             student = form.save(commit=False)
             
             school_name = request.POST.get('school', '').strip()
@@ -56,16 +36,14 @@ def register_student(request):
                 School.objects.get_or_create(name=school_name)
                 student.school = school_name
             
-            # --- 3. FINAL SAVE ---
-            # This triggers the StudentForm.save() method we just updated,
-            # which handles User creation and Password hashing.
+            # --- FINAL SAVE ---
+            # Triggers User model creation and custom lowercased username/email synchronization
             student.save()
             
             messages.success(request, "Registration Successful! Please login with your email.")
             return redirect('login')
             
         else:
-            # If email is taken or password is weak, Django shows the errors from forms.py
             messages.error(request, "Please correct the errors below.")
             
     else:
@@ -73,7 +51,7 @@ def register_student(request):
         
     return render(request, 'register_student.html', {'form': form})
 
-# ADD THIS NEW VIEW HERE:
+
 def school_autocomplete(request):
     query = request.GET.get('term', '')
     # This finds schools that contain the letters the student typed
@@ -83,7 +61,7 @@ def school_autocomplete(request):
 
 
 # ---------------------------
-# LOGIN
+# LOGIN (With Secure Executive Routing)
 # ---------------------------
 def login_view(request):
     if request.method == "POST":
@@ -96,7 +74,7 @@ def login_view(request):
             login(request, user)
             student = Student.objects.filter(user=user).first()
             
-            # Redirect logic based on specific Executive Roles
+            # Smart redirect based on database presence in the Executive table
             if student and student.is_executive():
                 return redirect('admin_dashboard')
             
@@ -112,7 +90,6 @@ def login_view(request):
 # ---------------------------
 @login_required
 def student_home(request):
-    # We find the student profile linked to the logged-in user
     student = get_object_or_404(Student, user=request.user)
     return render(request, "student_home.html", {
         "student": student,
@@ -129,25 +106,23 @@ def student_home(request):
 def admin_dashboard(request):
     admin_student = Student.objects.filter(user=request.user).first()
 
-    # Access Control: Only President, Treasurer, Fin Sec, or Superuser
+    # Access Control: Only users with assigned Executive Roles or Superusers
     if not (request.user.is_staff or (admin_student and admin_student.is_executive())):
         messages.error(request, "Access denied. Executives only.")
         return redirect('student_home')
 
     # --- FINANCIAL DATA ---
-    # Total income now only counts 'paid' status
     total_income = Payment.objects.filter(status='paid').aggregate(Sum('amount'))['amount__sum'] or 0
     
-    # NEW LOGIC: This gets ALL payments but puts 'processing' at the top
-    # Once you approve them, they stay in this list but move down
+    # Priority sorting: 'processing' payments stay at the top of the stack
     all_payments = Payment.objects.annotate(
         priority=Case(
-            When(status='processing', then=Value(1)), # New payments first
-            When(status='paid', then=Value(2)),       # History second
+            When(status='processing', then=Value(1)), 
+            When(status='paid', then=Value(2)),      
             default=Value(3),
             output_field=IntegerField(),
         )
-    ).order_by('priority', '-date_paid') # Newest date within those groups
+    ).order_by('priority', '-date_paid')
 
     unpaid_count = Student.objects.filter(payment__status='pending').count() + \
                    Student.objects.filter(payment__isnull=True).count()
@@ -156,7 +131,7 @@ def admin_dashboard(request):
         "students": Student.objects.all(),
         "total_income": total_income,
         "unpaid_count": unpaid_count,
-        "all_payments": all_payments,  # Use this in your template loop
+        "all_payments": all_payments,  
         "events": Event.objects.all(),
         "fundraising": Fundraising.objects.all(),
         "admin_student": admin_student 
@@ -166,16 +141,14 @@ def admin_dashboard(request):
 # ---------------------------
 # PAYMENT FLOW (Student Side)
 # ---------------------------
-
 @login_required
 def payment_instructions(request):
-    """Step 1: Show the student where to send the money"""
     student = get_object_or_404(Student, user=request.user)
     return render(request, 'payment_instructions.html', {'student': student})
 
+
 @login_required
 def submit_payment(request):
-    """Step 2: Student uploads the screenshot of the transfer"""
     student = get_object_or_404(Student, user=request.user)
 
     if request.method == "POST":
@@ -183,7 +156,6 @@ def submit_payment(request):
         receipt = request.FILES.get('payment_receipt')
 
         if receipt:
-            # Create unique payment record
             payment = Payment.objects.create(
                 student=student,
                 amount=amount,
@@ -191,7 +163,6 @@ def submit_payment(request):
                 status='processing'
             )
             
-            # EMAIL NOTIFICATION: Payment Received
             try:
                 send_mail(
                     subject="Payment Received - Awaiting Verification",
@@ -204,7 +175,7 @@ def submit_payment(request):
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[student.email],
                     fail_silently=True,
-                    timeout=10,  # Added timeout to prevent hanging if email server is slow
+                    timeout=10,  
                 )
             except Exception as e:
                 print(f"Payment submission email failed: {e}")
@@ -222,7 +193,7 @@ def submit_payment(request):
 def approve_payment(request, payment_id):
     admin_student = Student.objects.filter(user=request.user).first()
     
-    # Strictly for Fin Sec or President (Full Access)
+    # Validation relying on safe table hierarchy lookups
     can_approve = request.user.is_staff or (admin_student and (admin_student.is_financial_secretary() or admin_student.is_president()))
     
     if not can_approve:
@@ -233,20 +204,19 @@ def approve_payment(request, payment_id):
     payment.status = 'paid'
     payment.save()
 
-    # EMAIL NOTIFICATION: Payment Approved
     try:
         send_mail(
             subject="Payment Verified Successfully!",
             message=(
                 f"Hello {payment.student.full_name},\n\n"
                 f"Your payment of ₦{payment.amount} has been verified.\n\n"
-                "You now have full access to your student portal features. "
+                f"You now have full access to your student portal features. "
                 "Thank you for your commitment to NUSS!"
             ),
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[payment.student.email],
             fail_silently=True,
-            timeout=10,  # Added timeout to prevent hanging if email server is slow
+            timeout=10,  
         )
     except Exception as e:
         print(f"Approval email failed: {e}")
@@ -262,7 +232,6 @@ def approve_payment(request, payment_id):
 def delete_student(request, student_id):
     admin_student = Student.objects.filter(user=request.user).first()
     
-    # Strictly for President or Superuser
     if not (request.user.is_staff or (admin_student and admin_student.is_president())):
         messages.error(request, "Only the President has authority to delete records.")
         return redirect('admin_dashboard')
@@ -278,29 +247,23 @@ def delete_student(request, student_id):
 # ---------------------------
 # EVENTS & FUNDRAISING (President / Staff Only)
 # ---------------------------
-
 @login_required
 def create_event(request, event_id=None):
     admin_student = Student.objects.filter(user=request.user).first()
     
-    # Permission Check
     if not (request.user.is_staff or (admin_student and admin_student.is_president())):
         messages.error(request, "Only the President can manage events.")
         return redirect('admin_dashboard')
 
-    # If event_id is provided, we are EDITING; otherwise, we are CREATING
     event = get_object_or_404(Event, id=event_id) if event_id else None
-    is_new_event = event is None  # Check if this is a fresh announcement
+    is_new_event = event is None  
 
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
-            # 1. Save the event
             saved_event = form.save()
             
-            # 2. Only send email blast if it's a NEW event
             if is_new_event:
-                # Get all registered student emails
                 recipient_emails = list(Student.objects.values_list('email', flat=True))
                 
                 if recipient_emails:
@@ -317,7 +280,7 @@ def create_event(request, event_id=None):
                             from_email=settings.DEFAULT_FROM_EMAIL,
                             recipient_list=recipient_emails,
                             fail_silently=True,
-                            timeout=10,  # Added timeout to prevent hanging if email server is slow
+                            timeout=10,  
                         )
                     except Exception as e:
                         print(f"Event blast email failed: {e}")
@@ -333,6 +296,7 @@ def create_event(request, event_id=None):
         'edit_mode': bool(event)
     })
 
+
 @login_required
 def delete_event(request, event_id):
     admin_student = Student.objects.filter(user=request.user).first()
@@ -346,6 +310,7 @@ def delete_event(request, event_id):
     messages.success(request, "Event deleted successfully.")
     return redirect('admin_dashboard')
 
+
 @login_required
 def create_fundraising(request):
     admin_student = Student.objects.filter(user=request.user).first()
@@ -358,6 +323,7 @@ def create_fundraising(request):
         form.save()
         return redirect('admin_dashboard')
     return render(request, 'create_fundraising.html', {'form': form})
+
 
 def logout_view(request):
     logout(request)
