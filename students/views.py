@@ -74,8 +74,10 @@ def login_view(request):
             login(request, user)
             student = Student.objects.filter(user=user).first()
             
-            # Smart redirect based on database presence in the Executive table
-            if student and student.is_executive():
+            # --- FIXED EXECUTIVE & SUPERUSER ROUTING MATCH ---
+            # If they are a Django Superuser/Staff OR an assigned Student Executive,
+            # send them straight to your custom premium Admin Dashboard!
+            if user.is_superuser or user.is_staff or (student and student.is_executive()):
                 return redirect('admin_dashboard')
             
             return redirect('student_home')
