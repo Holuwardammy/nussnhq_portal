@@ -125,18 +125,18 @@ CLOUDINARY_STORAGE = {
 
 # --- DJANGO 6+ BACKWARD COMPATIBLE STORAGE CORE ---
 if not DEBUG:
-    # Production: Media files to Cloudinary, Static files optimized via WhiteNoise
+    # Production: Media files to Cloudinary, Static files handled cleanly via Django core
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            # REMOVED MANIFEST LOGIC HERE TO PREVENT MISSING FILE PIPELINE CRASHES
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+            # Bypasses WhiteNoise's breaking compression engine during Render builds
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-    # Legacy fallback patch to bypass Cloudinary's outdated collector lookup loop
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    # Legacy fallback patch
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 else:
     # Local Development fallback configurations
     STORAGES = {
