@@ -14,10 +14,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-95=8gc$s8_70$q5l$9ohez!!y3&ut*lt+_wc*ht1l8#^=tzeh8'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-95=8gc$s8_70$q5l$9ohez!!y3&ut*lt+_wc*ht1l8#^=tzeh8')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Automatically switches to False on Render when an environment variable is present, fallback to True locally
+DEBUG = os.getenv('RENDER', 'False') != 'True' and os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
     "nussnhq-portal.onrender.com",

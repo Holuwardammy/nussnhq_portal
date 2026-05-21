@@ -22,9 +22,12 @@
         {% endfor %}
     {% endif %}
 
-    <form method="POST" enctype="multipart/form-data" action="{% url 'register_student' %}">
+    <form method="POST" enctype="multipart/form-data" action="{% url 'register_student' %}" autocomplete="off">
         {% csrf_token %}
         {{ form.non_field_errors }}
+
+        <input type="text" name="username" style="display:none;" aria-hidden="true" autocomplete="false">
+        <input type="password" name="password" style="display:none;" aria-hidden="true" autocomplete="false">
 
         <label for="id_full_name">{{ form.full_name.label }}</label>
         {{ form.full_name }}
@@ -117,14 +120,6 @@
         {% if form.nationality.errors %}
             <div class="field-error">
                 {{ form.nationality.errors }}
-            </div>
-        {% endif %}
-
-        <label for="id_member_type">{{ form.member_type.label }}</label>
-        {{ form.member_type }}
-        {% if form.member_type.errors %}
-            <div class="field-error">
-                {{ form.member_type.errors }}
             </div>
         {% endif %}
 
