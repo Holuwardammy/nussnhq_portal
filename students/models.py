@@ -43,7 +43,7 @@ class Student(models.Model):
     member_type = models.CharField(
         max_length=50,
         choices=MEMBER_TYPE_CHOICES,
-        default='student_member'
+        default='student'
     )
 
     serial_number = models.CharField(max_length=20, unique=True, blank=True)

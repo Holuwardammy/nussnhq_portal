@@ -16,18 +16,6 @@ class StudentForm(forms.ModelForm):
         help_text="Min. 8 chars, 1 uppercase, 1 number, 1 symbol"
     )
 
-    # REMOVED Executive dropdown choices to protect structural architecture
-    MEMBERSHIP_CHOICES = [
-        ('student', 'Regular Student'),
-        ('student_member', 'Financial Student Member'),
-    ]
-
-    member_type = forms.ChoiceField(
-        choices=MEMBERSHIP_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        label="Membership Type"
-    )
-
     class Meta:
         model = Student
         fields = [
@@ -40,9 +28,10 @@ class StudentForm(forms.ModelForm):
             'profile_picture',
             'age',
             'state',
-            'nationality',
-            'member_type'
+            'nationality'
+            # <-- 'member_type' REMOVED FROM HERE COMPLETELY!
         ]
+        
         # 2. Corrected Widgets Placement (Inside Meta)
         widgets = {
             'full_name': forms.TextInput(attrs={'placeholder': 'Enter your full name', 'class': 'form-control'}),
