@@ -163,6 +163,10 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
+# --- WHITENOISE COMPRESSION OVERRIDE PATCH ---
+# Prevents Cloudinary dependency file errors from crashing the collectstatic engine on Render
+WHITENOISE_MANIFEST_STRICT = False
+
 
 # Media files are stored on the server
 MEDIA_URL = '/media/'
