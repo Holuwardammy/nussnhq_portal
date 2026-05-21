@@ -20,7 +20,7 @@ def home(request):
 
 
 # ---------------------------
-# REGISTER STUDENT
+# REGISTER STUDENT (OPTIMIZED FOR AUTOMATIC STUDENT ROUTING)
 # ---------------------------
 def register_student(request):
     if request.method == 'POST':
@@ -30,6 +30,9 @@ def register_student(request):
             # --- SCHOOL SELF-LEARNING LOGIC ---
             student = form.save(commit=False)
             
+            # Enforce that all new web registrations default explicitly to a regular student status
+            student.member_type = 'student'
+            
             school_name = request.POST.get('school', '').strip()
             if school_name:
                 # Add to our School list if it's a new one
@@ -37,7 +40,7 @@ def register_student(request):
                 student.school = school_name
             
             # --- FINAL SAVE ---
-            # Triggers User model creation and custom lowercased username/email synchronization
+            # Triggers User model creation and custom lowercased username/email synchronization inside forms.py
             student.save()
             
             messages.success(request, "Registration Successful! Please login with your email.")

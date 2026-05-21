@@ -29,7 +29,6 @@ class StudentForm(forms.ModelForm):
             'age',
             'state',
             'nationality'
-            # <-- 'member_type' REMOVED FROM HERE COMPLETELY!
         ]
         
         # 2. Corrected Widgets Placement (Inside Meta)
@@ -61,27 +60,27 @@ class StudentForm(forms.ModelForm):
         
         return password
 
-    # --- EMAIL VALIDATION ---
+    # --- CLEANED & FIX-PROVEN EMAIL VALIDATION ---
     def clean_email(self):
-        email = self.cleaned_data.get('email').lower()
+        email = self.cleaned_data.get('email')
+        if not email:
+            raise ValidationError("An email address is required.")
+        
+        email = email.strip().lower()
 
-        # Check Student model
+        # Only block if a separate student record already uses this email address
         if Student.objects.filter(email=email).exists():
-            raise ValidationError("A student with this email already exists.")
-
-        # Check Django User model (for login conflicts)
-        if User.objects.filter(username=email).exists():
-            raise ValidationError("This email is already registered as a user.")
+            raise ValidationError("A student profile with this email address is already registered.")
 
         return email
 
     def save(self, commit=True):
         student = super().save(commit=False)
-        email = self.cleaned_data.get('email').lower()
+        email = self.cleaned_data.get('email').strip().lower()
         password = self.cleaned_data.get('password')
         full_name = self.cleaned_data.get('full_name')
 
-        # Create/Update the associated User
+        # Find or create the associated User dynamically
         user = User.objects.filter(username=email).first()
         if user is None:
             user = User.objects.create_user(
@@ -89,13 +88,16 @@ class StudentForm(forms.ModelForm):
                 email=email,
                 password=password
             )
+        else:
+            # If the user entity already exists but didn't have a profile, update their password
+            user.set_password(password)
         
         # Sync Profile names to the User account
         name_parts = full_name.strip().split()
         user.first_name = name_parts[0] if name_parts else ""
         user.last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
         
-        # All web registrations default to standard non-staff access for structural safety
+        # All front-end registrations default to standard non-staff access for structural safety
         user.is_staff = False
         user.save()
 
@@ -120,7 +122,7 @@ class StudentForm(forms.ModelForm):
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[email],
                     fail_silently=True,
-                )
+                    )
             except Exception as e:
                 print(f"Registration email failed: {e}")
                 
