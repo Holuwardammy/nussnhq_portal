@@ -68,15 +68,14 @@ def login_view(request):
         email_input = request.POST.get("username").lower() if request.POST.get("username") else ""
         password_input = request.POST.get("password")
 
+        # Standard Django authentication matching the User model
         user = authenticate(request, username=email_input, password=password_input)
 
         if user:
             login(request, user)
             student = Student.objects.filter(user=user).first()
             
-            # --- FIXED EXECUTIVE & SUPERUSER ROUTING MATCH ---
-            # If they are a Django Superuser/Staff OR an assigned Student Executive,
-            # send them straight to your custom premium Admin Dashboard!
+            # Simple, clean routing to your custom dashboards
             if user.is_superuser or user.is_staff or (student and student.is_executive()):
                 return redirect('admin_dashboard')
             
