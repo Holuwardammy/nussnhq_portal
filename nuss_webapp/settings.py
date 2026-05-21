@@ -122,18 +122,18 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# --- BULLETPROOF STATIC STORAGE CORE ---
+# --- NATIVE DJANGO CORE PRODUCTION STORAGE CONFIGURATION ---
 if not DEBUG:
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            # Uses WhiteNoise to actively bundle and refresh your styles
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+            # Uses Django 6's stable core manifest backend to break old browser caching loops cleanly
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
         },
     }
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 else:
     STORAGES = {
         "default": {
@@ -159,9 +159,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
-# Tells WhiteNoise to ignore missing or broken file manifests gracefully
-WHITENOISE_MANIFEST_STRICT = False
 
 
 # Media files are stored on the server
