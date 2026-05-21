@@ -17,7 +17,6 @@ load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-95=8gc$s8_70$q5l$9ohez!!y3&ut*lt+_wc*ht1l8#^=tzeh8')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Automatically switches to False on Render when an environment variable is present, fallback to True locally
 DEBUG = os.getenv('RENDER', 'False') != 'True' and os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
@@ -72,7 +71,7 @@ ROOT_URLCONF = 'nuss_webapp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], # Added to ensure global templates folder is checked
+        'DIRS': [BASE_DIR / 'templates'], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,7 +79,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.media', # Essential for image URLs in templates
+                'django.template.context_processors.media', 
             ],
         },
     },
@@ -123,22 +122,19 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# --- DJANGO 6+ BACKWARD COMPATIBLE STORAGE CORE ---
+# --- BULLETPROOF STATIC STORAGE CORE ---
 if not DEBUG:
-    # Production: Media files to Cloudinary, Static files handled cleanly via Django core
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            # Bypasses WhiteNoise's breaking compression engine during Render builds
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            # Uses WhiteNoise to actively bundle and refresh your styles
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
-    # Legacy fallback patch
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 else:
-    # Local Development fallback configurations
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -152,7 +148,7 @@ else:
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Africa/Lagos' # Updated to Nigeria time for accurate payment timestamps
+TIME_ZONE = 'Africa/Lagos' 
 USE_I18N = True
 USE_TZ = True
 
@@ -164,8 +160,7 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-# --- WHITENOISE COMPRESSION OVERRIDE PATCH ---
-# Prevents Cloudinary dependency file errors from crashing the collectstatic engine on Render
+# Tells WhiteNoise to ignore missing or broken file manifests gracefully
 WHITENOISE_MANIFEST_STRICT = False
 
 
@@ -185,12 +180,9 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS') == 'True'
 
-# Pulling specific User/Pass keys from Render Environment
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
 
-# Fallback display name logic
-# Using a f-string ensures the email is properly formatted for Gmail
 DEFAULT_FROM_EMAIL = f"NUSS Portal <{EMAIL_HOST_USER}>"
 
 # Authentication Redirection
