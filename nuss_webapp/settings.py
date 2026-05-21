@@ -131,11 +131,12 @@ if not DEBUG:
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            # REMOVED MANIFEST LOGIC HERE TO PREVENT MISSING FILE PIPELINE CRASHES
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
     # Legacy fallback patch to bypass Cloudinary's outdated collector lookup loop
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 else:
     # Local Development fallback configurations
     STORAGES = {
