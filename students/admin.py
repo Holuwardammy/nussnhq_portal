@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from .models import (
     Student,
     Payment,
@@ -26,6 +25,7 @@ class StudentAdmin(admin.ModelAdmin):
         'department',
         'level',
         'serial_number',
+        'member_type',
         'is_verified',
         'registration_date'
     )
@@ -52,9 +52,7 @@ class StudentAdmin(admin.ModelAdmin):
         'updated_at'
     )
 
-    ordering = (
-        '-registration_date',
-    )
+    ordering = ('-registration_date',)
 
 
 # =========================================================
@@ -76,7 +74,7 @@ class PaymentAdmin(admin.ModelAdmin):
     list_filter = (
         'status',
         'paid',
-        'date_paid'
+        'created_at'
     )
 
     search_fields = (
@@ -90,9 +88,7 @@ class PaymentAdmin(admin.ModelAdmin):
         'created_at'
     )
 
-    ordering = (
-        '-created_at',
-    )
+    ordering = ('-created_at',)
 
 
 # =========================================================
@@ -109,18 +105,11 @@ class EventAdmin(admin.ModelAdmin):
         'created_at'
     )
 
-    search_fields = (
-        'title',
-        'location'
-    )
+    search_fields = ('title', 'location')
 
-    list_filter = (
-        'date',
-    )
+    list_filter = ('date',)
 
-    ordering = (
-        '-date',
-    )
+    ordering = ('-date',)
 
 
 # =========================================================
@@ -136,13 +125,9 @@ class FundraisingAdmin(admin.ModelAdmin):
         'created_at'
     )
 
-    search_fields = (
-        'title',
-    )
+    search_fields = ('title',)
 
-    ordering = (
-        '-created_at',
-    )
+    ordering = ('-created_at',)
 
 
 # =========================================================
@@ -151,18 +136,11 @@ class FundraisingAdmin(admin.ModelAdmin):
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
 
-    list_display = (
-        'id',
-        'name'
-    )
+    list_display = ('id', 'name')
 
-    search_fields = (
-        'name',
-    )
+    search_fields = ('name',)
 
-    ordering = (
-        'name',
-    )
+    ordering = ('name',)
 
 
 # =========================================================
@@ -178,17 +156,11 @@ class TenureAdmin(admin.ModelAdmin):
         'created_at'
     )
 
-    list_filter = (
-        'is_active',
-    )
+    list_filter = ('is_active',)
 
-    search_fields = (
-        'session',
-    )
+    search_fields = ('session',)
 
-    ordering = (
-        '-created_at',
-    )
+    ordering = ('-created_at',)
 
 
 # =========================================================
@@ -203,17 +175,13 @@ class ExecutivePositionAdmin(admin.ModelAdmin):
         'created_at'
     )
 
-    search_fields = (
-        'title',
-    )
+    search_fields = ('title',)
 
-    ordering = (
-        'title',
-    )
+    ordering = ('title',)
 
 
 # =========================================================
-# EXECUTIVE ASSIGNMENT ADMIN
+# EXECUTIVE ASSIGNMENT ADMIN (FULLY MATCHED SYSTEM)
 # =========================================================
 @admin.register(ExecutiveAssignment)
 class ExecutiveAssignmentAdmin(admin.ModelAdmin):
@@ -246,6 +214,29 @@ class ExecutiveAssignmentAdmin(admin.ModelAdmin):
         'removed_at'
     )
 
-    ordering = (
-        '-assigned_at',
-    )
+    ordering = ('-assigned_at',)
+
+    actions = [
+        'activate_executive',
+        'deactivate_executive'
+    ]
+
+    # =====================================================
+    # SAFE ACTION: ACTIVATE EXECUTIVE
+    # =====================================================
+    def activate_executive(self, request, queryset):
+        for obj in queryset:
+            obj.is_active = True
+            obj.save()
+
+    activate_executive.short_description = "Activate selected executives"
+
+    # =====================================================
+    # SAFE ACTION: DEACTIVATE EXECUTIVE
+    # =====================================================
+    def deactivate_executive(self, request, queryset):
+        for obj in queryset:
+            obj.is_active = False
+            obj.save()
+
+    deactivate_executive.short_description = "Deactivate selected executives"

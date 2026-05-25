@@ -18,24 +18,18 @@ class School(models.Model):
 
 # =========================================================
 # TENURE / SESSION MODEL
-# Example:
-# 2025/2026
-# 2026/2027
 # =========================================================
 class Tenure(models.Model):
     session = models.CharField(max_length=20, unique=True)
     is_active = models.BooleanField(default=False)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
-        # Ensure only one active tenure exists
         if self.is_active:
             Tenure.objects.exclude(id=self.id).update(is_active=False)
-
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -61,30 +55,16 @@ class Student(models.Model):
     )
 
     full_name = models.CharField(max_length=150)
-
     school = models.CharField(max_length=150)
     department = models.CharField(max_length=100)
     level = models.CharField(max_length=20)
-
     phone = models.CharField(max_length=20)
 
-    email = models.EmailField(
-        unique=True
-    )
+    email = models.EmailField(unique=True)
 
     age = models.PositiveIntegerField(null=True, blank=True)
-
-    state = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True
-    )
-
-    nationality = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True
-    )
+    state = models.CharField(max_length=50, null=True, blank=True)
+    nationality = models.CharField(max_length=50, null=True, blank=True)
 
     member_type = models.CharField(
         max_length=30,
@@ -92,11 +72,7 @@ class Student(models.Model):
         default='student'
     )
 
-    serial_number = models.CharField(
-        max_length=30,
-        unique=True,
-        blank=True
-    )
+    serial_number = models.CharField(max_length=30, unique=True, blank=True)
 
     profile_picture = models.ImageField(
         upload_to='profile_pics/',
@@ -107,17 +83,13 @@ class Student(models.Model):
     is_verified = models.BooleanField(default=False)
 
     registration_date = models.DateTimeField(auto_now_add=True)
-
     updated_at = models.DateTimeField(auto_now=True)
 
     # =====================================================
-    # EXECUTIVE HELPERS
+    # HELPERS
     # =====================================================
-
     def is_executive(self):
-        return self.executive_assignments.filter(
-            is_active=True
-        ).exists()
+        return self.executive_assignments.filter(is_active=True).exists()
 
     def is_president(self):
         return self.executive_assignments.filter(
@@ -125,30 +97,29 @@ class Student(models.Model):
             is_active=True
         ).exists()
 
+    def get_active_roles(self):
+        return self.executive_assignments.filter(is_active=True)
+
     # =====================================================
     # SAVE METHOD
     # =====================================================
-
     def save(self, *args, **kwargs):
 
-        # Normalize email
         if self.email:
             self.email = self.email.lower().strip()
 
-        # Sync User model safely
+        # Sync user
         if self.user:
-
-            if self.user.username != self.email:
-                self.user.username = self.email
-
-            if self.user.email != self.email:
-                self.user.email = self.email
-
+            self.user.username = self.email
+            self.user.email = self.email
             self.user.save()
 
-        # Generate Serial Number
-        if not self.serial_number:
+        # Prevent duplicate email (extra safety)
+        if Student.objects.exclude(id=self.id).filter(email=self.email).exists():
+            raise ValueError("Duplicate email detected.")
 
+        # Generate serial number
+        if not self.serial_number:
             year = timezone.now().year
 
             last_student = Student.objects.filter(
@@ -156,18 +127,13 @@ class Student(models.Model):
             ).order_by('id').last()
 
             last_number = 0
-
             if last_student and last_student.serial_number:
                 try:
-                    last_number = int(
-                        last_student.serial_number.split('/')[-1]
-                    )
+                    last_number = int(last_student.serial_number.split('/')[-1])
                 except:
                     last_number = 0
 
-            self.serial_number = (
-                f"NUSSNHQ/{year}/{last_number + 1:04d}"
-            )
+            self.serial_number = f"NUSSNHQ/{year}/{last_number + 1:04d}"
 
         super().save(*args, **kwargs)
 
@@ -176,7 +142,7 @@ class Student(models.Model):
 
 
 # =========================================================
-# EXECUTIVE POSITION MODEL
+# EXECUTIVE POSITION
 # =========================================================
 class ExecutivePosition(models.Model):
 
@@ -189,10 +155,10 @@ class ExecutivePosition(models.Model):
         ('assistant_general_secretary', 'Assistant General Secretary'),
         ('treasurer', 'Treasurer'),
         ('financial_secretary', 'Financial Secretary'),
-        ('pro', 'Public Relations Officer'),
-        ('pro_ii', 'Public Relations Officer II'),
+        ('pro', 'PRO'),
+        ('pro_ii', 'PRO II'),
         ('social_director', 'Social Director'),
-        ('welfare', 'Welfare Director'),
+        ('welfare', 'Welfare'),
         ('organising_committee', 'Organising Committee'),
     ]
 
@@ -212,7 +178,7 @@ class ExecutivePosition(models.Model):
 
 
 # =========================================================
-# EXECUTIVE ASSIGNMENT MODEL
+# EXECUTIVE ASSIGNMENT
 # =========================================================
 class ExecutiveAssignment(models.Model):
 
@@ -222,15 +188,8 @@ class ExecutiveAssignment(models.Model):
         related_name='executive_assignments'
     )
 
-    position = models.ForeignKey(
-        ExecutivePosition,
-        on_delete=models.CASCADE
-    )
-
-    tenure = models.ForeignKey(
-        Tenure,
-        on_delete=models.CASCADE
-    )
+    position = models.ForeignKey(ExecutivePosition, on_delete=models.CASCADE)
+    tenure = models.ForeignKey(Tenure, on_delete=models.CASCADE)
 
     appointed_by = models.ForeignKey(
         User,
@@ -243,22 +202,18 @@ class ExecutiveAssignment(models.Model):
     is_active = models.BooleanField(default=True)
 
     assigned_at = models.DateTimeField(auto_now_add=True)
-
-    removed_at = models.DateTimeField(
-        null=True,
-        blank=True
-    )
+    removed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ['position', 'tenure']
 
     def save(self, *args, **kwargs):
 
-        # Only one active president per tenure
-        if self.position.title == 'president' and self.is_active:
+        if self.is_active:
 
+            # Only one active per position per tenure
             ExecutiveAssignment.objects.filter(
-                position__title='president',
+                position=self.position,
                 tenure=self.tenure,
                 is_active=True
             ).exclude(id=self.id).update(
@@ -266,35 +221,32 @@ class ExecutiveAssignment(models.Model):
                 removed_at=timezone.now()
             )
 
+            # Extra safety for president (global uniqueness per tenure)
+            if self.position.title == 'president':
+                ExecutiveAssignment.objects.filter(
+                    position__title='president',
+                    tenure=self.tenure,
+                    is_active=True
+                ).exclude(id=self.id).update(
+                    is_active=False,
+                    removed_at=timezone.now()
+                )
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return (
-            f"{self.student.full_name} - "
-            f"{self.position.get_title_display()} "
-            f"({self.tenure.session})"
-        )
+        return f"{self.student.full_name} - {self.position.get_title_display()} ({self.tenure.session})"
 
 
 # =========================================================
-# EVENT MODEL
+# EVENT
 # =========================================================
 class Event(models.Model):
-
     title = models.CharField(max_length=200)
-
     description = models.TextField()
-
     date = models.DateField()
-
     location = models.CharField(max_length=200)
-
-    image = models.ImageField(
-        upload_to='event_flyers/',
-        null=True,
-        blank=True
-    )
-
+    image = models.ImageField(upload_to='event_flyers/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -305,19 +257,12 @@ class Event(models.Model):
 
 
 # =========================================================
-# FUNDRAISING MODEL
+# FUNDRAISING
 # =========================================================
 class Fundraising(models.Model):
-
     title = models.CharField(max_length=200)
-
     description = models.TextField()
-
-    goal = models.DecimalField(
-        max_digits=12,
-        decimal_places=2
-    )
-
+    goal = models.DecimalField(max_digits=12, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -325,7 +270,7 @@ class Fundraising(models.Model):
 
 
 # =========================================================
-# PAYMENT MODEL
+# PAYMENT
 # =========================================================
 class Payment(models.Model):
 
@@ -341,11 +286,7 @@ class Payment(models.Model):
         related_name='payments'
     )
 
-    amount = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=0
-    )
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     status = models.CharField(
         max_length=20,
@@ -360,30 +301,20 @@ class Payment(models.Model):
     )
 
     paid = models.BooleanField(default=False)
-
-    date_paid = models.DateTimeField(
-        null=True,
-        blank=True
-    )
+    date_paid = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
 
         if self.status == 'paid':
-
             self.paid = True
-
             if not self.date_paid:
                 self.date_paid = timezone.now()
-
         else:
             self.paid = False
 
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return (
-            f"{self.student.full_name} - "
-            f"{self.get_status_display()}"
-        )
+        return f"{self.student.full_name} - {self.get_status_display()}"
