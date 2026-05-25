@@ -1,0 +1,315 @@
+/* ==========================
+   LOGIN PAGE - PREMIUM BLUE & GOLD
+   ========================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+:root {
+    --primary-blue: #1A237E;
+    --luxury-gold: #FFD700;
+    --deep-gold: #B8860B;
+    --error-red: #d32f2f;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%; /* ADDED: Critical for mobile */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: url('/static/images/bac.jpg') no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed; /* CHANGED: Back to fixed */
+    min-height: 100%; /* CHANGED: Use % not vh */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Darkened Luxury Overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0; /* CHANGED: Use all 4 sides */
+    background: linear-gradient(135deg, rgba(26, 35, 126, 0.8), rgba(0, 0, 0, 0.7));
+    z-index: 0;
+}
+
+/* Main Login Box */
+.login-container {
+    width: 90%;
+    max-width: 420px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 50px 40px;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    animation: loginFadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    margin: 20px auto; /* CHANGED: auto for horizontal center */
+}
+
+.login-container h2 {
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 30px;
+    background: linear-gradient(to right, var(--primary-blue), var(--deep-gold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    letter-spacing: -0.5px;
+}
+
+/* Form Layout */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+input {
+    width: 100%;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    border: 2px solid #eef2f6;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    color: var(--primary-blue);
+    background: #fff;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    touch-action: manipulation;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--luxury-gold);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Luxury Button */
+button[type="submit"] {
+    margin-top: 10px;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--luxury-gold), var(--deep-gold));
+    color: var(--primary-blue);
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(184, 134, 11, 0.3);
+    transition: all 0.3s ease;
+    min-height: 48px;
+    touch-action: manipulation;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(184, 134, 11, 0.5);
+    filter: brightness(1.1);
+}
+
+button[type="submit"]:active {
+    transform: translateY(-1px);
+}
+
+/* Registration Link styling */
+.login-container p {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.login-container a {
+    color: var(--primary-blue);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    padding: 4px;
+}
+
+.login-container a:hover {
+    color: var(--deep-gold);
+    text-decoration: underline;
+}
+
+/* Django Messages/Alerts */
+.alert {
+    padding: 12px;
+    margin-top: 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.alert.error {
+    background: #ffebee;
+    color: var(--error-red);
+    border: 1px solid #ffcdd2;
+}
+
+.alert.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+/* Entrance Animation */
+@keyframes loginFadeUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(40px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* ==========================
+   MOBILE FIX - NO FLEX CENTER
+   ========================== */
+@media (max-width: 850px) {
+    html, body {
+        height: auto; /* CHANGED: Let it grow */
+        min-height: 100%;
+    }
+    
+    body {
+        display: block; /* CHANGED: Kill flex on mobile */
+        padding: 40px 0; /* CHANGED: Padding for spacing */
+        background-attachment: scroll;
+    }
+
+    body::before {
+        height: 100vh; /* CHANGED: Force full height */
+    }
+
+    .login-container {
+        width: 92%; 
+        max-width: 400px;
+        padding: 45px 30px; 
+        border-radius: 20px;
+        margin: 0 auto; /* CHANGED: Center horizontally only */
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        border: 2px solid rgba(255, 215, 0, 0.4);
+        /* REMOVED: max-height completely */
+    }
+
+    .login-container h2 {
+        font-size: 2rem;
+        margin-bottom: 25px;
+    }
+
+    input {
+        padding: 16px;
+        font-size: 16px;
+        border-radius: 14px;
+        margin-bottom: 25px;
+    }
+
+    button[type="submit"] {
+        padding: 18px;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-container p {
+        margin-top: 30px;
+        font-size: 1rem;
+    }
+}
+
+/* Extra small phones */
+@media (max-width: 380px) {
+    .login-container {
+        padding: 35px 20px;
+        width: 94%;
+    }
+    
+    .login-container h2 {
+        font-size: 1.8rem;
+    }
+}
+
+/* Back Button Container */
+.back-nav {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #1A237E; /* Deep Blue */
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 10px 18px;
+    background: #ffffff;
+    border: 2px solid #D4A017; /* Gold Border */
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.back-btn .arrow {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+/* Hover State */
+.back-btn:hover {
+    background: #D4A017; /* Gold Background */
+    color: #ffffff;
+    transform: translateX(-5px);
+    box-shadow: 0 6px 12px rgba(212, 160, 23, 0.3);
+}
+
+.back-btn:hover .arrow {
+    transform: translateX(-3px);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+    .back-nav {
+        top: 15px;
+        left: 15px;
+    }
+    
+    .back-btn {
+        padding: 8px 14px;
+        font-size: 0.9rem;
+    }
+}

@@ -1,240 +1,725 @@
-/* ===================== GLOBAL ===================== */
-body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #0f172a; /* dark navy */
-    color: #e5e7eb;
+/* =========================================
+   ADMIN DASHBOARD - PREMIUM BLUE & GOLD
+   MOBILE-OPTIMIZED VERSION
+   ========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-blue: #0d1241;
+    --accent-blue: #1A237E;
+    --luxury-gold: #FFD700;
+    --deep-gold: #B8860B;
+    --glass-white: rgba(255, 255, 255, 0.95);
+    --text-light: #e5e7eb;
 }
 
-/* ===================== HEADER ===================== */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: url('/static/images/bac.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--text-light);
+    min-height: 100vh;
+    overflow-x: hidden; /* CRITICAL: Fixes the horizontal screen shake */
+}
+
+/* Background Overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(13, 18, 65, 0.9), rgba(0, 0, 0, 0.8));
+    z-index: -1;
+}
+
+/* ===================== HEADER & NAVIGATION ===================== */
 header {
-    background: #111827;
-    padding: 18px 30px;
+    background: rgba(13, 18, 65, 0.8);
+    backdrop-filter: blur(15px);
+    padding: 15px 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #1f2937;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
     position: sticky;
     top: 0;
     z-index: 1000;
 }
 
 header h1 {
-    font-size: 20px;
-    margin: 0;
-    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #fff, var(--luxury-gold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
     letter-spacing: 1px;
+    margin: 0;
 }
 
-.logout-btn a {
-    background: #ef4444;
-    color: white;
-    padding: 8px 14px;
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.switch-btn {
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--luxury-gold);
+    border: 1px solid var(--luxury-gold);
+    padding: 8px 16px;
     border-radius: 8px;
     text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8rem;
     transition: 0.3s;
 }
 
-.logout-btn a:hover {
-    background: #dc2626;
+.switch-btn:hover {
+    background: var(--luxury-gold);
+    color: var(--primary-blue);
+}
+
+.logout-btn-link {
+    background: linear-gradient(135deg, #ef4444, #991b1b);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
+.logout-btn-link:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Mobile Header Adjustment */
+@media (max-width: 850px) {
+    header {
+        padding: 10px 15px;
+    }
+
+    header h1 {
+        font-size: 1rem;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .switch-btn, .logout-btn-link {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
 }
 
 /* ===================== CONTAINER ===================== */
 .container {
-    padding: 25px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-/* ===================== FLASH MESSAGES ===================== */
-.messages {
-    margin-bottom: 15px;
+/* ===================== ADMIN WELCOME ===================== */
+.admin-welcome {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 215, 0, 0.1);
 }
 
-.message {
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    background: #1f2937;
-    border-left: 4px solid #3b82f6;
+.admin-welcome h2 {
+    margin: 0 0 5px;
+    color: var(--luxury-gold);
+    font-size: 1.2rem;
+}
+
+.admin-info {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px dashed rgba(255, 215, 0, 0.3);
+    font-size: 0.8rem;
+    margin-bottom: 25px;
+    color: #cbd5e1;
+}
+
+h2 {
+    color: var(--luxury-gold);
 }
 
 /* ===================== STATS GRID ===================== */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, 1fr); /* 2x2 grid for mobile */
     gap: 15px;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 .stat-card {
-    background: #111827;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #1f2937;
-    transition: 0.3s;
+    background: var(--glass-white);
+    padding: 20px 10px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 215, 0, 0.2);
     text-align: center;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    border-color: #3b82f6;
 }
 
 .stat-card h3 {
     margin: 0;
-    font-size: 14px;
-    color: #9ca3af;
+    font-size: 0.7rem;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    font-weight: 600;
 }
 
 .stat-card p {
-    font-size: 24px;
-    margin: 10px 0 0;
-    font-weight: bold;
-    color: #ffffff;
-}
-
-/* ===================== ADMIN WELCOME ===================== */
-.admin-welcome {
-    background: linear-gradient(135deg, #1e293b, #111827);
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #334155;
-}
-
-.admin-welcome h2 {
-    margin: 0 0 10px;
-    color: #60a5fa;
-}
-
-/* ===================== INFO BOX ===================== */
-.admin-info {
-    background: #0b1220;
-    border: 1px dashed #334155;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    color: #94a3b8;
+    font-size: 1.5rem;
+    margin: 5px 0 0;
+    font-weight: 800;
+    color: var(--primary-blue);
 }
 
 /* ===================== TABS ===================== */
 .tab-buttons {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 6px;
+    border-radius: 12px;
+    overflow-x: auto; /* Swipe tabs on mobile */
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tab-buttons::-webkit-scrollbar {
+    display: none;
 }
 
 .tab-btn {
-    background: #1f2937;
-    color: #e5e7eb;
+    background: transparent;
+    color: var(--text-light);
     border: none;
-    padding: 10px 16px;
+    padding: 10px 18px;
     border-radius: 8px;
     cursor: pointer;
-    transition: 0.3s;
-}
-
-.tab-btn:hover {
-    background: #374151;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
 }
 
 .tab-btn.active {
-    background: #3b82f6;
-    color: white;
+    background: var(--luxury-gold);
+    color: var(--primary-blue);
 }
 
-/* ===================== TAB CONTENT ===================== */
+/* ===================== TAB CONTENT / TABLES ===================== */
 .tab-content {
     display: none;
-    background: #111827;
+    background: var(--glass-white);
     padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #1f2937;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: fadeIn 0.4s ease;
+    overflow: hidden;
 }
 
 .tab-content.active {
     display: block;
 }
 
-/* ===================== TABLE ===================== */
+/* 1. Table Container (Add <div class="table-container"> around your <table> in HTML) */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+}
+
+/* 2. Main Table Setup */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
-    overflow: hidden;
-    border-radius: 10px;
+    table-layout: auto;
+    background: transparent;
 }
 
-thead {
-    background: #1f2937;
-}
-
-th, td {
+/* 3. Header Styling */
+thead th {
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
     padding: 12px;
+    border-bottom: 2px solid rgba(26, 35, 126, 0.1);
     text-align: left;
-    border-bottom: 1px solid #1f2937;
-    font-size: 14px;
 }
 
-tr:hover {
-    background: #0b1220;
+/* 4. Cell Styling & Text Wrapping */
+tbody td {
+    padding: 15px 12px;
+    color: var(--primary-blue);
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(241, 245, 249, 0.5);
+    
+    /* Forces text to wrap and prevents "longing" */
+    white-space: normal !important;
+    word-wrap: break-word;
+    word-break: break-word;
+    vertical-align: middle;
 }
 
-/* ===================== PROFILE IMAGE ===================== */
-.profile-pic {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #3b82f6;
+/* 5. Column Width Constraints (Title & Description) */
+tbody td:nth-child(2),
+tbody td:nth-child(3) {
+    max-width: 250px;
+    min-width: 150px;
+    line-height: 1.5;
 }
 
-/* ===================== BUTTONS ===================== */
-.button {
-    background: #3b82f6;
-    color: white;
+/* 6. Action Buttons Styling */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit, .btn-delete {
     padding: 6px 12px;
     border-radius: 6px;
+    font-size: 0.75rem;
     text-decoration: none;
-    font-size: 13px;
-    transition: 0.3s;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
 }
 
-.button:hover {
-    background: #2563eb;
+.btn-edit {
+    background: var(--primary-blue);
+    color: var(--gold-accent) !important;
+    border: 1px solid var(--gold-accent);
+}
+
+.btn-edit:hover {
+    background: var(--gold-accent);
+    color: var(--primary-blue) !important;
+}
+
+.btn-delete {
+    background: #d9534f;
+    color: white !important;
+}
+
+.btn-delete:hover {
+    background: #c9302c;
+    transform: translateY(-1px);
+}
+
+/* 7. Flyer Thumbnail */
+.admin-event-thumb {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 160, 23, 0.3);
+}
+
+.no-image-text {
+    font-size: 0.7rem;
+    color: #1A237E;
+    font-style: italic;
+}
+
+/* ===================== PROFILE & BUTTONS ===================== */
+.profile-pic {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--luxury-gold);
+}
+
+.action-container {
+    display: flex !important;
+    gap: 8px;
+    justify-content: flex-start;
+    align-items: center;
+    min-width: 130px;
+}
+
+.button {
+    background: var(--accent-blue);
+    color: white !important;
+    padding: 8px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .delete-btn {
-    background: #ef4444;
-}
-
-.delete-btn:hover {
-    background: #dc2626;
+    background: #dc2626 !important;
+    color: white !important;
+    border: 1px solid #b91c1c;
 }
 
 /* ===================== STATUS ===================== */
 .paid {
-    color: #22c55e;
-    font-weight: bold;
+    color: #16a34a;
+    font-weight: 700;
+    background: #dcfce7;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.7rem;
 }
 
 .pending {
-    color: #f59e0b;
-    font-weight: bold;
+    color: #d97706;
+    font-weight: 700;
+    background: #fef3c7;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.7rem;
 }
 
-/* ===================== MOBILE RESPONSIVE ===================== */
-@media (max-width: 768px) {
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ===================== DESKTOP VIEW ADJUSTMENTS ===================== */
+@media (min-width: 769px) {
+    header {
+        padding: 15px 40px;
+    }
+    header h1 {
+        font-size: 1.4rem;
+    }
+    .container {
+        padding: 40px;
+    }
     .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(4, 1fr);
+    }
+    table {
+        display: table;
+    }
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+
+    /* This container allows the table to scroll sideways on phones */
+    .tab-content {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px; /* Slimmer padding for mobile */
     }
 
     table {
-        font-size: 12px;
+        display: table !important; /* Force it back to table mode */
+        width: 100%;
+        min-width: 600px; /* Forces a scrollbar if the screen is too small */
     }
 
-    header {
-        flex-direction: column;
-        gap: 10px;
+    /* Make buttons slightly larger for thumb-tapping on mobile */
+    .button {
+        padding: 12px 15px !important;
+        font-size: 0.85rem !important;
+        min-width: 60px;
+        text-align: center;
     }
+}
+
+/* Modal Styling */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    color: var(--primary-blue);
+    border: 2px solid var(--luxury-gold);
+}
+
+.info-row {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+}
+
+.info-row strong {
+    color: var(--accent-blue);
+    display: inline-block;
+    width: 100px;
+}
+
+.close-x {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ef4444;
+}
+
+/* =========================================
+   STRICT MOBILE "BOLD" VIEW (Under 850px)
+   ========================================= */
+@media (max-width: 850px) {
+    .container {
+        padding: 15px 10px;
+        width: 100%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+
+    .stat-card {
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card p {
+        font-size: 2rem;
+    }
+
+    .admin-welcome, .tab-content {
+        width: 100%;
+        margin: 0 auto 20px auto;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+
+    .tab-btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        flex: 1;
+        text-align: center;
+    }
+
+    .button, .logout-btn a {
+        display: block;
+        text-align: center;
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    .modal-card {
+        width: 95%;
+        margin: 10px;
+        padding: 20px;
+    }
+}
+
+/* =========================================
+   NEW: PAYMENT & INCOME TRACKING STYLES
+   ========================================= */
+
+/* 1. Income Card Specifics */
+.income-card {
+    border-left: 5px solid #2e7d32 !important;
+    background: linear-gradient(145deg, #ffffff, #f0fff4) !important;
+}
+
+.income-card h3 {
+    color: #2e7d32 !important;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.income-card p {
+    color: #1b5e20 !important;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+/* 2. Notification Badge on Tab */
+.notification-dot {
+    background: #ff5252;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-left: 8px;
+    box-shadow: 0 2px 5px rgba(255, 82, 82, 0.3);
+}
+
+/* 3. Enhanced Status Badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-badge.paid {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.status-badge.processing {
+    background-color: #fff3e0;
+    color: #ef6c00;
+    border: 1px solid #ffe0b2;
+    animation: pulse-orange 2s infinite;
+}
+
+.status-badge.pending {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+/* 4. Action Buttons & Helpers */
+.approve-btn {
+    background-color: #2e7d32 !important;
+    color: white !important;
+    transition: transform 0.2s;
+}
+
+.approve-btn:hover {
+    background-color: #1b5e20 !important;
+    transform: scale(1.05);
+}
+
+.verified-text {
+    color: #2e7d32;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* 5. Animations */
+@keyframes pulse-orange {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 108, 0, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(239, 108, 0, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 108, 0, 0);
+    }
+}
+
+/* Mobile Tweak for Income Card Layout */
+@media (max-width: 768px) {
+    .income-card {
+        grid-column: span 1;
+    }
+}
+
+/* Thumbnail for Admin Table */
+.admin-event-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.no-image-text {
+    font-size: 11px;
+    color: #999;
+    font-style: italic;
+}
+
+/* Event Table Image Thumbnails */
+.admin-event-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.no-image-text {
+    font-size: 11px;
+    color: #999;
+    font-style: italic;
+}
+
+/* Action Buttons Container */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+/* Edit Button Styling */
+.btn-edit {
+    background-color: #1A237E; /* Premium Blue */
+    color: white !important;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: opacity 0.2s;
+}
+
+/* Delete Button Styling */
+.btn-delete {
+    background-color: #d9534f; /* Red */
+    color: white !important;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+
+.btn-edit:hover, .btn-delete:hover {
+    opacity: 0.8;
+}
+
+.btn-delete:hover {
+    background-color: #c9302c;
+}
+
+.table-empty {
+    text-align: center;
+    padding: 20px;
+    color: #666;
 }

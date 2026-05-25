@@ -7,90 +7,164 @@ from dotenv import load_dotenv
 import os
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+# =========================================================
+# BASE DIRECTORY
+# =========================================================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env file
+
+# =========================================================
+# LOAD ENV VARIABLES
+# =========================================================
 load_dotenv()
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-95=8gc$s8_70$q5l$9ohez!!y3&ut*lt+_wc*ht1l8#^=tzeh8')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('RENDER', 'False') != 'True' and os.getenv('DEBUG', 'True') == 'True'
+# =========================================================
+# SECURITY
+# =========================================================
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    'django-insecure-dev-key'
+)
+
+DEBUG = os.getenv(
+    'RENDER',
+    'False'
+) != 'True' and os.getenv(
+    'DEBUG',
+    'True'
+) == 'True'
+
 
 ALLOWED_HOSTS = [
-    "nussnhq-portal.onrender.com",
-    "localhost",
-    "127.0.0.1",
+    'nussnhq-portal.onrender.com',
+    'localhost',
+    '127.0.0.1',
 ]
 
-# CSRF Fix: Ensures mobile browsers and Render subdomains are trusted
+
 CSRF_TRUSTED_ORIGINS = [
-    "https://nussnhq-portal.onrender.com",
-    "https://*.onrender.com"
+    'https://nussnhq-portal.onrender.com',
+    'https://*.onrender.com',
 ]
 
-# HTTPS/Cookie Security Fix for Mobile 403 Errors
+
+# =========================================================
+# SECURITY FOR PRODUCTION
+# =========================================================
 if not DEBUG:
+
     SESSION_COOKIE_SECURE = True
+
     CSRF_COOKIE_SECURE = True
+
     SECURE_BROWSER_XSS_FILTER = True
+
     SECURE_CONTENT_TYPE_NOSNIFF = True
+
     SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    SECURE_PROXY_SSL_HEADER = (
+        'HTTP_X_FORWARDED_PROTO',
+        'https'
+    )
 
 
-# Application definition
-
+# =========================================================
+# APPLICATIONS
+# =========================================================
 INSTALLED_APPS = [
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
     'django.contrib.staticfiles',
+
+    # Cloudinary
     'cloudinary',
+    'cloudinary_storage',
+
+    # Local Apps
     'students',
 ]
 
+
+# =========================================================
+# MIDDLEWARE
+# =========================================================
 MIDDLEWARE = [
+
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Handles static files on Render
+
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
+
     'django.middleware.common.CommonMiddleware',
+
     'django.middleware.csrf.CsrfViewMiddleware',
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
+
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+# =========================================================
+# URLS
+# =========================================================
 ROOT_URLCONF = 'nuss_webapp.urls'
 
+
+# =========================================================
+# TEMPLATES
+# =========================================================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], 
+
+        'DIRS': [
+            BASE_DIR / 'templates'
+        ],
+
         'APP_DIRS': True,
+
         'OPTIONS': {
             'context_processors': [
+
                 'django.template.context_processors.debug',
+
                 'django.template.context_processors.request',
+
                 'django.contrib.auth.context_processors.auth',
+
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.media', 
+
+                'django.template.context_processors.media',
             ],
         },
     },
 ]
 
+
+# =========================================================
+# WSGI
+# =========================================================
 WSGI_APPLICATION = 'nuss_webapp.wsgi.application'
 
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+# =========================================================
+# DATABASE
+# =========================================================
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
+
     DATABASES = {
         'default': dj_database_url.parse(
             DATABASE_URL,
@@ -98,91 +172,177 @@ if DATABASE_URL:
             ssl_require=True
         )
     }
+
 else:
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
 
-# Password validation
+# =========================================================
+# PASSWORD VALIDATORS
+# =========================================================
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
-# Cloudinary Settings
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
-}
 
-# --- NATIVE DJANGO CORE PRODUCTION STORAGE CONFIGURATION ---
-if not DEBUG:
-    STORAGES = {
-        "default": {
-            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-        },
-        "staticfiles": {
-            # Uses Django 6's stable core manifest backend to break old browser caching loops cleanly
-            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
-        },
-    }
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
-else:
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-
-# Internationalization
+# =========================================================
+# INTERNATIONALIZATION
+# =========================================================
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Africa/Lagos' 
+
+TIME_ZONE = 'Africa/Lagos'
+
 USE_I18N = True
+
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# =========================================================
+# STATIC FILES
+# =========================================================
 STATIC_URL = '/static/'
+
+
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    BASE_DIR / 'static'
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 
-# Media files are stored on the server
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+# =========================================================
+# MEDIA FILES
+# =========================================================
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
-# Default primary key field type
+# =========================================================
+# CLOUDINARY STORAGE
+# =========================================================
+CLOUDINARY_STORAGE = {
+
+    'CLOUD_NAME': os.getenv(
+        'CLOUDINARY_CLOUD_NAME'
+    ),
+
+    'API_KEY': os.getenv(
+        'CLOUDINARY_API_KEY'
+    ),
+
+    'API_SECRET': os.getenv(
+        'CLOUDINARY_API_SECRET'
+    ),
+}
+
+
+# =========================================================
+# STORAGE CONFIGURATION
+# =========================================================
+if not DEBUG:
+
+    STORAGES = {
+
+        "default": {
+            "BACKEND": (
+                "cloudinary_storage.storage."
+                "MediaCloudinaryStorage"
+            ),
+        },
+
+        "staticfiles": {
+            "BACKEND": (
+                "django.contrib.staticfiles.storage."
+                "ManifestStaticFilesStorage"
+            ),
+        },
+    }
+
+else:
+
+    STORAGES = {
+
+        "default": {
+            "BACKEND": (
+                "django.core.files.storage."
+                "FileSystemStorage"
+            ),
+        },
+
+        "staticfiles": {
+            "BACKEND": (
+                "django.contrib.staticfiles.storage."
+                "StaticFilesStorage"
+            ),
+        },
+    }
+
+
+# =========================================================
+# DEFAULT PRIMARY KEY
+# =========================================================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Email Configuration for Password Reset and Notifications
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# =========================================================
+# EMAIL CONFIGURATION
+# =========================================================
+EMAIL_BACKEND = (
+    'django.core.mail.backends.smtp.EmailBackend'
+)
 
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS') == 'True'
+EMAIL_HOST = os.getenv(
+    'EMAIL_HOST',
+    'smtp.gmail.com'
+)
 
-EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
+EMAIL_PORT = int(
+    os.getenv('EMAIL_PORT', 587)
+)
 
-DEFAULT_FROM_EMAIL = f"NUSS Portal <{EMAIL_HOST_USER}>"
+EMAIL_USE_TLS = (
+    os.getenv('EMAIL_USE_TLS') == 'True'
+)
 
-# Authentication Redirection
+EMAIL_HOST_USER = os.getenv('EMAIL_USER')
+
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASS')
+
+
+DEFAULT_FROM_EMAIL = (
+    f'NUSSNHQ Portal <{EMAIL_HOST_USER}>'
+)
+
+
+# =========================================================
+# AUTH REDIRECTS
+# =========================================================
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'dashboard'
+
+LOGIN_REDIRECT_URL = 'student_home'
+
 LOGOUT_REDIRECT_URL = 'login'
