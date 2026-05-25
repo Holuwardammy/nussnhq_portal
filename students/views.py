@@ -340,3 +340,17 @@ def create_fundraising(request):
         return redirect('admin_dashboard')
 
     return render(request, 'create_fundraising.html', {'form': form})
+
+    # ==========================================
+# TEMPORARY AUTO-DELETE FIX (Remove after deploy)
+# ==========================================
+from django.contrib.auth.models import User
+try:
+    # This finds the user connected to that specific school text and purges them
+    bad_user = User.objects.filter(student__school__icontains="LADOKE").first()
+    if bad_user:
+        bad_user.delete()
+        print("Success: Broken tester student deleted!")
+except Exception as e:
+    print(f"Auto-delete ran into an issue: {e}")
+# ==========================================
