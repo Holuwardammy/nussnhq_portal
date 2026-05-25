@@ -723,3 +723,74 @@ tbody td:nth-child(3) {
     padding: 20px;
     color: #666;
 }
+
+/* =========================================================
+   EXECUTIVE ROLE ASSIGNMENT STYLES
+   ========================================================= */
+
+/* Wrap the action layout cleanly */
+.action-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+    width: 100%;
+    min-width: 160px; /* Prevents compression in the table row */
+}
+
+/* Base style for the dropdown selector */
+.action-container select {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: #1A237E; /* Premium Blue */
+    background-color: #FFFFFF;
+    border: 2px solid #D4A017; /* Premium Gold */
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    outline: none;
+    appearance: none; /* Removes default native browser arrows */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A237E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+    padding-right: 30px; /* Keeps text clear of custom arrow */
+}
+
+/* Subtle hover and focus transitions */
+.action-container select:hover {
+    background-color: #FFFDF3;
+    border-color: #B8860B; /* Darker Gold */
+    box-shadow: 0 2px 4px rgba(26, 35, 126, 0.1);
+}
+
+.action-container select:focus {
+    border-color: #1A237E;
+    box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.15);
+}
+
+/* Option configurations */
+.action-container select option {
+    font-weight: normal;
+    color: #333333;
+    background-color: #FFFFFF;
+}
+
+/* =========================================================
+   MOBILE LAYOUT REFINEMENT (MEDIA QUERIES)
+   ========================================================= */
+@media (max-width: 767px) {
+    .action-container {
+        min-width: 100%;
+    }
+    
+    .action-container select {
+        font-size: 0.9rem; /* Make it easily tappable on touch screens */
+        padding: 8px 10px;
+    }
+}

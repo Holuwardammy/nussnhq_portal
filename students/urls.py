@@ -40,6 +40,9 @@ urlpatterns = [
     # President only: Record Management
     path('delete_student/<int:student_id>/', views.delete_student, name='delete_student'),
     
+    # NEW: President only: Assign Executive Roles From Dashboard Table
+    path('admin_dashboard/assign-role/<int:student_id>/', views.assign_executive_role, name='assign_executive_role'),
+    
     # school-autocomplete
     path('school-autocomplete/', views.school_autocomplete, name='school_autocomplete'),
 ]

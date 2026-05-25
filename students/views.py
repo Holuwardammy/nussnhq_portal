@@ -207,8 +207,20 @@ def admin_dashboard(request):
         is_active=True
     ).select_related('student', 'position', 'tenure')
 
+    # Add dynamic execution helper properties right onto student objects for template template rendering
+    students_list = Student.objects.all().select_related('user').prefetch_related('payments', 'executive_assignments')
+    for s in students_list:
+        active_assignment = s.executive_assignments.filter(is_active=True).first()
+        s.member_type = active_assignment.position.title.replace('_', ' ').title() if active_assignment else "Student Member"
+
+    # Add role helper flags to the admin student context object
+    if student:
+        student.is_president = student.executive_assignments.filter(position__title='president', is_active=True).exists()
+        student.is_financial_secretary = student.executive_assignments.filter(position__title='financial_secretary', is_active=True).exists()
+        student.is_treasurer = student.executive_assignments.filter(position__title='treasurer', is_active=True).exists()
+
     return render(request, 'admin_dashboard.html', {
-        'students': Student.objects.all().select_related('user').prefetch_related('payments', 'executive_assignments'),
+        'students': students_list,
         'total_income': total_income,
         'unpaid_count': unpaid_count,
         'all_payments': all_payments,
@@ -221,6 +233,55 @@ def admin_dashboard(request):
 
 
 # =========================================================
+# ASSIGN EXECUTIVE ROLE (NEW REVENUE MODAL INTERFACE)
+# =========================================================
+@login_required
+def assign_executive_role(request, student_id):
+    # Security checkpoint: Only real active President profiles or Staff developers can run updates
+    if not is_president(request.user) and not request.user.is_staff:
+        messages.error(request, "Access denied. Only the President can modify executive assignments.")
+        return redirect('admin_dashboard')
+
+    if request.method == 'POST':
+        student = get_object_or_404(Student, id=student_id)
+        position_title = request.POST.get('executive_position', '').strip().lower().replace(' ', '_')
+
+        if not position_title:
+            messages.error(request, "No position specified.")
+            return redirect('admin_dashboard')
+
+        # Clean out any old/existing executive assignments for this student to prevent overlapping conflicts
+        ExecutiveAssignment.objects.filter(student=student, is_active=True).update(is_active=False)
+
+        # If choice is 'member', we simply demote them by leaving active assignments turned off
+        if position_title == 'member':
+            messages.success(request, f"Successfully removed executive roles from {student.full_name}.")
+            return redirect('admin_dashboard')
+
+        # Locate the current active calendar tenure block
+        active_tenure = Tenure.objects.filter(is_active=True).first()
+        if not active_tenure:
+            messages.error(request, "No active tenure track found. Please set an active tenure in django admin first.")
+            return redirect('admin_dashboard')
+
+        # Safely locate or provision the designated structural position row
+        position_obj, _ = ExecutivePosition.objects.get_or_create(title=position_title)
+
+        # Provision and bind the brand new leadership record assignments
+        ExecutiveAssignment.objects.create(
+            student=student,
+            position=position_obj,
+            tenure=active_tenure,
+            is_active=True
+        )
+
+        display_title = position_title.replace('_', ' ').title()
+        messages.success(request, f"Successfully appointed {student.full_name} as {display_title}!")
+        
+    return redirect('admin_dashboard')
+
+
+# =========================================================
 # APPROVE PAYMENT
 # =========================================================
 @login_required
@@ -230,7 +291,7 @@ def approve_payment(request, payment_id):
 
     if not (
         student and (
-            student.is_president()
+            student.executive_assignments.filter(position__title='president', is_active=True).exists()
             or student.executive_assignments.filter(
                 position__title='financial_secretary',
                 is_active=True
