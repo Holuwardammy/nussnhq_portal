@@ -167,7 +167,10 @@ class StudentForm(forms.ModelForm):
             raise ValidationError(
                 'This email is already registered.'
             )
-
+        # Check Django User table 
+        if User.objects.filter(email=email).exists(): 
+            raise ValidationError( 
+                "An account with this email already exists." )
         return email
 
     # =====================================================
