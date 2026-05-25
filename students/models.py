@@ -55,7 +55,12 @@ class Student(models.Model):
     )
 
     full_name = models.CharField(max_length=150)
-    school = models.CharField(max_length=150)
+    # Change this line so it links to your School model
+    school = models.ForeignKey('School', 
+                               on_delete=models.PROTECT, 
+                               null=True, 
+                               blank=True, 
+                               related_name='students')
     department = models.CharField(max_length=100)
     level = models.CharField(max_length=20)
     phone = models.CharField(max_length=20)
@@ -93,7 +98,7 @@ class Student(models.Model):
 
     def is_president(self):
         return self.executive_assignments.filter(
-            position__title='president',
+            position__title__iexact='president',  # Added __iexact here
             is_active=True
         ).exists()
 

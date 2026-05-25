@@ -21,7 +21,8 @@ class StudentForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'placeholder': 'Enter a strong password',
-            'class': 'form-control'
+            'class': 'form-control',
+            'autocomplete': 'new-password'
         }),
         required=True,
         label='Password'
@@ -83,16 +84,19 @@ class StudentForm(forms.ModelForm):
     # =====================================================
     def clean_email(self):
         email = self.cleaned_data.get('email')
-
         if not email:
             raise ValidationError("Email is required.")
 
         email = email.strip().lower()
 
-        # IMPORTANT FIX: allow editing existing record
+        # If we are UPDATING an existing student profile
         if self.instance and self.instance.pk:
+            # Check if ANY OTHER student is already using this email
+            if Student.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
+                raise ValidationError("This email is already taken by another student.")
             return email
 
+        # If we are REGISTERING a brand new student
         if Student.objects.filter(email=email).exists():
             raise ValidationError("This email is already registered.")
 

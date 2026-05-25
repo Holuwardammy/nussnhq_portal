@@ -68,6 +68,7 @@
                    id="school-search" 
                    placeholder="Start typing your school name..." 
                    autocomplete="off" 
+                   value="{{ request.POST.school|default_if_none:'' }}"
                    required>
 
             <ul id="school-list" style="display: none;"></ul>

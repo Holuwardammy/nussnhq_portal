@@ -56,7 +56,6 @@ def home(request):
 # REGISTER STUDENT
 # =========================================================
 def register_student(request):
-
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
 
@@ -66,8 +65,10 @@ def register_student(request):
 
             school_name = request.POST.get('school', '').strip()
             if school_name:
-                School.objects.get_or_create(name=school_name)
-                student.school = school_name
+                # 1. Get or create the actual School database object row
+                school_obj, created = School.objects.get_or_create(name=school_name)
+                # 2. Assign the object directly to the foreign key relationship
+                student.school = school_obj  
 
             student.save()
 
@@ -75,7 +76,6 @@ def register_student(request):
             return redirect('login')
 
         messages.error(request, "Please correct errors.")
-
     else:
         form = StudentForm()
 
@@ -208,7 +208,7 @@ def admin_dashboard(request):
     ).select_related('student', 'position', 'tenure')
 
     return render(request, 'admin_dashboard.html', {
-        'students': Student.objects.all(),
+        'students': Student.objects.all().select_related('user').prefetch_related('payments', 'executive_assignments'),
         'total_income': total_income,
         'unpaid_count': unpaid_count,
         'all_payments': all_payments,
