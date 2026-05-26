@@ -951,3 +951,78 @@ tbody td:nth-child(3) {
         width: 100%;
     }
 }
+
+/* ==========================================================================
+   ADMIN SCHOLARSHIP MANAGEMENT LAYOUT
+   ========================================================================== */
+
+/* Management Section wrapper utility rows */
+.scholarship-management-panel {
+    margin-top: 25px;
+}
+
+/* Form Layout structural grid */
+.scholarship-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.scholarship-form-grid.full-width-field {
+    grid-template-columns: 1fr;
+}
+
+/* Custom badges tailored for operational status items */
+.status-badge-active {
+    background-color: rgba(46, 125, 50, 0.1);
+    color: #2E7D32;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-badge-expired {
+    background-color: rgba(198, 40, 40, 0.1);
+    color: #C62828;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Align inline tracking button vectors inside control table operations */
+.admin-table td .btn-danger-style {
+    background-color: #C62828;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.admin-table td .btn-danger-style:hover {
+    background-color: #B71C1C;
+}
+
+/* Break form down cleanly for mobile viewports */
+@media screen and (max-width: 768px) {
+    .scholarship-form-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    /* Make inline row indicators stack cleanly inside structural responsive screens */
+    .admin-table td[data-label="Actions"] {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 8px;
+    }
+}

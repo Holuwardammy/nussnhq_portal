@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=3">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=3.1">
 </head>
 <body>
 
@@ -89,7 +89,7 @@
         <button class="tab-btn" data-tab="events-tab">Events</button>
         <button class="tab-btn" data-tab="fundraising-tab">Fundraising</button>
         <button class="tab-btn" data-tab="announcements-tab">Announcements</button>
-    </div>
+        <button class="tab-btn" data-tab="scholarships-tab">Scholarships</button> </div>
 
     <div id="students-tab" class="tab-content active">
         <h2>Registered Students</h2>
@@ -348,6 +348,53 @@
         </table>
     </div>
 
+    <div id="scholarships-tab" class="tab-content">
+        <div class="tab-section-header">
+            <h2>Manage Scholarship Opportunities</h2>
+            {% if admin_student.is_president or user.is_staff %}
+                <button type="button" class="button btn-create-announcement" id="openScholarshipBtn">Add Scholarship</button>
+            {% endif %}
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Provider</th>
+                    <th>Scheme Title</th>
+                    <th>Worth</th>
+                    <th>Deadline</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for scholarship in scholarships %}
+                <tr>
+                    <td data-label="Provider"><strong>{{ scholarship.provider }}</strong></td>
+                    <td data-label="Scheme Title">{{ scholarship.title }}</td>
+                    <td data-label="Worth">{{ scholarship.amount }}</td>
+                    <td data-label="Deadline">
+                        {% if scholarship.is_expired %}
+                            <span style="background:#fee2e2; color:#ef4444; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.85rem;">Closed</span>
+                        {% else %}
+                            {{ scholarship.deadline|date:"d M, Y" }}
+                        {% endif %}
+                    </td>
+                    <td data-label="Actions">
+                        <div class="action-buttons">
+                            <a href="{{ scholarship.application_link }}" target="_blank" class="button btn-view-receipt" style="text-decoration:none; text-align:center;">Link ↗</a>
+                            {% if admin_student.is_president or user.is_staff %}
+                                <a href="{% url 'delete_scholarship' scholarship.id %}" class="btn-delete" onclick="return confirm('Permanently remove this scholarship listing?')">Delete</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="table-empty">No tracking records added yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 <div id="studentModal" class="modal-overlay">
@@ -379,6 +426,48 @@
             <div class="modal-form-actions">
                 <button type="button" id="cancelAnnouncementBtn" class="button btn-cancel">Cancel</button>
                 <button type="submit" class="button btn-save-announcement">Broadcast Now</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="scholarshipModal" class="modal-overlay">
+    <div class="modal-card">
+        <span id="closeScholarshipX" class="close-x">&times;</span>
+        <h2>Post Scholarship Portal Link</h2>
+        <form action="{% url 'create_scholarship' %}" method="POST" class="admin-modal-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Scholarship Title</label>
+                {{ scholarship_form.title }}
+            </div>
+            <div class="form-group">
+                <label>Provider/Company</label>
+                {{ scholarship_form.provider }}
+            </div>
+            <div class="form-group">
+                <label>Value / Worth</label>
+                {{ scholarship_form.amount }}
+            </div>
+            <div class="form-group">
+                <label>Application Link</label>
+                {{ scholarship_form.application_link }}
+            </div>
+            <div class="form-group">
+                <label>Deadline Date</label>
+                {{ scholarship_form.deadline }}
+            </div>
+            <div class="form-group">
+                <label>Eligibility Criteria</label>
+                {{ scholarship_form.eligibility }}
+            </div>
+            <div class="form-group">
+                <label>Brief Description</label>
+                {{ scholarship_form.description }}
+            </div>
+            <div class="modal-form-actions">
+                <button type="button" id="cancelScholarshipBtn" class="button btn-cancel">Cancel</button>
+                <button type="submit" class="button btn-save-announcement">Publish Board</button>
             </div>
         </form>
     </div>
@@ -442,7 +531,26 @@
         if (closeAnnX) closeAnnX.addEventListener('click', closeAnnouncementModal);
         if (cancelAnnBtn) cancelAnnBtn.addEventListener('click', closeAnnouncementModal);
 
-        // Global Outside Modal Window Clicks
+        // SCHOLARSHIP MODAL OPEN/CLOSE LOGIC (NEW)
+        const schModal = document.getElementById('scholarshipModal');
+        const openSchBtn = document.getElementById('openScholarshipBtn');
+        const closeSchX = document.getElementById('closeScholarshipX');
+        const cancelSchBtn = document.getElementById('cancelScholarshipBtn');
+
+        if (openSchBtn) {
+            openSchBtn.addEventListener('click', () => {
+                schModal.style.display = 'flex';
+            });
+        }
+
+        const closeScholarshipModal = () => {
+            schModal.style.display = 'none';
+        };
+
+        if (closeSchX) closeSchX.addEventListener('click', closeScholarshipModal);
+        if (cancelSchBtn) cancelSchBtn.addEventListener('click', closeScholarshipModal);
+
+        // Global Outside Modal Window Clicks (UPDATED)
         window.onclick = function(event) {
             const studentModal = document.getElementById('studentModal');
             if (event.target == studentModal) {
@@ -450,6 +558,9 @@
             }
             if (event.target == annModal) {
                 closeAnnouncementModal();
+            }
+            if (event.target == schModal) {
+                closeScholarshipModal();
             }
         }
     });

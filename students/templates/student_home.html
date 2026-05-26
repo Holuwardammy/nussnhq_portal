@@ -26,11 +26,13 @@
         </div>
 
         <div class="header-right">
+            {% if is_paid_member %}
             <div class="hamburger" id="hamburger" onclick="toggleMenu()">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
+            {% endif %}
 
             <div class="logout-btn desktop-only">
                 <a href="{% url 'logout' %}">Logout</a>
@@ -39,10 +41,13 @@
 
         <nav class="nav-menu" id="nav-menu">
             <ul class="nav-links">
-                <li><a href="#" onclick="showSection('home')">Home</a></li>
-                <li><a href="#" onclick="showSection('announcements')">Announcements</a></li>
-                <li><a href="#" onclick="showSection('events')">Events</a></li>
-                <li><a href="#" onclick="showSection('payments')">Payments</a></li>
+                {% if is_paid_member %}
+                    <li><a href="#" onclick="showSection('home')">Home</a></li>
+                    <li><a href="#" onclick="showSection('announcements')">Announcements</a></li>
+                    <li><a href="#" onclick="showSection('events')">Events</a></li>
+                    <li><a href="#" onclick="showSection('payments')">Payments</a></li>
+                    <li><a href="#" onclick="showSection('scholarships')">Scholarships</a></li>
+                {% endif %}
                 <li class="mobile-logout"><a href="{% url 'logout' %}">Logout</a></li>
             </ul>
         </nav>
@@ -129,123 +134,170 @@
         </div>
 
         <div class="right-column">
-            <div class="action-buttons-row">
-                <div class="download-action">
-                    <button id="download-id-btn" class="btn-pay download-btn-style">
-                        📥 Download ID Card (Image)
-                    </button>
-                    <p id="download-status" class="status-msg-style" style="display: none;">
-                        Generating high-quality image...
-                    </p>
+            {% if is_paid_member %}
+                <div class="action-buttons-row">
+                    <div class="download-action">
+                        <button id="download-id-btn" class="btn-pay download-btn-style">
+                            📥 Download ID Card (Image)
+                        </button>
+                        <p id="download-status" class="status-msg-style" style="display: none;">
+                            Generating high-quality image...
+                        </p>
+                    </div>
+
+                    <div class="payment-action-area">
+                        <a href="{% url 'payment_instructions' %}" class="btn-pay">Make New Payment / Upload Receipt</a>
+                    </div>
                 </div>
 
-                <div class="payment-action-area">
-                    <a href="{% url 'payment_instructions' %}" class="btn-pay">Make New Payment / Upload Receipt</a>
-                </div>
-            </div>
+                <section class="details-section">
+                    <div class="details-grid">
+                        <div class="detail-item"><strong>Email:</strong> <span>{{ student.user.email }}</span></div>
+                        <div class="detail-item"><strong>Phone:</strong> <span>{{ student.phone }}</span></div>
+                        <div class="detail-item"><strong>School:</strong> <span>{{ student.school }}</span></div>
+                        <div class="detail-item"><strong>Department:</strong> <span>{{ student.department }}</span></div>
+                        <div class="detail-item"><strong>Level:</strong> <span>{{ student.level }}</span></div>
+                        <div class="detail-item"><strong>State:</strong> <span>{{ student.state }}</span></div>
+                    </div>
 
-            <section class="details-section">
-                <div class="details-grid">
-                    <div class="detail-item"><strong>Email:</strong> <span>{{ student.user.email }}</span></div>
-                    <div class="detail-item"><strong>Phone:</strong> <span>{{ student.phone }}</span></div>
-                    <div class="detail-item"><strong>School:</strong> <span>{{ student.school }}</span></div>
-                    <div class="detail-item"><strong>Department:</strong> <span>{{ student.department }}</span></div>
-                    <div class="detail-item"><strong>Level:</strong> <span>{{ student.level }}</span></div>
-                    <div class="detail-item"><strong>State:</strong> <span>{{ student.state }}</span></div>
-                </div>
-
-                <div class="notifications-area">
-                    <h3>System Notifications</h3>
-                    <div class="notify-box">
-                        {% if payments.first.status == 'paid' %}
+                    <div class="notifications-area">
+                        <h3>System Notifications</h3>
+                        <div class="notify-box">
                             <p>Your membership is active. You have full access to NUSSNHQ resources.</p>
-                        {% else %}
-                            <p>Welcome to the NUSSNHQ portal. Please ensure your semester dues are cleared to maintain active status.</p>
-                        {% endif %}
+                        </div>
                     </div>
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <div id="announcements-section" class="display-section" style="display: none;">
-        <h2 class="section-title">Executive Announcement Board</h2>
-        <div class="announcements-grid">
-            {% for announcement in announcements %}
-                <div class="announcement-card {% if announcement.is_pinned %}pinned-card{% endif %}">
-                    <div class="announcement-header">
-                        <h3>{% if announcement.is_pinned %}📌 {% endif %}{{ announcement.title }}</h3>
-                        <span class="announcement-date">{{ announcement.date_posted|date:"d M, Y" }}</span>
-                    </div>
-                    <div class="announcement-body">
-                        <p>{{ announcement.content|linebreaksbr }}</p>
-                    </div>
-                </div>
-            {% empty %}
-                <div class="empty-state">
-                    <p>No active announcements posted at this time. Check back later!</p>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div id="events-section" class="display-section" style="display: none;">
-        <h2 class="section-title">Upcoming Events</h2>
-        <div class="events-grid">
-            {% for event in events %}
-                <div class="event-card-horizontal">
-                    <div class="event-date-strip">
-                        <span class="month">{{ event.date|date:"M" }}</span>
-                        <span class="day">{{ event.date|date:"d" }}</span>
-                    </div>
-                    <div class="event-flyer-thumb">
-                        {% if event.image %}
-                            <img src="{{ event.image.url }}" alt="Flyer">
-                        {% endif %}
-                    </div>
-                    <div class="event-info">
-                        <h3>{{ event.title }}</h3>
-                        <p class="location">📍 {{ event.location }}</p>
-                        <p class="description">{{ event.description|truncatewords:20 }}</p>
-                    </div>
-                </div>
-            {% empty %}
-                <div class="empty-state">
-                    <p>No upcoming events at the moment.</p>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div id="payments-section" class="display-section" style="display: none;">
-        <h2 class="section-title">Payment History</h2>
-        <div class="table-container">
-            {% if payments %}
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Amount</th>
-                            <th>Reference</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for payment in payments %}
-                            <tr>
-                                <td>{{ payment.created_at|date:"d M, Y" }}</td>
-                                <td>₦{{ payment.amount }}</td>
-                                <td>{{ payment.reference_id }}</td>
-                                <td>{{ payment.get_status_display }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                </section>
             {% else %}
-                <p>You have no payment records yet.</p>
+                <section class="details-section">
+                    <div class="notifications-area" style="margin-top: 0;">
+                        <h3 style="color: #C62828;">🔒 Portal Access Locked</h3>
+                        <div class="notify-box" style="border-left: 4px solid #C62828; background-color: rgba(198, 40, 40, 0.03); padding: 15px;">
+                            <p style="font-weight: 600; margin-bottom: 10px;">Your current semester session status is Unpaid or Processing.</p>
+                            <p>To view official executive announcements, check active bourses/scholarship matching boards, or download your image card, you must resolve outstanding dues.</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <a href="{% url 'payment_instructions' %}" class="btn-pay" style="display: block; text-align: center; text-decoration: none;">
+                            💳 Clear Outstanding Dues / Upload Receipt
+                        </a>
+                    </div>
+                </section>
             {% endif %}
         </div>
     </div>
+
+    {% if is_paid_member %}
+        <div id="announcements-section" class="display-section" style="display: none;">
+            <h2 class="section-title">Executive Announcement Board</h2>
+            <div class="announcements-grid">
+                {% for announcement in announcements %}
+                    <div class="announcement-card {% if announcement.is_pinned %}pinned-card{% endif %}">
+                        <div class="announcement-header">
+                            <h3>{% if announcement.is_pinned %}📌 {% endif %}{{ announcement.title }}</h3>
+                            <span class="announcement-date">{{ announcement.date_posted|date:"d M, Y" }}</span>
+                        </div>
+                        <div class="announcement-body">
+                            <p>{{ announcement.content|linebreaksbr }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="empty-state">
+                        <p>No active announcements posted at this time. Check back later!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="events-section" class="display-section" style="display: none;">
+            <h2 class="section-title">Upcoming Events</h2>
+            <div class="events-grid">
+                {% for event in events %}
+                    <div class="event-card-horizontal">
+                        <div class="event-date-strip">
+                            <span class="month">{{ event.date|date:"M" }}</span>
+                            <span class="day">{{ event.date|date:"d" }}</span>
+                        </div>
+                        <div class="event-flyer-thumb">
+                            {% if event.image %}
+                                <img src="{{ event.image.url }}" alt="Flyer">
+                            {% endif %}
+                        </div>
+                        <div class="event-info">
+                            <h3>{{ event.title }}</h3>
+                            <p class="location">📍 {{ event.location }}</p>
+                            <p class="description">{{ event.description|truncatewords:20 }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="empty-state">
+                        <p>No upcoming events at the moment.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="payments-section" class="display-section" style="display: none;">
+            <h2 class="section-title">Payment History</h2>
+            <div class="table-container">
+                {% if payments %}
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Reference</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                                <tr>
+                                    <td>{{ payment.created_at|date:"d M, Y" }}</td>
+                                    <td>₦{{ payment.amount }}</td>
+                                    <td>{{ payment.reference_id }}</td>
+                                    <td>{{ payment.get_status_display }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>You have no payment records yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="scholarships-section" class="display-section" style="display: none;">
+            <h2 class="section-title">Available Scholarship Opportunities</h2>
+            <div class="announcements-grid">
+                {% for scholarship in scholarships %}
+                    <div class="announcement-card">
+                        <div class="announcement-header">
+                            <h3>{{ scholarship.title }}</h3>
+                            <span class="announcement-date">Deadline: {{ scholarship.deadline|date:"d M, Y" }}</span>
+                        </div>
+                        <div class="announcement-body">
+                            <p><strong>Provider:</strong> {{ scholarship.provider }}</p>
+                            <p><strong>Value/Worth:</strong> {{ scholarship.amount }}</p>
+                            <p><strong>Eligibility:</strong> {{ scholarship.eligibility }}</p>
+                            <p style="margin-top: 8px;">{{ scholarship.description|linebreaksbr }}</p>
+                            
+                            <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+                                {% if scholarship.is_expired %}
+                                    <button class="btn-pay" disabled style="opacity: 0.5; cursor: not-allowed;">Closed</button>
+                                {% else %}
+                                    <a href="{{ scholarship.application_link }}" target="_blank" class="btn-pay" style="text-decoration: none; display: inline-block; text-align: center;">Apply Here ↗</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="empty-state">
+                        <p>No verified scholarships uploaded on the panel yet. Please check back periodically.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
 
 </main>
 
@@ -256,9 +308,11 @@
         const hamburger = document.getElementById('hamburger');
         const body = document.body;
 
-        navMenu.classList.toggle('active');
-        hamburger.classList.toggle('toggle');
-        body.classList.toggle('menu-open');
+        if (navMenu && hamburger) {
+            navMenu.classList.toggle('active');
+            hamburger.classList.toggle('toggle');
+            body.classList.toggle('menu-open');
+        }
     }
 
     // Close menu when clicking outside
@@ -266,6 +320,9 @@
         const navMenu = document.getElementById('nav-menu');
         const hamburger = document.getElementById('hamburger');
         const body = document.body;
+        
+        if (!navMenu || !hamburger) return;
+        
         const isClickInside = navMenu.contains(event.target) || hamburger.contains(event.target);
 
         if (!isClickInside && navMenu.classList.contains('active')) {
@@ -282,7 +339,6 @@
 
         const targetSection = document.getElementById(sectionId + '-section');
         if (targetSection) {
-            // Checks if it's the home view to keep flex grid alignment properties active
             if (sectionId === 'home') {
                 targetSection.style.display = 'flex';
             } else {
@@ -294,17 +350,26 @@
             'home': 'Student Dashboard', 
             'announcements': 'Executive Announcements',
             'events': 'Events & Flyers', 
-            'payments': 'Payment History' 
+            'payments': 'Payment History',
+            'scholarships': 'Scholarships & Bursaries'
         };
-        document.getElementById('page-title').innerText = titles[sectionId];
+        
+        const titleEl = document.getElementById('page-title');
+        if (titleEl && titles[sectionId]) {
+            titleEl.innerText = titles[sectionId];
+        }
 
-        // Close menu
-        document.getElementById('nav-menu').classList.remove('active');
-        document.getElementById('hamburger').classList.remove('toggle');
-        document.body.classList.remove('menu-open');
+        // Close menu cleanly
+        const navMenu = document.getElementById('nav-menu');
+        const hamburger = document.getElementById('hamburger');
+        if (navMenu && hamburger) {
+            navMenu.classList.remove('active');
+            hamburger.classList.remove('toggle');
+            document.body.classList.remove('menu-open');
+        }
     }
 
-    // 3. ID Card Download Logic - wrapped in DOMContentLoaded for safety
+    // 3. ID Card Download Logic
     document.addEventListener('DOMContentLoaded', function() {
         const downloadBtn = document.getElementById('download-id-btn');
         if (downloadBtn) {

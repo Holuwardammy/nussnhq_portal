@@ -340,3 +340,26 @@ class Announcement(models.Model):
 
     def __str__(self):
         return f"{'📌 ' if self.is_pinned else ''}{self.title}"
+    
+
+# =========================================================
+# SCHOLARSHIP MODEL
+# =========================================================
+
+class Scholarship(models.Model):
+    title = models.CharField(max_length=255)
+    provider = models.CharField(max_length=255, help_text="e.g., Shell, Chevron, State Government")
+    description = models.TextField()
+    eligibility = models.TextField(help_text="Specify GPA, Department, or Level requirements")
+    amount = models.CharField(max_length=100, help_text="e.g., ₦150,000 / Year or Fully Funded")
+    application_link = models.URLField(max_length=500)
+    deadline = models.DateField()
+    date_posted = models.DateTimeField(default=timezone.now)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.provider}"
+
+    @property
+    def is_expired(self):
+        return timezone.now().date() > self.deadline

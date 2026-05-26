@@ -18,15 +18,16 @@ from .models import (
     ExecutiveAssignment,
     ExecutivePosition,
     Tenure,
-    Announcement  # 1. IMPORTED THE ANNOUNCEMENT MODEL HERE
-    # Import your new form at the top of views.py alongside the others
+    Announcement,
+    Scholarship  # UPDATED: Imported the Scholarship Model
 )
 
 from .forms import (
     StudentForm,
     EventForm,
     FundraisingForm,
-    AnnouncementForm
+    AnnouncementForm,
+    ScholarshipForm  # UPDATED: Imported the Scholarship Form
 )
 
 # =========================================================
@@ -123,16 +124,33 @@ def logout_view(request):
 @login_required
 def student_home(request):
     student = get_object_or_404(Student, user=request.user)
+    
+    # Check the latest payment status for lockdown
+    all_payments = Payment.objects.filter(student=student).order_by('-created_at')
+    latest_payment = all_payments.first()
+    is_paid_member = latest_payment and latest_payment.status == 'paid'
 
-    # 2. FETCH ANNOUNCEMENTS FROM DATABASE (Ordered by pinned status first, then newest date)
-    announcements = Announcement.objects.all().order_by('-is_pinned', '-date_posted')
+    if is_paid_member:
+        # SECURE: Only query and pass data if dues are fully cleared
+        announcements = Announcement.objects.all().order_by('-is_pinned', '-date_posted')
+        scholarships = Scholarship.objects.filter(is_active=True).order_by('deadline')
+        events = Event.objects.all()
+        fundraising = Fundraising.objects.all()
+    else:
+        # BLOCK: Send completely empty data streams to unpaid profiles
+        announcements = Announcement.objects.none()
+        scholarships = Scholarship.objects.none()
+        events = Event.objects.none()
+        fundraising = Fundraising.objects.none()
 
     return render(request, 'student_home.html', {
         'student': student,
-        'payments': Payment.objects.filter(student=student),
-        'events': Event.objects.all(),
-        'fundraising': Fundraising.objects.all(),
-        'announcements': announcements,  # 3. PASSED TO TEMPLATE CONTEXT
+        'payments': all_payments,
+        'events': events,
+        'fundraising': fundraising,
+        'announcements': announcements,
+        'scholarships': scholarships,
+        'is_paid_member': is_paid_member, # Passed helper boolean to control template layout layers
     })
 
 
@@ -180,8 +198,9 @@ def school_autocomplete(request):
     results = [school.name for school in schools]
     return JsonResponse(results, safe=False)
 
+
 # =========================================================
-# ADMIN DASHBOARD (UPDATED)
+# ADMIN DASHBOARD (UPDATED FOR SCHOLARSHIPS)
 # =========================================================
 @login_required
 def admin_dashboard(request):
@@ -232,17 +251,20 @@ def admin_dashboard(request):
         'executives': executives,
         'active_tenure': active_tenure,
         'admin_student': student,
-        'announcements': Announcement.objects.all().order_by('-is_pinned', '-date_posted'), # PASSED TO ADMIN VIEW
-        'announcement_form': AnnouncementForm() # EMPTY FORM FOR MODALS/CREATION
+        'announcements': Announcement.objects.all().order_by('-is_pinned', '-date_posted'),
+        'announcement_form': AnnouncementForm(),
+        
+        # UPDATED: Added scholarship data configurations to the management hub
+        'scholarships': Scholarship.objects.all().order_by('-date_posted'),
+        'scholarship_form': ScholarshipForm()  # Empty form instance for the new popup modal
     })
 
 
 # =========================================================
-# CREATE / EDIT ANNOUNCEMENT (NEW)
+# CREATE / EDIT ANNOUNCEMENT
 # =========================================================
 @login_required
 def create_announcement(request, announcement_id=None):
-    # Only allow the President or active Executives to broadcast announcements
     if not is_executive(request.user):
         messages.error(request, "Permission denied.")
         return redirect('admin_dashboard')
@@ -262,7 +284,7 @@ def create_announcement(request, announcement_id=None):
 
 
 # =========================================================
-# DELETE ANNOUNCEMENT (NEW)
+# DELETE ANNOUNCEMENT
 # =========================================================
 @login_required
 def delete_announcement(request, announcement_id):
@@ -277,7 +299,46 @@ def delete_announcement(request, announcement_id):
 
 
 # =========================================================
-# ASSIGN EXECUTIVE ROLE (NEW REVENUE MODAL INTERFACE)
+# CREATE / EDIT SCHOLARSHIP (NEW)
+# =========================================================
+@login_required
+def create_scholarship(request, scholarship_id=None):
+    # Only allow active Executives to publish new scholarship opportunities
+    if not is_executive(request.user):
+        messages.error(request, "Permission denied.")
+        return redirect('admin_dashboard')
+
+    scholarship = get_object_or_404(Scholarship, id=scholarship_id) if scholarship_id else None
+
+    if request.method == 'POST':
+        form = ScholarshipForm(request.POST, instance=scholarship)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Scholarship opportunity listed successfully!")
+            return redirect('admin_dashboard')
+    else:
+        form = ScholarshipForm(instance=scholarship)
+
+    return redirect('admin_dashboard')
+
+
+# =========================================================
+# DELETE SCHOLARSHIP (NEW)
+# =========================================================
+@login_required
+def delete_scholarship(request, scholarship_id):
+    if not is_executive(request.user):
+        messages.error(request, "Permission denied.")
+        return redirect('admin_dashboard')
+
+    scholarship = get_object_or_404(Scholarship, id=scholarship_id)
+    scholarship.delete()
+    messages.success(request, "Scholarship record removed.")
+    return redirect('admin_dashboard')
+
+
+# =========================================================
+# ASSIGN EXECUTIVE ROLE
 # =========================================================
 @login_required
 def assign_executive_role(request, student_id):
@@ -314,6 +375,7 @@ def assign_executive_role(request, student_id):
         ExecutiveAssignment.objects.create(
             student=student,
             position=position_obj,
+            get_active_student=active_tenure,
             tenure=active_tenure,
             is_active=True
         )

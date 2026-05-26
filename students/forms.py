@@ -11,7 +11,8 @@ from .models import (
     Event,
     Fundraising,
     Payment,
-    Announcement
+    Announcement,
+    Scholarship
 )
 
 # =========================================================
@@ -226,4 +227,21 @@ class AnnouncementForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Enter announcement title'}),
             'content': forms.Textarea(attrs={'placeholder': 'Write your announcement content here...', 'rows': 4}),
+        }
+
+# =========================================================
+# SCHOLARSHIP FORM
+# =========================================================
+class ScholarshipForm(forms.ModelForm):
+    class Meta:
+        model = Scholarship
+        fields = ['title', 'provider', 'description', 'eligibility', 'amount', 'application_link', 'deadline', 'is_active']
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': 'e.g., NNPC/Chevron National Merit Scholarship'}),
+            'provider': forms.TextInput(attrs={'placeholder': 'e.g., Chevron Nigeria'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Describe the scholarship opportunity...', 'rows': 3}),
+            'eligibility': forms.Textarea(attrs={'placeholder': 'e.g., 300 Level engineering students with minimum 3.5 CGPA', 'rows': 2}),
+            'amount': forms.TextInput(attrs={'placeholder': 'e.g., ₦200,000 annually'}),
+            'application_link': forms.URLInput(attrs={'placeholder': 'https://external-scholarship-portal.com'}),
+            'deadline': forms.DateInput(attrs={'type': 'date'}),
         }
