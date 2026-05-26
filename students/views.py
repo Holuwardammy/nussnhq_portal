@@ -17,13 +17,16 @@ from .models import (
     School,
     ExecutiveAssignment,
     ExecutivePosition,
-    Tenure
+    Tenure,
+    Announcement  # 1. IMPORTED THE ANNOUNCEMENT MODEL HERE
+    # Import your new form at the top of views.py alongside the others
 )
 
 from .forms import (
     StudentForm,
     EventForm,
-    FundraisingForm
+    FundraisingForm,
+    AnnouncementForm
 )
 
 # =========================================================
@@ -121,16 +124,20 @@ def logout_view(request):
 def student_home(request):
     student = get_object_or_404(Student, user=request.user)
 
+    # 2. FETCH ANNOUNCEMENTS FROM DATABASE (Ordered by pinned status first, then newest date)
+    announcements = Announcement.objects.all().order_by('-is_pinned', '-date_posted')
+
     return render(request, 'student_home.html', {
         'student': student,
         'payments': Payment.objects.filter(student=student),
         'events': Event.objects.all(),
         'fundraising': Fundraising.objects.all(),
+        'announcements': announcements,  # 3. PASSED TO TEMPLATE CONTEXT
     })
 
 
 # =========================================================
-# PAYMENT INSTRUCTIONS  ✅ FIX ADDED (WAS MISSING BEFORE)
+# PAYMENT INSTRUCTIONS  
 # =========================================================
 @login_required
 def payment_instructions(request):
@@ -165,7 +172,7 @@ def submit_payment(request):
 
 
 # =========================================================
-# SCHOOL AUTOCOMPLETE  ✅ FIX ADDED (WAS MISSING BEFORE)
+# SCHOOL AUTOCOMPLETE  
 # =========================================================
 def school_autocomplete(request):
     query = request.GET.get('term', '')
@@ -173,13 +180,11 @@ def school_autocomplete(request):
     results = [school.name for school in schools]
     return JsonResponse(results, safe=False)
 
-
 # =========================================================
-# ADMIN DASHBOARD
+# ADMIN DASHBOARD (UPDATED)
 # =========================================================
 @login_required
 def admin_dashboard(request):
-
     student = get_active_student(request.user)
 
     if not is_executive(request.user):
@@ -207,13 +212,11 @@ def admin_dashboard(request):
         is_active=True
     ).select_related('student', 'position', 'tenure')
 
-    # Add dynamic execution helper properties right onto student objects for template template rendering
     students_list = Student.objects.all().select_related('user').prefetch_related('payments', 'executive_assignments')
     for s in students_list:
         active_assignment = s.executive_assignments.filter(is_active=True).first()
         s.member_type = active_assignment.position.title.replace('_', ' ').title() if active_assignment else "Student Member"
 
-    # Add role helper flags to the admin student context object
     if student:
         student.is_president = student.executive_assignments.filter(position__title='president', is_active=True).exists()
         student.is_financial_secretary = student.executive_assignments.filter(position__title='financial_secretary', is_active=True).exists()
@@ -228,8 +231,49 @@ def admin_dashboard(request):
         'fundraising': Fundraising.objects.all(),
         'executives': executives,
         'active_tenure': active_tenure,
-        'admin_student': student
+        'admin_student': student,
+        'announcements': Announcement.objects.all().order_by('-is_pinned', '-date_posted'), # PASSED TO ADMIN VIEW
+        'announcement_form': AnnouncementForm() # EMPTY FORM FOR MODALS/CREATION
     })
+
+
+# =========================================================
+# CREATE / EDIT ANNOUNCEMENT (NEW)
+# =========================================================
+@login_required
+def create_announcement(request, announcement_id=None):
+    # Only allow the President or active Executives to broadcast announcements
+    if not is_executive(request.user):
+        messages.error(request, "Permission denied.")
+        return redirect('admin_dashboard')
+
+    announcement = get_object_or_404(Announcement, id=announcement_id) if announcement_id else None
+
+    if request.method == 'POST':
+        form = AnnouncementForm(request.POST, instance=announcement)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Announcement published successfully!")
+            return redirect('admin_dashboard')
+    else:
+        form = AnnouncementForm(instance=announcement)
+
+    return render(request, 'create_announcement.html', {'form': form})
+
+
+# =========================================================
+# DELETE ANNOUNCEMENT (NEW)
+# =========================================================
+@login_required
+def delete_announcement(request, announcement_id):
+    if not is_executive(request.user):
+        messages.error(request, "Permission denied.")
+        return redirect('admin_dashboard')
+
+    announcement = get_object_or_404(Announcement, id=announcement_id)
+    announcement.delete()
+    messages.success(request, "Announcement removed.")
+    return redirect('admin_dashboard')
 
 
 # =========================================================
@@ -237,7 +281,6 @@ def admin_dashboard(request):
 # =========================================================
 @login_required
 def assign_executive_role(request, student_id):
-    # Security checkpoint: Only real active President profiles or Staff developers can run updates
     if not is_president(request.user) and not request.user.is_staff:
         messages.error(request, "Access denied. Only the President can modify executive assignments.")
         return redirect('admin_dashboard')

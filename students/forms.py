@@ -10,7 +10,8 @@ from .models import (
     Student,
     Event,
     Fundraising,
-    Payment
+    Payment,
+    Announcement
 )
 
 # =========================================================
@@ -212,4 +213,17 @@ class PaymentForm(forms.ModelForm):
             'student': forms.Select(attrs={'class': 'form-control'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+# =========================================================
+# ANNOUNCEMENT FORM
+# =========================================================
+
+class AnnouncementForm(forms.ModelForm):
+    class Meta:
+        model = Announcement
+        fields = ['title', 'content', 'is_pinned']
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': 'Enter announcement title'}),
+            'content': forms.Textarea(attrs={'placeholder': 'Write your announcement content here...', 'rows': 4}),
         }

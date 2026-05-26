@@ -55,12 +55,13 @@ class Student(models.Model):
     )
 
     full_name = models.CharField(max_length=150)
-    # Change this line so it links to your School model
-    school = models.ForeignKey('School', 
-                               on_delete=models.PROTECT, 
-                               null=True, 
-                               blank=True, 
-                               related_name='students')
+    school = models.ForeignKey(
+        'School', 
+        on_delete=models.PROTECT, 
+        null=True, 
+        blank=True, 
+        related_name='students'
+    )
     department = models.CharField(max_length=100)
     level = models.CharField(max_length=20)
     phone = models.CharField(max_length=20)
@@ -98,7 +99,7 @@ class Student(models.Model):
 
     def is_president(self):
         return self.executive_assignments.filter(
-            position__title__iexact='president',  # Added __iexact here
+            position__title__iexact='president',  
             is_active=True
         ).exists()
 
@@ -323,3 +324,19 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"{self.student.full_name} - {self.get_status_display()}"
+
+
+# =========================================================
+# ANNOUNCEMENT MODEL (ADDED)
+# =========================================================
+class Announcement(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    is_pinned = models.BooleanField(default=False)
+    date_posted = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-is_pinned', '-date_posted']
+
+    def __str__(self):
+        return f"{'📌 ' if self.is_pinned else ''}{self.title}"

@@ -15,6 +15,11 @@ urlpatterns = [
     # ==========================================
     path('student_home/', views.student_home, name='student_home'),
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('announcement/create/', views.create_announcement, name='create_announcement'),
+    
+    # FIX: Changed '=' to ':' for parameter parsing
+    path('announcement/edit/<int:announcement_id>/', views.create_announcement, name='edit_announcement'),
+    path('announcement/delete/<int:announcement_id>/', views.delete_announcement, name='delete_announcement'),
 
     # ==========================================
     # PAYMENT & VERIFICATION SYSTEM

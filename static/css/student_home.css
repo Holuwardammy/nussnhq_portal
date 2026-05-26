@@ -800,3 +800,117 @@ body.menu-open {
         margin: 0 auto;
     }
 }
+
+/* ==========================================================================
+   EXECUTIVE ANNOUNCEMENT BOARD SECTIONS
+   ========================================================================== */
+
+.section-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.8rem;
+    color: #1A237E; /* Premium Navy/Blue */
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #D4A017; /* Premium Gold Accent Line */
+    padding-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+/* Grid layout for announcements */
+.announcements-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* Base Announcement Card styling */
+.announcement-card {
+    background: #ffffff;
+    border-left: 5px solid #1A237E; /* Left border blue highlight */
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.announcement-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Special Highlight Card styling if Pinned/Urgent */
+.announcement-card.pinned-card {
+    border-left-color: #D4A017; /* Changes highlight border to Gold */
+    background: linear-gradient(to right, #fffdf3, #ffffff);
+}
+
+/* Card Internal Header Alignment */
+.announcement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.announcement-header h3 {
+    font-size: 1.3rem;
+    color: #1A237E;
+    margin: 0;
+    font-weight: 700;
+}
+
+.announcement-card.pinned-card .announcement-header h3 {
+    color: #b0820f; /* Slightly darker gold text for reading clarity */
+}
+
+.announcement-date {
+    font-size: 0.85rem;
+    color: #666666;
+    font-weight: 600;
+    background: #f4f5f7;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+}
+
+/* Card Body text rules */
+.announcement-body {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333333;
+}
+
+/* Empty State Styling if no entries exist */
+.empty-state {
+    background: #f9f9f9;
+    border: 2px dashed #cccccc;
+    border-radius: 8px;
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #666666;
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS ADJUSTMENTS
+   ========================================================================== */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+    
+    .announcement-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .announcement-date {
+        margin-top: 0.25rem;
+    }
+    
+    .announcement-card {
+        padding: 1.2rem;
+    }
+}

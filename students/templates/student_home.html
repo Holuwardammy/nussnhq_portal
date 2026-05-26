@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Portal | {{ student.full_name }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/student_home.css' %}?v=9">
+    <link rel="stylesheet" href="{% static 'css/student_home.css' %}?v=9.1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
@@ -25,25 +25,22 @@
             <h2>NUSSN Student Portal</h2>
         </div>
 
-        <!-- Group hamburger + logout together -->
         <div class="header-right">
-            <!-- Hamburger Icon -->
             <div class="hamburger" id="hamburger" onclick="toggleMenu()">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
 
-            <!-- Desktop Logout -->
             <div class="logout-btn desktop-only">
                 <a href="{% url 'logout' %}">Logout</a>
             </div>
         </div>
 
-        <!-- Navigation Links -->
         <nav class="nav-menu" id="nav-menu">
             <ul class="nav-links">
                 <li><a href="#" onclick="showSection('home')">Home</a></li>
+                <li><a href="#" onclick="showSection('announcements')">Announcements</a></li>
                 <li><a href="#" onclick="showSection('events')">Events</a></li>
                 <li><a href="#" onclick="showSection('payments')">Payments</a></li>
                 <li class="mobile-logout"><a href="{% url 'logout' %}">Logout</a></li>
@@ -65,9 +62,7 @@
         {% endif %}
     </div>
 
-    <!-- HOME SECTION (ID Card & Info) -->
     <div id="home-section" class="main-layout display-section">
-        <!-- LEFT COLUMN: ID Card only -->
         <div class="left-column">
             <section class="id-card-container">
                 <div class="id-card" id="membership-card">
@@ -125,6 +120,7 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
                     <div class="id-card-footer">
                         <p>Valid for the 2026 Academic Session</p>
                     </div>
@@ -132,7 +128,6 @@
             </section>
         </div>
 
-        <!-- RIGHT COLUMN: Buttons + Student Info -->
         <div class="right-column">
             <div class="action-buttons-row">
                 <div class="download-action">
@@ -173,7 +168,27 @@
         </div>
     </div>
 
-    <!-- EVENTS SECTION (Hidden by default) -->
+    <div id="announcements-section" class="display-section" style="display: none;">
+        <h2 class="section-title">Executive Announcement Board</h2>
+        <div class="announcements-grid">
+            {% for announcement in announcements %}
+                <div class="announcement-card {% if announcement.is_pinned %}pinned-card{% endif %}">
+                    <div class="announcement-header">
+                        <h3>{% if announcement.is_pinned %}📌 {% endif %}{{ announcement.title }}</h3>
+                        <span class="announcement-date">{{ announcement.date_posted|date:"d M, Y" }}</span>
+                    </div>
+                    <div class="announcement-body">
+                        <p>{{ announcement.content|linebreaksbr }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    <p>No active announcements posted at this time. Check back later!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
     <div id="events-section" class="display-section" style="display: none;">
         <h2 class="section-title">Upcoming Events</h2>
         <div class="events-grid">
@@ -202,7 +217,6 @@
         </div>
     </div>
 
-    <!-- PAYMENTS SECTION (Hidden by default) -->
     <div id="payments-section" class="display-section" style="display: none;">
         <h2 class="section-title">Payment History</h2>
         <div class="table-container">
@@ -267,9 +281,21 @@
         sections.forEach(sec => sec.style.display = 'none');
 
         const targetSection = document.getElementById(sectionId + '-section');
-        if (targetSection) targetSection.style.display = 'flex';
+        if (targetSection) {
+            // Checks if it's the home view to keep flex grid alignment properties active
+            if (sectionId === 'home') {
+                targetSection.style.display = 'flex';
+            } else {
+                targetSection.style.display = 'block';
+            }
+        }
 
-        const titles = { 'home': 'Student Dashboard', 'events': 'Events & Flyers', 'payments': 'Payment History' };
+        const titles = { 
+            'home': 'Student Dashboard', 
+            'announcements': 'Executive Announcements',
+            'events': 'Events & Flyers', 
+            'payments': 'Payment History' 
+        };
         document.getElementById('page-title').innerText = titles[sectionId];
 
         // Close menu

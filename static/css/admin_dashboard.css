@@ -794,3 +794,160 @@ tbody td:nth-child(3) {
         padding: 8px 10px;
     }
 }
+
+/* ==========================================================================
+   ANNOUNCEMENTS PANEL & MANAGEMENT ELEMENTS
+   ========================================================================== */
+
+/* Header rows layout helper */
+.tab-section-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+/* Custom action triggers */
+.btn-create-announcement {
+    background-color: #D4A017 !important; /* Premium Gold Accent */
+    color: #1A237E !important; /* Contrast Navy Text */
+    font-weight: 700 !important;
+    border: none;
+    transition: background 0.2s ease;
+}
+
+.btn-create-announcement:hover {
+    background-color: #b0820f !important;
+}
+
+/* Badges for display fields */
+.badge-pinned {
+    background-color: #fff8e1;
+    color: #b0820f;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: 1px solid #D4A017;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.badge-standard {
+    background-color: #f4f5f7;
+    color: #4a5568;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* View text helper state */
+.view-only-text {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* Modal Form styling elements */
+.admin-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-top: 1rem;
+    text-align: left;
+}
+
+.admin-modal-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.admin-modal-form label {
+    font-weight: 600;
+    color: #1A237E;
+    font-size: 0.9rem;
+}
+
+.admin-modal-form input[type="text"],
+.admin-modal-form textarea {
+    width: 100%;
+    padding: 0.65rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+.admin-modal-form input[type="text"]:focus,
+.admin-modal-form textarea:focus {
+    outline: none;
+    border-color: #1A237E;
+    box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+}
+
+.admin-modal-form .form-group-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    margin-top: 0.2rem;
+}
+
+.admin-modal-form .form-group-checkbox input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+}
+
+.modal-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.btn-cancel {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+}
+
+.btn-cancel:hover {
+    background-color: #dc2626 !important;
+}
+
+.btn-save-announcement {
+    background-color: #1A237E !important;
+    color: #ffffff !important;
+}
+
+.btn-save-announcement:hover {
+    background-color: #121858 !important;
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 600px) {
+    .tab-section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .tab-section-header h2 {
+        text-align: center;
+    }
+    
+    .modal-form-actions {
+        flex-direction: column-reverse;
+    }
+    
+    .modal-form-actions .button {
+        width: 100%;
+    }
+}
