@@ -1026,3 +1026,313 @@ tbody td:nth-child(3) {
         padding-top: 8px;
     }
 }
+
+/* =========================================
+   RESPONSIVENESS LAYER - MOBILE & LAPTOP
+   Appended only. No existing code modified.
+   ========================================= */
+
+/* --- 1. SMALL MOBILE: 320px - 480px --- */
+@media only screen and (max-width: 480px) {
+    header h1 {
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .header-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    
+    .switch-btn, .logout-btn-link {
+        padding: 5px 8px;
+        font-size: 0.7rem;
+        min-height: 32px; /* Touch target */
+    }
+    
+    .container {
+        padding: 12px 8px;
+    }
+    
+    .stats-grid {
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 18px 8px;
+    }
+    
+    .stat-card h3 {
+        font-size: 0.65rem;
+    }
+    
+    .stat-card p {
+        font-size: 1.3rem;
+    }
+    
+    .tab-btn {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+        min-height: 44px; /* iOS touch target */
+    }
+    
+    /* Table: Better horizontal scroll + sticky first col */
+    .table-container {
+        border: 1px solid rgba(255, 215, 0, 0.1);
+        border-radius: 8px;
+    }
+    
+    table {
+        min-width: 500px; /* Reduced from 600px for small screens */
+    }
+    
+    thead th {
+        font-size: 0.7rem;
+        padding: 10px 8px;
+    }
+    
+    tbody td {
+        padding: 12px 8px;
+        font-size: 0.8rem;
+    }
+    
+    /* Action buttons stack on tiny screens */
+    .action-buttons, .action-container {
+        flex-direction: column;
+        gap: 6px;
+        min-width: 100px;
+    }
+    
+    .btn-edit, .btn-delete, .button {
+        width: 100%;
+        padding: 10px 8px;
+        font-size: 0.75rem;
+        min-height: 36px;
+    }
+    
+    .admin-event-thumb {
+        width: 35px;
+        height: 35px;
+    }
+    
+    /* Modal adjustments */
+    .modal-card {
+        width: 94%;
+        padding: 18px;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+    
+    .info-row strong {
+        width: 80px;
+        font-size: 0.85rem;
+    }
+}
+
+/* --- 2. LARGE MOBILE / SMALL TABLET: 481px - 768px --- */
+@media only screen and (min-width: 481px) and (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+    
+    .stat-card p {
+        font-size: 1.8rem;
+    }
+    
+    .tab-btn {
+        min-height: 44px;
+    }
+    
+    table {
+        min-width: 550px;
+    }
+    
+    .action-container {
+        min-width: 140px;
+    }
+    
+    .scholarship-form-grid {
+        gap: 15px;
+    }
+}
+
+/* --- 3. TABLET / SMALL LAPTOP: 769px - 1024px --- */
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        padding: 30px 25px;
+    }
+    
+    header {
+        padding: 15px 30px;
+    }
+    
+    header h1 {
+        font-size: 1.25rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    
+    .stat-card {
+        padding: 25px 15px;
+    }
+    
+    .stat-card h3 {
+        font-size: 0.75rem;
+    }
+    
+    .stat-card p {
+        font-size: 1.6rem;
+    }
+    
+    .tab-content {
+        padding: 25px;
+    }
+    
+    /* Tables: No scroll needed, full width */
+    .table-container {
+        overflow-x: visible;
+    }
+    
+    table {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    tbody td:nth-child(2),
+    tbody td:nth-child(3) {
+        max-width: 200px;
+    }
+    
+    /* Action buttons side-by-side */
+    .action-buttons, .action-container {
+        flex-direction: row;
+        min-width: 150px;
+    }
+    
+    .scholarship-form-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .income-card p {
+        font-size: 1.7rem;
+    }
+}
+
+/* --- 4. LAPTOP / DESKTOP: 1025px - 1440px --- */
+@media only screen and (min-width: 1025px) and (max-width: 1440px) {
+    .container {
+        padding: 40px 35px;
+    }
+    
+    header {
+        padding: 18px 50px;
+    }
+    
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .stats-grid {
+        gap: 25px;
+    }
+    
+    .stat-card {
+        padding: 30px 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    }
+    
+    tbody td:nth-child(2),
+    tbody td:nth-child(3) {
+        max-width: 300px;
+    }
+    
+    .tab-content {
+        padding: 30px;
+    }
+    
+    .modal-card {
+        max-width: 500px;
+    }
+}
+
+/* --- 5. LARGE DESKTOP: 1441px+ --- */
+@media only screen and (min-width: 1441px) {
+    .container {
+        padding: 50px;
+    }
+    
+    .stats-grid {
+        gap: 30px;
+    }
+    
+    tbody td:nth-child(2),
+    tbody td:nth-child(3) {
+        max-width: 400px;
+    }
+}
+
+/* --- 6. TOUCH DEVICE OPTIMIZATIONS --- */
+@media (hover: none) and (pointer: coarse) {
+    .switch-btn, .logout-btn-link, .button, .btn-edit, .btn-delete, .tab-btn {
+        min-height: 44px; /* WCAG touch target */
+    }
+    
+    .action-container select {
+        min-height: 44px;
+    }
+    
+    /* Remove hover effects on touch */
+    .stat-card:hover, .btn-edit:hover, .btn-delete:hover {
+        transform: none;
+    }
+}
+
+/* --- 7. LANDSCAPE MOBILE FIX --- */
+@media only screen and (max-height: 500px) and (orientation: landscape) {
+    header {
+        padding: 8px 15px;
+        position: relative; /* Don't stick on short screens */
+    }
+    
+    .admin-welcome {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .stats-grid {
+        margin-bottom: 20px;
+    }
+    
+    .modal-card {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+/* --- 8. PRINT STYLES - Bonus --- */
+@media print {
+    body::before, header, .tab-buttons, .action-buttons, .button {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .tab-content, .stat-card {
+        background: white;
+        border: 1px solid #ddd;
+        box-shadow: none;
+    }
+}

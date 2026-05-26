@@ -285,3 +285,180 @@ button[type="submit"]:active {
     margin-top: 2px;
     margin-left: 5px;
 }
+
+/* =====================================
+   ADDED RESPONSIVENESS - REGISTRATION PAGE
+   Mobile + Laptop refinements only
+   Does not modify existing rules
+   ===================================== */
+
+/* --- LAPTOP / DESKTOP 1024px - 1439px --- */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    .registration-container {
+        max-width: 640px; /* Slightly wider for long forms on laptop */
+        padding: 60px 50px;
+        max-height: calc(100vh - 80px); /* More breathing room than 40px */
+    }
+
+    .registration-container h2 {
+        font-size: 2.4rem;
+        margin-bottom: 35px;
+    }
+
+    form {
+        gap: 18px; /* More space between fields on desktop */
+    }
+
+    label {
+        font-size: 0.9rem; /* Better readability */
+    }
+
+    input, select, .searchable-select input[type="text"] {
+        padding: 15px 20px;
+        font-size: 16px;
+    }
+
+    button[type="submit"] {
+        padding: 18px;
+        font-size: 1.15rem;
+        margin-top: 25px;
+    }
+}
+
+/* --- LARGE DESKTOP 1440px+ --- */
+@media (min-width: 1440px) {
+    body {
+        padding: 40px; /* More outer space on 4K/ultra-wide */
+    }
+
+    .registration-container {
+        max-width: 700px; /* Prevent form looking too skinny on big screens */
+        transform: scale(1.02); /* Subtle luxury scale */
+    }
+
+    .registration-container h2 {
+        font-size: 2.6rem;
+    }
+}
+
+/* --- TABLET 600px - 1023px --- */
+@media (min-width: 600px) and (max-width: 1023px) {
+    .registration-container {
+        max-width: 580px;
+        width: 90%;
+        padding: 45px 35px;
+        max-height: none; /* Tablets can scroll, no height lock */
+    }
+
+    .registration-container h2 {
+        font-size: 2.1rem;
+    }
+}
+
+/* --- MOBILE LANDSCAPE / SHORT HEIGHT FIX --- */
+@media (max-height: 600px) and (orientation: landscape) {
+    body {
+        align-items: flex-start;
+        padding: 15px 0;
+    }
+
+    .registration-container {
+        margin: 10px auto;
+        padding: 30px 25px;
+        max-height: none; /* Let it scroll naturally in landscape */
+        overflow-y: visible;
+    }
+
+    .registration-container h2 {
+        font-size: 1.6rem;
+        margin-bottom: 20px;
+    }
+
+    form {
+        gap: 12px;
+    }
+
+    input, select, .searchable-select input[type="text"] {
+        padding: 12px 14px;
+        margin-bottom: 0; /* Gap handles spacing */
+    }
+
+    button[type="submit"] {
+        padding: 14px;
+        margin-top: 15px;
+    }
+}
+
+/* --- EXTRA SMALL PHONES 320px - 360px --- */
+@media (max-width: 360px) {
+    .registration-container {
+        width: 94%;
+        padding: 30px 18px;
+    }
+
+    .registration-container h2 {
+        font-size: 1.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    input, select, .searchable-select input[type="text"] {
+        padding: 14px 12px;
+        font-size: 16px; /* Still prevents iOS zoom */
+    }
+
+    button[type="submit"] {
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+    }
+}
+
+/* --- TOUCH DEVICE OPTIMIZATION --- */
+@media (hover: none) and (pointer: coarse) {
+    button[type="submit"]:hover {
+        transform: none; /* Remove lift on touch */
+        filter: brightness(1);
+        box-shadow: 0 10px 20px rgba(184, 134, 11, 0.3);
+    }
+
+    .searchable-select ul li {
+        min-height: 48px; /* Ensure 44px+ tap targets in dropdown */
+        display: flex;
+        align-items: center;
+    }
+
+    input:focus, select:focus {
+        transform: none; /* Prevent jumpy focus on mobile */
+    }
+}
+
+/* --- PREVENT BODY SCROLL LOCK ON LAPTOP --- */
+@media (min-width: 851px) {
+    body {
+        overflow-y: auto; /* Override any mobile block */
+    }
+    
+    .registration-container {
+        overflow-y: auto;
+        scrollbar-width: thin; /* Firefox */
+        scrollbar-color: var(--luxury-gold) #f1f1f1; /* Firefox */
+    }
+
+    /* Webkit scrollbar styling for desktop */
+    .registration-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .registration-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    .registration-container::-webkit-scrollbar-thumb {
+        background: var(--luxury-gold);
+        border-radius: 10px;
+    }
+    
+    .registration-container::-webkit-scrollbar-thumb:hover {
+        background: var(--deep-gold);
+    }
+}

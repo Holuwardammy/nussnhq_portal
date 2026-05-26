@@ -984,3 +984,139 @@ body.menu-open {
         padding: 12px;
     }
 }
+
+/* =====================================
+   ADD-ONLY RESPONSIVENESS LAYER
+   Mobile + Laptop refinements
+   Does not modify existing rules
+   ===================================== */
+
+/* 1. EXTRA SMALL PHONES: 360px and below - prevents ID card overflow */
+@media (max-width: 360px) {
+    .id-card,
+    .left-column {
+        width: 100% !important;
+        max-width: 300px !important;
+    }
+    
+    .header-container {
+        padding: 0 10px;
+    }
+    
+    .header h2 {
+        font-size: 16px;
+    }
+    
+    .header-right {
+        gap: 8px;
+    }
+    
+    .logout-btn a {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+    
+    .container {
+        width: 96%;
+    }
+}
+
+/* 2. LAPTOP REFINEMENT: 1025px to 1440px - stops right-column from being too narrow */
+@media (min-width: 1025px) and (max-width: 1440px) {
+    .main-layout {
+        gap: 40px;
+        padding: 0 20px;
+    }
+    
+    .right-column {
+        flex: 1 1 700px;
+        max-width: 700px;
+    }
+    
+    .details-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+/* 3. LARGE DESKTOP: 1441px+ - uses extra screen space better */
+@media (min-width: 1441px) {
+    .main-layout {
+        gap: 50px;
+        justify-content: flex-start;
+        max-width: 1400px;
+    }
+    
+    .right-column {
+        flex: 1 1 800px;
+        max-width: 800px;
+    }
+    
+    .details-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .container {
+        max-width: 1600px;
+    }
+}
+
+/* 4. LANDSCAPE PHONE FIX: prevents hamburger overlap when phone is sideways */
+@media (max-width: 900px) and (orientation: landscape) {
+    .header {
+        position: relative;
+    }
+    
+    .nav-menu {
+        padding-top: 50px;
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    .welcome-section h1 {
+        font-size: 20px;
+    }
+}
+
+/* 5. TOUCH TARGET FIX: ensures buttons are 44px+ tall on all touch devices */
+@media (pointer: coarse) {
+    .btn-pay,
+    .download-btn-style,
+    .logout-btn a,
+    .nav-menu .nav-links a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .hamburger {
+        min-width: 44px;
+        min-height: 44px;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+/* 6. PREVENT HORIZONTAL SCROLL: safety net for all devices */
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+.id-card-container,
+.announcement-card,
+.event-card-horizontal,
+.table-container {
+    max-width: 100%;
+}
+
+/* 7. TABLE SCROLL FIX for mobile: keeps tables usable without breaking layout */
+@media (max-width: 600px) {
+    .table-container {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .admin-table {
+        min-width: 500px;
+    }
+}

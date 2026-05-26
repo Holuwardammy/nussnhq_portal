@@ -313,3 +313,107 @@ button[type="submit"]:active {
         font-size: 0.9rem;
     }
 }
+
+/* ==========================
+   ADDED RESPONSIVENESS - MOBILE + LAPTOP
+   Does not modify existing rules, only adds breakpoints
+   ========================== */
+
+/* --- LAPTOP / LARGE SCREENS 1024px+ --- */
+@media (min-width: 1024px) {
+    .login-container {
+        max-width: 460px; /* Slightly roomier on big screens */
+        padding: 60px 50px; /* More breathing space */
+    }
+
+    .login-container h2 {
+        font-size: 2.4rem; /* Better hierarchy on desktop */
+    }
+
+    body {
+        background-attachment: fixed; /* Parallax stays smooth on laptop */
+    }
+
+    button[type="submit"] {
+        min-height: 52px; /* Slightly larger click target for desktop */
+        font-size: 1.15rem;
+    }
+
+    .back-nav {
+        top: 30px;
+        left: 30px; /* More offset on wide screens */
+    }
+}
+
+/* --- TABLET 768px to 1023px --- */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .login-container {
+        max-width: 440px;
+        padding: 50px 40px;
+        width: 85%; /* Use more of tablet width */
+    }
+
+    .login-container h2 {
+        font-size: 2.3rem;
+    }
+
+    body {
+        background-attachment: scroll; /* Better perf on tablets */
+        padding: 30px 0;
+    }
+}
+
+/* --- MOBILE LANDSCAPE / SMALL HEIGHT --- */
+@media (max-height: 500px) and (orientation: landscape) {
+    body {
+        align-items: flex-start; /* Stop vertical centering when keyboard pops */
+        padding: 20px 0;
+    }
+
+    .login-container {
+        margin: 10px auto; /* Less top margin in landscape */
+        padding: 30px 25px;
+    }
+
+    .login-container h2 {
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+    }
+
+    input {
+        margin-bottom: 15px;
+        padding: 12px 14px;
+    }
+
+    button[type="submit"] {
+        padding: 14px;
+    }
+}
+
+/* --- LARGE DESKTOP 1440px+ --- */
+@media (min-width: 1440px) {
+    .login-container {
+        max-width: 500px; /* Prevent it looking tiny on ultra-wide */
+        transform: scale(1.05); /* Subtle luxury scaling */
+    }
+    
+    body::before {
+        background: linear-gradient(135deg, rgba(26, 35, 126, 0.75), rgba(0, 0, 0, 0.65)); /* Less dark on big screens */
+    }
+}
+
+/* --- ACCESSIBILITY: TOUCH DEVICES --- */
+@media (hover: none) and (pointer: coarse) {
+    button[type="submit"]:hover {
+        transform: none; /* Kill hover lift on touch */
+        filter: brightness(1);
+    }
+    
+    .back-btn:hover {
+        transform: none; /* Prevent jumpy hover on mobile */
+    }
+    
+    input, button, .back-btn {
+        -webkit-tap-highlight-color: rgba(255, 215, 0, 0.2); /* Gold tap feedback */
+    }
+}
