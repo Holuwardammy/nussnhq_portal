@@ -51,7 +51,14 @@ def is_president(user):
 # =========================================================
 # HOME
 # =========================================================
+from django.http import HttpResponse
+
 def home(request):
+    # Quick intercept: If it's just an uptime bot checking if the server is breathing, 
+    # give it a fast, clean 200 OK without running template rendering engine tasks.
+    if request.method == 'HEAD':
+        return HttpResponse()
+
     events = Event.objects.all().order_by('-date')
     return render(request, 'home.html', {'events': events})
 
