@@ -271,12 +271,31 @@
     </div>
 
     <div id="fundraising-tab" class="tab-content">
-        <div class="tab-section-header">
-            <h2>Fundraising</h2>
-            {% if admin_student.is_president or user.is_staff %}
-                <a href="{% url 'create_fundraising' %}" class="button">Create Fundraising</a>
-            {% endif %}
-        </div>
+    <div class="tab-section-header">
+        <h2>Fundraising</h2>
+        {% if admin_student.is_president or user.is_staff %}
+            <a href="{% url 'create_fundraising' %}" class="button">Create Fundraising</a>
+        {% endif %}
+    </div>
+
+    <div class="fundraising-grid">
+        {% for campaign in fundraising %}
+            <div class="fundraising-card">
+                <h3>{{ campaign.title }}</h3>
+                <p>{{ campaign.description }}</p>
+                {% if admin_student.is_president or user.is_staff %}
+                    <div class="card-actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                        <a href="{% url 'edit_fundraising' campaign.id %}" class="btn-edit" style="background-color: #D4A017; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.9rem;">Edit</a>
+                        
+                        <a href="{% url 'delete_fundraising' campaign.id %}" class="btn-delete" onclick="return confirm('Are you sure you want to delete this campaign?');" style="background-color: #d9534f; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.9rem;">Delete</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>No fundraising campaigns running at the moment.</p>
+        {% endfor %}
+    </div>
+</div>
 
         <table>
             <thead>

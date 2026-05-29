@@ -41,11 +41,15 @@ urlpatterns = [
     # ==========================================
     # EXECUTIVE MANAGEMENT TOOLS
     # ==========================================
-    # President only: Event & Campaign Creation
+    # President only: Event Management
     path('create_event/', views.create_event, name='create_event'),
     path('event/edit/<int:event_id>/', views.create_event, name='edit_event'),
     path('event/delete/<int:event_id>/', views.delete_event, name='delete_event'),
+    
+    # President only: Fundraising Management System
     path('create_fundraising/', views.create_fundraising, name='create_fundraising'),
+    path('fundraising/edit/<int:fundraising_id>/', views.create_fundraising, name='edit_fundraising'),
+    path('fundraising/delete/<int:fundraising_id>/', views.delete_fundraising, name='delete_fundraising'),
     
     # President only: Record Management
     path('delete_student/<int:student_id>/', views.delete_student, name='delete_student'),

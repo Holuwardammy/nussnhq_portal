@@ -1,3 +1,4 @@
+import threading  # <-- Added for background execution to fix Render 500 errors
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
@@ -47,6 +48,19 @@ def is_president(user):
         is_active=True
     ).exists()
 
+# Separate task processing to safeguard web process cycle execution speed
+def _send_event_email_async(event_title, student_emails):
+    try:
+        send_mail(
+            subject=f"New Event: {event_title}",
+            message=f"A new event has been posted: {event_title}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=student_emails,
+            fail_silently=True
+        )
+    except Exception:
+        pass
+
 
 # =========================================================
 # HOME
@@ -61,9 +75,9 @@ def home(request):
     fundraising_campaigns = Fundraising.objects.all().order_by('-id')
 
     return render(request, 'home.html', {
-    'events': events,
-    'fundraising': fundraising_campaigns  
-})
+        'events': events,
+        'fundraising': fundraising_campaigns  
+    })
 
 
 # =========================================================
@@ -458,13 +472,12 @@ def create_event(request, event_id=None):
             emails = list(Student.objects.values_list('email', flat=True))
 
             if emails:
-                send_mail(
-                    subject=f"New Event: {saved_event.title}",
-                    message=f"A new event has been posted: {saved_event.title}",
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=emails,
-                    fail_silently=True
+                # 🚀 RUN VIA BACKGROUND THREAD: Handled concurrently so the page loads immediately
+                thr = threading.Thread(
+                    target=_send_event_email_async, 
+                    args=(saved_event.title, emails)
                 )
+                thr.start()
 
             messages.success(request, "Event saved.")
             return redirect('admin_dashboard')
@@ -491,18 +504,40 @@ def delete_event(request, event_id):
 
 
 # =========================================================
-# FUNDRAISING
+# CREATE / EDIT FUNDRAISING
 # =========================================================
 @login_required
-def create_fundraising(request):
+def create_fundraising(request, fundraising_id=None):
     if not is_president(request.user):
+        messages.error(request, "Only President allowed.")
         return redirect('admin_dashboard')
 
-    form = FundraisingForm(request.POST or None)
+    # Fixed: Adding lookups so this view seamlessly handles BOTH creating and editing
+    campaign = get_object_or_404(Fundraising, id=fundraising_id) if fundraising_id else None
 
-    if form.is_valid():
-        form.save()
-        messages.success(request, "Fundraising created.")
-        return redirect('admin_dashboard')
+    if request.method == 'POST':
+        form = FundraisingForm(request.POST, instance=campaign)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Fundraising campaign saved.")
+            return redirect('admin_dashboard')
+    else:
+        form = FundraisingForm(instance=campaign)
 
     return render(request, 'create_fundraising.html', {'form': form})
+
+
+# =========================================================
+# DELETE FUNDRAISING
+# =========================================================
+@login_required
+def delete_fundraising(request, fundraising_id):
+    if not is_president(request.user):
+        messages.error(request, "Only President allowed.")
+        return redirect('admin_dashboard')
+
+    campaign = get_object_or_404(Fundraising, id=fundraising_id)
+    campaign.delete()
+
+    messages.success(request, "Fundraising campaign deleted.")
+    return redirect('admin_dashboard')
