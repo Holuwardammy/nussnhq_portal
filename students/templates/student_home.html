@@ -101,10 +101,17 @@
                             <div class="id-row">
                                 <div class="detail-group">
                                     <label>MEMBER TYPE</label>
-                                    <p class="badge {{ student.member_type }}">
-                                        {{ student.get_member_type_display }}
+                                    <p class="badge {% if student.user.groups.all %}executive{% else %}student{% endif %}">
+                                        {% if student.user.is_superuser %}
+                                            Admin
+                                        {% elif student.user.groups.all %}
+                                            {{ student.user.groups.all.0.name }}
+                                        {% else %}
+                                            Student
+                                        {% endif %}
                                     </p>
                                 </div>
+                            </div>
                                 <div class="detail-group">
                                     <label>STATUS</label>
                                     <p class="status-text">

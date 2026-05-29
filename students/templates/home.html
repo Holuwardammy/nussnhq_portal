@@ -142,6 +142,34 @@
     </div>
 </section>
 
+<div class="public-section fundraising-wrapper">
+    <h2 class="section-heading">Active Fundraising Campaigns</h2>
+    
+    {% if fundraising %}
+        <div class="fundraising-grid">
+            {% for campaign in fundraising %}
+                <div class="fundraising-card">
+                    <div class="card-header">
+                        <h3>{{ campaign.title }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="campaign-description">{{ campaign.description|linebreaks }}</p>
+                        
+                        <div class="goal-info">
+                            <span class="target-amount"><strong>Target Goal:</strong> ₦{{ campaign.goal_amount|default:"0" }}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'login' %}" class="btn-donate">Log In to Support</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-campaigns">There are no active fundraising campaigns at the moment. Check back soon!</p>
+    {% endif %}
+</div>
+
 <!-- GALLERY SECTION -->
 <section id="gallery" class="gallery">
     <h2>Gallery</h2>

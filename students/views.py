@@ -58,7 +58,12 @@ def home(request):
         return HttpResponse()
 
     events = Event.objects.all().order_by('-date')
-    return render(request, 'home.html', {'events': events})
+    fundraising_campaigns = Fundraising.objects.all().order_by('-id')
+
+    return render(request, 'home.html', {
+    'events': events,
+    'fundraising': fundraising_campaigns  
+})
 
 
 # =========================================================
