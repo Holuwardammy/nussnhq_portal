@@ -12,9 +12,17 @@
 
 <body>
 
-{% if student.member_type == 'president' or student.member_type == 'financial_secretary' or student.member_type == 'treasurer' %}
+{% if student.user.is_superuser or student.user.groups.all %}
 <div class="admin-toggle-bar">
-    <span>Logged in as {{ student.get_member_type_display }} (Executive View)</span>
+    <span>
+        Logged in as 
+        {% if student.user.is_superuser %}
+            Admin
+        {% else %}
+            {{ student.user.groups.all.0.name }}
+        {% endif %} 
+        (Executive View)
+    </span>
     <a href="{% url 'admin_dashboard' %}" class="back-to-admin">Return to Admin Dashboard</a>
 </div>
 {% endif %}
@@ -22,7 +30,7 @@
 <header class="header">
     <div class="header-container">
         <div class="logo-area">
-            <h2>NUSSN Student Portal</h2>
+            <h2>NUSS Student Portal</h2>
         </div>
 
         <div class="header-right">
@@ -112,24 +120,24 @@
                                     </p>
                                 </div>
                             </div>
-                                <div class="detail-group">
-                                    <label>STATUS</label>
-                                    <p class="status-text">
-                                        {% if payments %}
-                                            {% with latest_payment=payments.first %}
-                                                {% if latest_payment.status == 'paid' %}
-                                                    <span class="status-paid">PAID ✔</span>
-                                                {% elif latest_payment.status == 'processing' %}
-                                                    <span class="status-processing">PENDING ⏳</span>
-                                                {% else %}
-                                                    <span class="status-unpaid">UNPAID ❌</span>
-                                                {% endif %}
-                                            {% endwith %}
-                                        {% else %}
-                                            <span class="no-record">NO RECORD</span>
-                                        {% endif %}
-                                    </p>
-                                </div>
+                            
+                            <div class="detail-group">
+                                <label>STATUS</label>
+                                <p class="status-text">
+                                    {% if payments %}
+                                        {% with latest_payment=payments.first %}
+                                            {% if latest_payment.status == 'paid' %}
+                                                <span class="status-paid">PAID ✔</span>
+                                            {% elif latest_payment.status == 'processing' %}
+                                                <span class="status-processing">PENDING ⏳</span>
+                                            {% else %}
+                                                <span class="status-unpaid">UNPAID ❌</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% else %}
+                                        <span class="no-record">NO RECORD</span>
+                                    {% endif %}
+                                </p>
                             </div>
                         </div>
                     </div>

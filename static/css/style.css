@@ -463,7 +463,7 @@ section.visible {
 }
 
 /* =========================================
-   7. EVENTS SECTION
+   7. RESTRUCTURED EVENTS SECTION (CENTRALIZED)
    ========================================= */
 .events {
     width: 100%;
@@ -472,6 +472,7 @@ section.visible {
     padding: 100px 20px;
     box-sizing: border-box;
     overflow: hidden;
+    text-align: center; /* Centralizes the section heading and overview */
 }
 
 .events h2 {
@@ -498,91 +499,119 @@ section.visible {
     font-size: 1.1rem;
     color: #546e7a;
     padding: 0 15px;
+    line-height: 1.6;
 }
 
 .events-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    gap: 30px;
     width: 100%;
+    justify-content: center; /* Perfectly centers grid paths if columns are fewer than max */
 }
 
 .event-card {
-    background: #f8fafc;
-    padding: 40px 30px;
+    background: #ffffff;
     border-radius: 20px;
     border: 1px solid #e2e8f0;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     display: flex;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     flex-direction: column;
     align-items: center;
+    text-align: center; /* Ensures text strings sit dead center */
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .event-card:hover {
-    transform: translateY(-12px) scale(1.02);
-    background: #ffffff;
-    box-shadow: 0 20px 40px rgba(26, 35, 126, 0.08);
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(26, 35, 126, 0.1);
     border-color: #D4A017;
+}
+
+/* Premium Image Frame Fix: Allows the complete visual context to show */
+.event-image-wrapper {
+    width: 100%;
+    height: auto;
+    max-height: 260px;
+    overflow: hidden;
+    position: relative;
+    border-bottom: 4px solid #D4A017;
+}
+
+.event-flyer-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Assures full, unclipped picture aspect ratios */
+    background-color: #0d1241; /* Sleek structural letterboxing if needed */
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.event-card:hover .event-flyer-img {
+    transform: scale(1.03);
+}
+
+/* Internal Card Elements Layout Details */
+.event-details-content {
+    padding: 30px 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    flex-grow: 1;
 }
 
 .event-date {
     display: inline-block;
     background: #1A237E;
     color: #D4A017;
-    padding: 8px 20px;
+    padding: 8px 22px;
     border-radius: 50px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(26, 35, 126, 0.2);
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.15);
 }
 
 .event-card h3 {
     color: #1A237E;
     font-size: 1.5rem;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     font-weight: 700;
-}
-
-.event-card p {
-    font-size: 0.95rem;
-    color: #64748b;
-    line-height: 1.6;
-}
-
-.event-image-wrapper {
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
-    border-radius: 8px 8px 0 0;
-}
-
-.event-flyer-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.event-card:hover .event-flyer-img {
-    transform: scale(1.05);
+    line-height: 1.3;
 }
 
 .event-location {
-    font-size: 0.9rem;
-    color: #1A237E;
-    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #D4A017;
+    background: rgba(26, 35, 126, 0.05);
+    padding: 4px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+/* Text Integrity Fix: No max-height cuts, lets every single word read clearly */
+.event-card p {
+    font-size: 1rem;
+    color: #64748b;
+    line-height: 1.7;
+    margin: 0;
+    width: 100%;
 }
 
 .no-events {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 40px;
+    padding: 50px;
     color: #64748b;
+    font-size: 1.1rem;
+    background: #ffffff;
+    border-radius: 15px;
+    border: 1px dashed #cbd5e1;
 }
 
 @media (max-width: 768px) {
@@ -590,12 +619,7 @@ section.visible {
         padding: 70px 5%;
     }
     .event-card {
-        padding: 30px 20px;
-    }
-}
-@media (max-width: 480px) {
-    .events-container {
-        grid-template-columns: 1fr;
+        border-radius: 16px;
     }
 }
 
@@ -844,7 +868,6 @@ footer {
 
 .footer-container {
     display: grid;
-    /* Updated to 3 columns to fit the new Map section */
     grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 40px;
     max-width: 1300px;
@@ -915,7 +938,6 @@ footer {
 }
 
 .social-links img {
-    /* Critical Fix for Large Files */
     width: 24px !important;
     height: 24px !important;
     max-width: 24px;
@@ -957,8 +979,155 @@ footer {
     .footer-right iframe { max-width: 100%; }
 }
 
+/* =========================================================
+   11. RESTRUCTURED PUBLIC FUNDRAISING SECTION (CENTRALIZED)
+   ========================================================= */
+.public-section {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 40px 20px;
+    text-align: center; /* Centralizes introductory headings and wrappers */
+}
+
+/* Uplifted Section Header to match premium design semantics */
+.public-section .section-heading {
+    color: #1A237E;
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 800;
+    margin-bottom: 25px;
+    position: relative;
+    display: inline-block;
+    border-left: none; /* Removed the flat left-border */
+    padding-left: 0;
+    text-transform: none;
+}
+
+.public-section .section-heading::after {
+    content: '';
+    display: block;
+    width: 70px;
+    height: 4px;
+    background: #D4A017;
+    margin: 15px auto 0;
+    border-radius: 2px;
+}
+
+.fundraising-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+    gap: 35px;
+    margin-top: 40px;
+    justify-content: center;
+}
+
+.fundraising-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px; /* Made rounder to match premium cards */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-align: center; /* Centers nested content details */
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.fundraising-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(26, 35, 126, 0.1);
+    border-color: #D4A017;
+}
+
+.fundraising-card .card-header {
+    background: linear-gradient(135deg, #1A237E 0%, #0d1241 100%);
+    padding: 25px 20px;
+    border-bottom: 3px solid #D4A017;
+}
+
+.fundraising-card .card-header h3 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.fundraising-card .card-body {
+    padding: 35px 25px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Legibility Fix: Removed all restrictions so long campaign stories render entirely */
+.campaign-description {
+    color: #64748b;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.goal-info {
+    background-color: rgba(26, 35, 126, 0.03);
+    border: 1px dashed rgba(26, 35, 126, 0.2);
+    padding: 14px 25px;
+    border-radius: 12px;
+    color: #1A237E;
+    font-weight: 700;
+    font-size: 1.1rem;
+    width: 100%;
+    letter-spacing: 0.5px;
+}
+
+.fundraising-card .card-footer {
+    padding: 20px 25px 30px;
+    background-color: #ffffff;
+    border-top: none;
+    width: 100%;
+}
+
+/* Premium Golden Action Trigger CTA */
+.btn-donate {
+    display: block;
+    width: 100%;
+    background: linear-gradient(135deg, #FFD700 0%, #D4A017 100%);
+    color: #1A237E;
+    text-align: center;
+    text-decoration: none;
+    padding: 15px 0;
+    font-weight: 700;
+    border-radius: 12px;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-donate:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(212, 160, 23, 0.4);
+    background: #FFD700;
+    color: #000;
+}
+
+.no-campaigns {
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 15px;
+    border: 1px dashed #cbd5e1;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
 /* =========================================
-   STRICT MOBILE "BOLD" VIEW
+   12. STRICT MOBILE "BOLD" VIEW & OVERRIDES
    ========================================= */
 @media (max-width: 850px) {
     #navbar h2 {
@@ -974,20 +1143,24 @@ footer {
         border-radius: 15px;
     }
 
-    .about h2, .programs h2, .events h2, .gallery h2, .contact h2 {
+    .about h2, .programs h2, .events h2, .gallery h2, .contact h2, .public-section .section-heading {
         width: 100%;
     }
 
-    .about-cards, .programs-container, .events-container, .gallery-container {
+    .about-cards, .programs-container, .events-container, .gallery-container, .fundraising-grid {
         grid-template-columns: 1fr !important; 
         gap: 25px;
     }
 
-    .card, .program, .event-card {
-        padding: 40px 25px;
+    .card, .program, .event-card, .fundraising-card {
+        padding: 10px 5px; /* Handled dynamic distribution spacing */
         border-radius: 20px;
         width: 100%;
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .event-card, .fundraising-card {
+        padding: 0; /* Keeps card background structure flush */
     }
 
     .program:hover {
@@ -1026,126 +1199,8 @@ footer {
         justify-content: center;
         margin-top: 25px;
     }
-}
 
-/* =========================================================
-   PUBLIC HOMEPAGE FUNDRAISING STYLES
-   ========================================================= */
-
-.public-section {
-    margin: 40px auto;
-    padding: 20px;
-    max-width: 1200px;
-}
-
-.section-heading {
-    color: #1A237E;
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 25px;
-    border-left: 5px solid #D4A017;
-    padding-left: 12px;
-    text-transform: uppercase;
-}
-
-.fundraising-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 25px;
-}
-
-.fundraising-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.fundraising-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-}
-
-.fundraising-card .card-header {
-    background-color: #1A237E;
-    padding: 15px 20px;
-}
-
-.fundraising-card .card-header h3 {
-    color: #ffffff;
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-
-.fundraising-card .card-body {
-    padding: 20px;
-    flex-grow: 1;
-}
-
-.campaign-description {
-    color: #4a5568;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-
-.goal-info {
-    background-color: #f7fafc;
-    border: 1px solid #edf2f7;
-    padding: 12px;
-    border-radius: 6px;
-    color: #1A237E;
-    font-weight: 600;
-    font-size: 1rem;
-    text-align: center;
-}
-
-.fundraising-card .card-footer {
-    padding: 15px 20px;
-    background-color: #f8fafc;
-    border-top: 1px solid #edf2f7;
-}
-
-.btn-donate {
-    display: block;
-    width: 100%;
-    background-color: #D4A017;
-    color: #ffffff;
-    text-align: center;
-    text-decoration: none;
-    padding: 10px 0;
-    font-weight: 700;
-    border-radius: 4px;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    transition: background-color 0.2s ease;
-}
-
-.btn-donate:hover {
-    background-color: #b88612;
-    color: #ffffff;
-}
-
-.no-campaigns {
-    text-align: center;
-    color: #718096;
-    font-style: italic;
-    padding: 30px;
-    background: #f7fafc;
-    border-radius: 6px;
-}
-
-/* Mobile Responsiveness Rules */
-@media (max-width: 768px) {
-    .fundraising-grid {
-        grid-template-columns: 1fr;
-    }
     .btn-donate {
-        padding: 14px 0; /* Clear, bold touch targets for mobile profiles */
+        padding: 16px 0; /* Clear, bold touch targets for modern mobile platforms */
     }
 }
