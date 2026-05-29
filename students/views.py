@@ -137,7 +137,7 @@ def student_home(request):
     if is_paid_member:
         # SECURE: Only query and pass data if dues are fully cleared
         announcements = Announcement.objects.all().order_by('-is_pinned', '-date_posted')
-        scholarships = Scholarship.objects.filter(is_active=True).order_by('deadline')
+        scholarships = Scholarship.objects.all().order_by('-date_posted')
         events = Event.objects.all()
         fundraising = Fundraising.objects.all()
     else:
@@ -316,6 +316,9 @@ def create_scholarship(request, scholarship_id=None):
             form.save()
             messages.success(request, "Scholarship opportunity listed successfully!")
             return redirect('admin_dashboard')
+        else:
+            # Add this so you can see EXACTLY why a scholarship failed to save
+            messages.error(request, f"Failed to save scholarship. Errors: {form.errors.as_text()}")
     
     return redirect('admin_dashboard')
 
