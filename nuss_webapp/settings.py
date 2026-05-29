@@ -39,14 +39,17 @@ DEBUG = os.getenv(
 
 ALLOWED_HOSTS = [
     'nussnhq-portal.onrender.com',
+    'nussnhq.com.ng',          # 1. Added root custom domain
+    'www.nussnhq.com.ng',      # 2. Added www subdomain
     'localhost',
     '127.0.0.1',
 ]
 
-
 CSRF_TRUSTED_ORIGINS = [
     'https://nussnhq-portal.onrender.com',
     'https://*.onrender.com',
+    'https://nussnhq.com.ng',      # 3. Added secure root custom origin
+    'https://www.nussnhq.com.ng',  # 4. Added secure www custom origin
 ]
 
 
