@@ -135,17 +135,44 @@ img {
 }
 
 /* =========================================
-   3. GLOBAL SECTION REVEAL
+   3. GLOBAL SECTION REVEAL ANIMATIONS
    ========================================= */
 section {
     opacity: 0;
-    transform: translateY(40px);
-    transition: all 0.9s ease-out;
+    transform: translateY(50px);
+    transition: opacity 1s cubic-bezier(0.215, 0.61, 0.355, 1), 
+                transform 1s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 section.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Delay staggered cards inside viewport-visible sections */
+section.visible .card,
+section.visible .program,
+section.visible .event-card,
+section.visible .fundraising-card,
+section.visible .gallery-item {
+    animation: layoutCardReveal 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.15) both;
+}
+
+/* Stagger indices calculations */
+section.visible .card:nth-child(1), section.visible .program:nth-child(1) { animation-delay: 0.1s; }
+section.visible .card:nth-child(2), section.visible .program:nth-child(2) { animation-delay: 0.25s; }
+section.visible .card:nth-child(3), section.visible .program:nth-child(3) { animation-delay: 0.4s; }
+section.visible .card:nth-child(4), section.visible .program:nth-child(4) { animation-delay: 0.55s; }
+
+@keyframes layoutCardReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.96);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 /* Responsive fix for Nav */
@@ -209,16 +236,16 @@ section.visible {
                 url('/static/images/bac.jpg') center/cover no-repeat;
     z-index: 1;
     overflow: hidden;
-    animation: heroPop 1.2s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+    animation: heroPop 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     padding: 40px 20px;
 }
 
-.hero h1, .hero p, .btn-hero {
+.hero h1, .hero p, .hero-actions {
     position: relative;
     z-index: 2;
     opacity: 0;
-    transform: translateY(30px);
-    animation: fadeInUp 0.8s ease-out forwards;
+    transform: translateY(40px);
+    animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .hero h1 {
@@ -241,6 +268,16 @@ section.visible {
     padding: 0 20px;
 }
 
+.hero-actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    animation-delay: 0.7s;
+}
+
 .btn-hero {
     display: inline-block;
     background: linear-gradient(135deg, #FFD700 0%, #D4A017 100%);
@@ -254,20 +291,19 @@ section.visible {
     text-decoration: none;
     box-shadow: 0 10px 30px rgba(212, 160, 23, 0.3);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation-delay: 0.7s;
     min-width: 200px;
     min-height: 44px;
 }
 
 .btn-hero:hover {
-    transform: scale(1.08) translateY(-8px);
+    transform: scale(1.08) translateY(-5px);
     box-shadow: 0 15px 40px rgba(212, 160, 23, 0.5);
     color: #000;
     background: #FFD700;
 }
 
 @keyframes heroPop {
-    0% { transform: scale(1.1); opacity: 0; }
+    0% { transform: scale(1.06); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
 
@@ -289,11 +325,14 @@ section.visible {
         background-attachment: scroll;
         min-height: calc(100vh - 70px);
     }
+    .hero-actions {
+        flex-direction: column;
+        gap: 15px;
+    }
     .btn-hero { 
         padding: 16px 35px; 
         font-size: 1rem;
         width: min(90%, 300px);
-        margin-bottom: 10px;
     }
 }
 
@@ -379,7 +418,7 @@ section.visible {
 }
 
 /* =========================================
-   6. PROGRAMS SECTION
+   6. PROGRAMS SECTION (PERFECTLY CENTERED)
    ========================================= */
 .programs {
     padding: 100px 8%;
@@ -418,21 +457,26 @@ section.visible {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 35px;
+    justify-content: center;
 }
 
 .program {
     background: #ffffff;
     padding: 45px 35px;
     border-radius: 20px;
-    text-align: left;
+    text-align: center; /* FIXED: Centered card textual content layouts */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    border-left: 5px solid #D4A017;
-    transition: all 0.4s ease;
+    border-top: 5px solid #D4A017; /* FIXED: Converted from border-left to keep card balanced when centered */
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .program:hover {
-    transform: translateX(10px);
+    transform: translateY(-10px); /* FIXED: Swapped horizontal slide out for an elegant upward lift */
     background: #ffffff;
     box-shadow: 0 20px 25px -5px rgba(26, 35, 126, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
@@ -454,9 +498,6 @@ section.visible {
     .programs {
         padding: 70px 5%;
     }
-    .program:hover {
-        transform: translateY(-5px);
-    }
     .program {
         padding: 35px 25px;
     }
@@ -471,8 +512,7 @@ section.visible {
     margin: 0 auto;
     padding: 100px 20px;
     box-sizing: border-box;
-    overflow: hidden;
-    text-align: center; /* Centralizes the section heading and overview */
+    text-align: center; 
 }
 
 .events h2 {
@@ -507,7 +547,7 @@ section.visible {
     grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
     gap: 30px;
     width: 100%;
-    justify-content: center; /* Perfectly centers grid paths if columns are fewer than max */
+    justify-content: center; 
 }
 
 .event-card {
@@ -518,7 +558,7 @@ section.visible {
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center; /* Ensures text strings sit dead center */
+    text-align: center; 
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
@@ -529,7 +569,6 @@ section.visible {
     border-color: #D4A017;
 }
 
-/* Premium Image Frame Fix: Allows the complete visual context to show */
 .event-image-wrapper {
     width: 100%;
     height: auto;
@@ -542,8 +581,8 @@ section.visible {
 .event-flyer-img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Assures full, unclipped picture aspect ratios */
-    background-color: #0d1241; /* Sleek structural letterboxing if needed */
+    object-fit: contain; 
+    background-color: #0d1241; 
     display: block;
     transition: transform 0.5s ease;
 }
@@ -552,7 +591,6 @@ section.visible {
     transform: scale(1.03);
 }
 
-/* Internal Card Elements Layout Details */
 .event-details-content {
     padding: 30px 25px;
     display: flex;
@@ -594,7 +632,6 @@ section.visible {
     margin-bottom: 15px;
 }
 
-/* Text Integrity Fix: No max-height cuts, lets every single word read clearly */
 .event-card p {
     font-size: 1rem;
     color: #64748b;
@@ -855,7 +892,7 @@ section.visible {
 }
 
 /* =========================================
-   10. PREMIUM FOOTER - FINAL FIXED VERSION
+   10. PREMIUM FOOTER
    ========================================= */
 footer {
     background: #0d1241;
@@ -874,7 +911,6 @@ footer {
     margin: 0 auto;
 }
 
-/* LEFT COLUMN: BRANDING */
 .footer-left h3 {
     font-size: 1.8rem;
     color: #D4A017;
@@ -891,7 +927,6 @@ footer {
     margin-bottom: 15px;
 }
 
-/* Official HQ Email Link */
 .footer-email {
     color: #D4A017;
     text-decoration: none;
@@ -905,7 +940,6 @@ footer {
     text-decoration: underline;
 }
 
-/* RIGHT COLUMN: SOCIALS & MAP */
 .footer-right h4, .footer-right h3 {
     font-size: 1.2rem;
     color: #FFFFFF;
@@ -915,7 +949,6 @@ footer {
     letter-spacing: 1px;
 }
 
-/* SOCIAL LINKS FIX */
 .social-links {
     display: flex;
     gap: 15px;
@@ -953,14 +986,12 @@ footer {
     box-shadow: 0 5px 15px rgba(212, 160, 23, 0.4);
 }
 
-/* MAP STYLING */
 .footer-right iframe {
     border-radius: 12px;
     border: 1px solid rgba(212, 160, 23, 0.3);
     box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
-/* BOTTOM BAR */
 .footer-bottom {
     text-align: center;
     margin-top: 60px;
@@ -970,11 +1001,10 @@ footer {
     color: #94a3b8;
 }
 
-/* RESPONSIVE FIXES */
 @media (max-width: 768px) {
     footer { padding: 60px 5% 30px; }
     .footer-container { text-align: center; justify-items: center; }
-    .footer-left p { margin: 0 auto 15px; }
+    .footer-left p { margin: 0 auto; }
     .social-links { justify-content: center; }
     .footer-right iframe { max-width: 100%; }
 }
@@ -986,10 +1016,9 @@ footer {
     max-width: 1200px;
     margin: 60px auto;
     padding: 40px 20px;
-    text-align: center; /* Centralizes introductory headings and wrappers */
+    text-align: center; 
 }
 
-/* Uplifted Section Header to match premium design semantics */
 .public-section .section-heading {
     color: #1A237E;
     font-size: clamp(2rem, 5vw, 2.8rem);
@@ -997,7 +1026,7 @@ footer {
     margin-bottom: 25px;
     position: relative;
     display: inline-block;
-    border-left: none; /* Removed the flat left-border */
+    border-left: none; 
     padding-left: 0;
     text-transform: none;
 }
@@ -1023,12 +1052,12 @@ footer {
 .fundraising-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 20px; /* Made rounder to match premium cards */
+    border-radius: 20px; 
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    text-align: center; /* Centers nested content details */
+    text-align: center; 
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
@@ -1061,7 +1090,6 @@ footer {
     align-items: center;
 }
 
-/* Legibility Fix: Removed all restrictions so long campaign stories render entirely */
 .campaign-description {
     color: #64748b;
     font-size: 1rem;
@@ -1089,7 +1117,6 @@ footer {
     width: 100%;
 }
 
-/* Premium Golden Action Trigger CTA */
 .btn-donate {
     display: block;
     width: 100%;
@@ -1153,14 +1180,14 @@ footer {
     }
 
     .card, .program, .event-card, .fundraising-card {
-        padding: 10px 5px; /* Handled dynamic distribution spacing */
+        padding: 10px 5px; 
         border-radius: 20px;
         width: 100%;
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
     
     .event-card, .fundraising-card {
-        padding: 0; /* Keeps card background structure flush */
+        padding: 0; 
     }
 
     .program:hover {
@@ -1201,6 +1228,6 @@ footer {
     }
 
     .btn-donate {
-        padding: 16px 0; /* Clear, bold touch targets for modern mobile platforms */
+        padding: 16px 0; 
     }
 }
