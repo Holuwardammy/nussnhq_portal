@@ -8,6 +8,7 @@ from django.conf import settings
 
 from .models import (
     Student,
+    School,  # Added School import explicitly for get_or_create logic
     Event,
     Fundraising,
     Payment,
@@ -30,6 +31,17 @@ class StudentForm(forms.ModelForm):
         label='Password'
     )
 
+    # Force school to accept raw text input instead of an integer ID
+    school = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your institution name',
+            'list': 'school-list'  # Hooks into template autocomplete <datalist>
+        }),
+        required=True,
+        label='School'
+    )
+
     class Meta:
         model = Student
         fields = [
@@ -47,7 +59,6 @@ class StudentForm(forms.ModelForm):
 
         widgets = {
             'full_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'school': forms.TextInput(attrs={'class': 'form-control'}),
             'department': forms.TextInput(attrs={'class': 'form-control'}),
             'level': forms.TextInput(attrs={'class': 'form-control'}),
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
@@ -57,6 +68,23 @@ class StudentForm(forms.ModelForm):
             'nationality': forms.TextInput(attrs={'class': 'form-control'}),
             'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
+    # =====================================================
+    # SCHOOL AUTOMATION (FIND OR CREATE)
+    # =====================================================
+    def clean_school(self):
+        school_name = self.cleaned_data.get('school')
+        if not school_name:
+            raise ValidationError("School name is required.")
+        
+        # Clean white space rules and format beautifully
+        school_name = " ".join(school_name.strip().split()).title()
+        
+        # Find existing record or save it cleanly as a new option
+        school_object, created = School.objects.get_or_create(name=school_name)
+        
+        # Returns the object instance to pass ForeignKey checks safely
+        return school_object
 
     # =====================================================
     # PASSWORD VALIDATION
@@ -111,12 +139,14 @@ class StudentForm(forms.ModelForm):
     # SAVE METHOD (SAFE USER SYNC)
     # =====================================================
     def save(self, commit=True):
-
         student = super().save(commit=False)
 
         email = self.cleaned_data['email'].strip().lower()
         password = self.cleaned_data['password']
         full_name = self.cleaned_data['full_name'].strip()
+
+        # Map clean school object instance explicitly
+        student.school = self.cleaned_data['school']
 
         # Get or create user
         user = User.objects.filter(username=email).first()
@@ -219,7 +249,6 @@ class PaymentForm(forms.ModelForm):
 # =========================================================
 # ANNOUNCEMENT FORM
 # =========================================================
-
 class AnnouncementForm(forms.ModelForm):
     class Meta:
         model = Announcement

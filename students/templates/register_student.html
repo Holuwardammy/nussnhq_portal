@@ -68,7 +68,7 @@
                    id="school-search" 
                    placeholder="Start typing your school name..." 
                    autocomplete="off" 
-                   value="{{ request.POST.school|default_if_none:'' }}"
+                   value="{{ form.school.value|default_if_none:'' }}"
                    required>
 
             <ul id="school-list" style="display: none;"></ul>
@@ -76,7 +76,7 @@
             <input type="hidden" 
                    name="school" 
                    id="school-selected" 
-                   value="{{ request.POST.school|default_if_none:'' }}">
+                   value="{{ form.school.value|default_if_none:'' }}">
         </div>
         {% if form.school.errors %}
             <div class="field-error">
@@ -143,7 +143,7 @@ const selectedSchool = document.getElementById('school-selected');
 
 searchInput.addEventListener('input', async () => {
     const query = searchInput.value;
-    selectedSchool.value = query;
+    selectedSchool.value = query; // Keeps hidden value updated as they type new school titles
 
     if (query.length < 2) {
         schoolList.style.display = 'none';
@@ -179,12 +179,14 @@ searchInput.addEventListener('input', async () => {
     }
 });
 
+// Close dropdown if user clicks away from the container
 document.addEventListener('click', (e) => {
     if (!searchInput.contains(e.target) && !schoolList.contains(e.target)) {
         schoolList.style.display = 'none';
     }
 });
 
+// Restore form state safely if validation checks reload the interface
 window.addEventListener('load', () => {
     if (selectedSchool.value) {
         searchInput.value = selectedSchool.value;

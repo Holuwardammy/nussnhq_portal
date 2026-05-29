@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Sum, Case, When, Value, IntegerField
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -19,7 +19,7 @@ from .models import (
     ExecutivePosition,
     Tenure,
     Announcement,
-    Scholarship  # UPDATED: Imported the Scholarship Model
+    Scholarship
 )
 
 from .forms import (
@@ -27,7 +27,7 @@ from .forms import (
     EventForm,
     FundraisingForm,
     AnnouncementForm,
-    ScholarshipForm  # UPDATED: Imported the Scholarship Form
+    ScholarshipForm
 )
 
 # =========================================================
@@ -51,8 +51,6 @@ def is_president(user):
 # =========================================================
 # HOME
 # =========================================================
-from django.http import HttpResponse
-
 def home(request):
     # Quick intercept: If it's just an uptime bot checking if the server is breathing, 
     # give it a fast, clean 200 OK without running template rendering engine tasks.
@@ -71,33 +69,32 @@ def register_student(request):
         form = StudentForm(request.POST, request.FILES)
 
         if form.is_valid():
+            # Let the form's updated save method handle User creation, password hashing,
+            # and automatic School creation/linking out of the clean text data safely.
             student = form.save(commit=False)
             student.member_type = 'student'
-
-            school_name = request.POST.get('school', '').strip()
-            if school_name:
-                # 1. Get or create the actual School database object row
-                school_obj, created = School.objects.get_or_create(name=school_name)
-                # 2. Assign the object directly to the foreign key relationship
-                student.school = school_obj  
-
             student.save()
 
             messages.success(request, "Registration successful!")
             return redirect('login')
 
-        messages.error(request, "Please correct errors.")
+        messages.error(request, "Please correct errors below.")
     else:
         form = StudentForm()
 
-    return render(request, 'register_student.html', {'form': form})
+    # Query all currently verified schools so your HTML template can populate options inside your <datalist> tag
+    existing_schools = School.objects.all()
+
+    return render(request, 'register_student.html', {
+        'form': form,
+        'existing_schools': existing_schools
+    })
 
 
 # =========================================================
 # LOGIN
 # =========================================================
 def login_view(request):
-
     if request.method == 'POST':
         email = request.POST.get('username', '').strip().lower()
         password = request.POST.get('password')
@@ -157,7 +154,7 @@ def student_home(request):
         'fundraising': fundraising,
         'announcements': announcements,
         'scholarships': scholarships,
-        'is_paid_member': is_paid_member, # Passed helper boolean to control template layout layers
+        'is_paid_member': is_paid_member, 
     })
 
 
@@ -175,7 +172,6 @@ def payment_instructions(request):
 # =========================================================
 @login_required
 def submit_payment(request):
-
     student = get_object_or_404(Student, user=request.user)
 
     if request.method == 'POST':
@@ -207,7 +203,7 @@ def school_autocomplete(request):
 
 
 # =========================================================
-# ADMIN DASHBOARD (UPDATED FOR SCHOLARSHIPS)
+# ADMIN DASHBOARD
 # =========================================================
 @login_required
 def admin_dashboard(request):
@@ -260,10 +256,8 @@ def admin_dashboard(request):
         'admin_student': student,
         'announcements': Announcement.objects.all().order_by('-is_pinned', '-date_posted'),
         'announcement_form': AnnouncementForm(),
-        
-        # UPDATED: Added scholarship data configurations to the management hub
         'scholarships': Scholarship.objects.all().order_by('-date_posted'),
-        'scholarship_form': ScholarshipForm()  # Empty form instance for the new popup modal
+        'scholarship_form': ScholarshipForm()  
     })
 
 
@@ -306,11 +300,10 @@ def delete_announcement(request, announcement_id):
 
 
 # =========================================================
-# CREATE / EDIT SCHOLARSHIP (NEW)
+# CREATE / EDIT SCHOLARSHIP
 # =========================================================
 @login_required
 def create_scholarship(request, scholarship_id=None):
-    # Only allow active Executives to publish new scholarship opportunities
     if not is_executive(request.user):
         messages.error(request, "Permission denied.")
         return redirect('admin_dashboard')
@@ -323,14 +316,12 @@ def create_scholarship(request, scholarship_id=None):
             form.save()
             messages.success(request, "Scholarship opportunity listed successfully!")
             return redirect('admin_dashboard')
-    else:
-        form = ScholarshipForm(instance=scholarship)
-
+    
     return redirect('admin_dashboard')
 
 
 # =========================================================
-# DELETE SCHOLARSHIP (NEW)
+# DELETE SCHOLARSHIP
 # =========================================================
 @login_required
 def delete_scholarship(request, scholarship_id):
@@ -378,11 +369,10 @@ def assign_executive_role(request, student_id):
         # Safely locate or provision the designated structural position row
         position_obj, _ = ExecutivePosition.objects.get_or_create(title=position_title)
 
-        # Provision and bind the brand new leadership record assignments
+        # Provision and bind the brand new leadership record assignments (FIXED: removed invalid argument)
         ExecutiveAssignment.objects.create(
             student=student,
             position=position_obj,
-            get_active_student=active_tenure,
             tenure=active_tenure,
             is_active=True
         )
@@ -398,7 +388,6 @@ def assign_executive_role(request, student_id):
 # =========================================================
 @login_required
 def approve_payment(request, payment_id):
-
     student = get_active_student(request.user)
 
     if not (
@@ -426,7 +415,6 @@ def approve_payment(request, payment_id):
 # =========================================================
 @login_required
 def delete_student(request, student_id):
-
     if not is_president(request.user):
         messages.error(request, "Only President can delete.")
         return redirect('admin_dashboard')
@@ -447,7 +435,6 @@ def delete_student(request, student_id):
 # =========================================================
 @login_required
 def create_event(request, event_id=None):
-
     if not is_president(request.user):
         messages.error(request, "Only President allowed.")
         return redirect('admin_dashboard')
@@ -485,7 +472,6 @@ def create_event(request, event_id=None):
 # =========================================================
 @login_required
 def delete_event(request, event_id):
-
     if not is_president(request.user):
         return redirect('admin_dashboard')
 
@@ -501,7 +487,6 @@ def delete_event(request, event_id):
 # =========================================================
 @login_required
 def create_fundraising(request):
-
     if not is_president(request.user):
         return redirect('admin_dashboard')
 
