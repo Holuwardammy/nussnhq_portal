@@ -1336,3 +1336,118 @@ tbody td:nth-child(3) {
         box-shadow: none;
     }
 }
+
+/* ==========================================================================
+   FUNDRAISING GRID & CARDS
+   ========================================================================== */
+.fundraising-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.fundraising-card {
+    background-color: #ffffff;
+    border-left: 4px solid #D4A017; /* Premium Gold Accent */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fundraising-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(26, 35, 126, 0.1); /* Subtle Deep Blue glow */
+}
+
+.fundraising-card h3 {
+    color: #1A237E; /* Deep Premium Blue */
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.fundraising-card p {
+    color: #4A4A4A;
+    font-size: 0.95rem;
+    line-line-height: 1.5;
+    margin-bottom: 15px;
+    flex-grow: 1;
+}
+
+/* ==========================================================================
+   CARD ACTION BUTTONS
+   ========================================================================== */
+.card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 15px;
+}
+
+/* Standardized Base Style for Card Buttons */
+.card-actions .btn-edit,
+.card-actions .btn-delete {
+    flex: 1;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+    display: inline-block;
+}
+
+/* Edit Link Style (Gold Accent) */
+.card-actions .btn-edit {
+    background-color: #D4A017;
+    color: #ffffff;
+}
+
+/* Delete Link Style (Soft Crimson Crimson) */
+.card-actions .btn-delete {
+    background-color: #d9534f;
+    color: #ffffff;
+}
+
+/* Interaction States */
+.card-actions .btn-edit:hover,
+.card-actions .btn-delete:hover {
+    opacity: 0.9;
+}
+
+.card-actions .btn-edit:active,
+.card-actions .btn-delete:active {
+    transform: scale(0.98);
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS (Clear and Bold)
+   ========================================================================== */
+@media (max-width: 600px) {
+    .fundraising-grid {
+        grid-template-columns: 1fr; /* Stack into a single column on mobile */
+        gap: 15px;
+    }
+    
+    .fundraising-card {
+        padding: 16px;
+    }
+
+    .card-actions {
+        flex-direction: row; /* Keep buttons side-by-side or use 'column' if text is long */
+    }
+    
+    .card-actions .btn-edit,
+    .card-actions .btn-delete {
+        padding: 10px 12px; /* Marginally larger touch target for mobile fingers */
+        font-size: 0.95rem;
+    }
+}
