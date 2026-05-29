@@ -2,7 +2,7 @@ import os
 import django
 
 # Initialize Django environment settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings') # Change 'core' to your project name if different
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'nuss_webapp.settings') # Change 'core' to your project name if different
 django.setup()
 
 from django.contrib.auth import get_user_model
