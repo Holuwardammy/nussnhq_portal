@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=3.2">
 </head>
@@ -89,7 +90,8 @@
         <button class="tab-btn" data-tab="events-tab">Events</button>
         <button class="tab-btn" data-tab="fundraising-tab">Fundraising</button>
         <button class="tab-btn" data-tab="announcements-tab">Announcements</button>
-        <button class="tab-btn" data-tab="scholarships-tab">Scholarships</button> </div>
+        <button class="tab-btn" data-tab="scholarships-tab">Scholarships</button> 
+    </div>
 
     <div id="students-tab" class="tab-content active">
         <h2>Registered Students</h2>
@@ -178,47 +180,42 @@
                 </tr>
             </thead>
             <tbody>
-    {% for payment in all_payments %}
-        <tr {% if payment.status == 'processing' %}class="row-processing"{% endif %}>
-            <td data-label="Student">{{ payment.student.full_name }}</td>
-            <td data-label="Amount">₦{{ payment.amount }}</td>
-            <td data-label="Receipt">
-                {% if payment.payment_receipt %}
-                    <a href="{{ payment.payment_receipt.url }}" target="_blank" class="button btn-view-receipt">View Receipt</a>
-                {% else %}
-                    <span class="no-receipt-text">No receipt</span>
-                {% endif %}
-            </td>
-            <td data-label="Status">
-                <span class="status-badge {{ payment.status }}">
-                    {{ payment.get_status_display }}
-                </span>
-            </td>
-            <td data-label="Date Paid">{{ payment.date_paid|default:"—" }}</td>
-            <td data-label="Action">
-                <div class="action-container">
-                {% if admin_student.is_financial_secretary or admin_student.is_president or admin_student.is_treasurer or user.is_staff %}
-                    
-                    {% if payment.status == 'processing' %}
-                        <a href="{% url 'approve_payment' payment.id %}" class="button btn-approve">Approve Now</a>
-                    
-                    {%     elif payment.status == 'paid' %}
-                        <span class="verified-text">Verified</span>
-
-                    {%     elif payment.status == 'pending' %}
-                        <a href="{% url 'approve_payment' payment.id %}" class="button">Mark Paid</a>
-                    
-                    {%     endif %}
-
-                {% else %}
-                    <span class="view-only-text">Viewing Only</span>
-                {% endif %}
-                </div>
-            </td>
-        </tr>
-    {% empty %}
-        <tr><td colspan="6" class="table-empty">No payment records found.</td></tr>
-    {% endfor %}
+            {% for payment in all_payments %}
+                <tr {% if payment.status == 'processing' %}class="row-processing"{% endif %}>
+                    <td data-label="Student">{{ payment.student.full_name }}</td>
+                    <td data-label="Amount">₦{{ payment.amount }}</td>
+                    <td data-label="Receipt">
+                        {% if payment.payment_receipt %}
+                            <a href="{{ payment.payment_receipt.url }}" target="_blank" class="button btn-view-receipt">View Receipt</a>
+                        {% else %}
+                            <span class="no-receipt-text">No receipt</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Status">
+                        <span class="status-badge {{ payment.status }}">
+                            {{ payment.get_status_display }}
+                        </span>
+                    </td>
+                    <td data-label="Date Paid">{{ payment.date_paid|default:"—" }}</td>
+                    <td data-label="Action">
+                        <div class="action-container">
+                        {% if admin_student.is_financial_secretary or admin_student.is_president or admin_student.is_treasurer or user.is_staff %}
+                            {% if payment.status == 'processing' %}
+                                <a href="{% url 'approve_payment' payment.id %}" class="button btn-approve">Approve Now</a>
+                            {% elif payment.status == 'paid' %}
+                                <span class="verified-text">Verified</span>
+                            {% elif payment.status == 'pending' %}
+                                <a href="{% url 'approve_payment' payment.id %}" class="button">Mark Paid</a>
+                            {% endif %}
+                        {% else %}
+                            <span class="view-only-text">Viewing Only</span>
+                        {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="table-empty">No payment records found.</td></tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>
@@ -271,32 +268,31 @@
     </div>
 
     <div id="fundraising-tab" class="tab-content">
-    <div class="tab-section-header">
-        <h2>Fundraising</h2>
-        {% if admin_student.is_president or user.is_staff %}
-            <a href="{% url 'create_fundraising' %}" class="button">Create Fundraising</a>
-        {% endif %}
-    </div>
+        <div class="tab-section-header">
+            <h2>Fundraising</h2>
+            {% if admin_student.is_president or user.is_staff %}
+                <a href="{% url 'create_fundraising' %}" class="button">Create Fundraising</a>
+            {% endif %}
+        </div>
 
-    <div class="fundraising-grid">
-        {% for campaign in fundraising %}
-            <div class="fundraising-card">
-                <h3>{{ campaign.title }}</h3>
-                <p>{{ campaign.description }}</p>
-                {% if admin_student.is_president or user.is_staff %}
-                    <div class="card-actions" style="margin-top: 15px; display: flex; gap: 10px;">
-                        <a href="{% url 'edit_fundraising' campaign.id %}" class="btn-edit" style="background-color: #D4A017; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.9rem;">Edit</a>
-                        
-                        <a href="{% url 'delete_fundraising' campaign.id %}" class="btn-delete" onclick="return confirm('Are you sure you want to delete this campaign?');" style="background-color: #d9534f; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.9rem;">Delete</a>
-                    </div>
-                {% endif %}
-            </div>
-        {% empty %}
-            <p>No fundraising campaigns running at the moment.</p>
-        {% endfor %}
-    </div>
-</div>
+        <div class="fundraising-grid">
+            {% for campaign in fundraising %}
+                <div class="fundraising-card">
+                    <h3>{{ campaign.title }}</h3>
+                    <p>{{ campaign.description }}</p>
+                    {% if admin_student.is_president or user.is_staff %}
+                        <div class="card-actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                            <a href="{% url 'edit_fundraising' campaign.id %}" class="btn-edit" style="background-color: #D4A017; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.9rem;">Edit</a>
+                            <a href="{% url 'delete_fundraising' campaign.id %}" class="btn-delete" onclick="return confirm('Are you sure you want to delete this campaign?');" style="background-color: #d9534f; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.9rem;">Delete</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p style="padding: 15px 0;">No fundraising campaigns running at the moment.</p>
+            {% endfor %}
+        </div>
 
+        <h2 style="margin-top: 40px;">Campaign Metric Overview</h2>
         <table>
             <thead>
                 <tr>
@@ -313,7 +309,7 @@
                     <td data-label="Goal">₦{{ fund.goal }}</td>
                 </tr>
             {% empty %}
-                <tr><td colspan="3" class="table-empty">No campaigns yet.</td></tr>
+                <tr><td colspan="3" class="table-empty">No active summary records yet.</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -550,7 +546,7 @@
         if (closeAnnX) closeAnnX.addEventListener('click', closeAnnouncementModal);
         if (cancelAnnBtn) cancelAnnBtn.addEventListener('click', closeAnnouncementModal);
 
-        // SCHOLARSHIP MODAL OPEN/CLOSE LOGIC (NEW)
+        // SCHOLARSHIP MODAL OPEN/CLOSE LOGIC
         const schModal = document.getElementById('scholarshipModal');
         const openSchBtn = document.getElementById('openScholarshipBtn');
         const closeSchX = document.getElementById('closeScholarshipX');
@@ -569,7 +565,7 @@
         if (closeSchX) closeSchX.addEventListener('click', closeScholarshipModal);
         if (cancelSchBtn) cancelSchBtn.addEventListener('click', closeScholarshipModal);
 
-        // Global Outside Modal Window Clicks (UPDATED)
+        // Global Outside Modal Window Clicks
         window.onclick = function(event) {
             const studentModal = document.getElementById('studentModal');
             if (event.target == studentModal) {
