@@ -66,6 +66,9 @@ SECURE_SSL_REDIRECT = False if DEBUG else True
 # APPLICATIONS
 # =========================================================
 INSTALLED_APPS = [
+    # 🛠️ FIXED: Cloudinary Storage must be above staticfiles to catch profile picture paths!
+    'cloudinary_storage',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -73,8 +76,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Cloudinary Storage Dependencies
-    'cloudinary_storage',
+    # Cloudinary Base Wrapper
     'cloudinary',
 
     # Local Apps
@@ -241,7 +243,6 @@ DEFAULT_FROM_EMAIL = f'NUSSNHQ Portal <{EMAIL_HOST_USER}>'
 # =========================================================
 # AUTH REDIRECTS
 # =========================================================
-# Ensure your local application views match these names exactly in urls.py
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'student_home'
 LOGOUT_REDIRECT_URL = 'login'
