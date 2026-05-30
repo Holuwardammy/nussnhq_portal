@@ -220,6 +220,9 @@ STORAGES = {
     },
 }
 
+# 🔑 ADD THIS LINE RIGHT HERE TO FIX THE CLOUDINARY BUILD CRASH:
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 # =========================================================
 # DEFAULT PRIMARY KEY
