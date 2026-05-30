@@ -3,7 +3,7 @@
    MOBILE-OPTIMIZED VERSION
    ========================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap');
 
 :root {
     --primary-blue: #0d1241;
@@ -239,7 +239,7 @@ h2 {
     display: block;
 }
 
-/* 1. Table Container (Add <div class="table-container"> around your <table> in HTML) */
+/* 1. Table Container */
 .table-container {
     width: 100%;
     overflow-x: auto;
@@ -272,8 +272,6 @@ tbody td {
     color: var(--primary-blue);
     font-size: 0.85rem;
     border-bottom: 1px solid rgba(241, 245, 249, 0.5);
-    
-    /* Forces text to wrap and prevents "longing" */
     white-space: normal !important;
     word-wrap: break-word;
     word-break: break-word;
@@ -296,8 +294,8 @@ tbody td:nth-child(3) {
 
 .btn-edit, .btn-delete {
     padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    border-radius: 4px;
+    font-size: 12px;
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
@@ -305,13 +303,13 @@ tbody td:nth-child(3) {
 }
 
 .btn-edit {
-    background: var(--primary-blue);
-    color: var(--gold-accent) !important;
-    border: 1px solid var(--gold-accent);
+    background: var(--accent-blue); /* Premium Dark Blue */
+    color: var(--luxury-gold) !important; /* 🛠️ FIXED: Replaced non-existent variable */
+    border: 1px solid var(--luxury-gold);
 }
 
 .btn-edit:hover {
-    background: var(--gold-accent);
+    background: var(--luxury-gold);
     color: var(--primary-blue) !important;
 }
 
@@ -351,10 +349,11 @@ tbody td:nth-child(3) {
 
 .action-container {
     display: flex !important;
+    flex-direction: column;
     gap: 8px;
     justify-content: flex-start;
-    align-items: center;
-    min-width: 130px;
+    align-items: stretch;
+    min-width: 160px;
 }
 
 .button {
@@ -399,12 +398,8 @@ tbody td:nth-child(3) {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* ===================== DESKTOP VIEW ADJUSTMENTS ===================== */
@@ -431,20 +426,18 @@ tbody td:nth-child(3) {
         display: none !important;
     }
 
-    /* This container allows the table to scroll sideways on phones */
     .tab-content {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch;
-        padding: 10px; /* Slimmer padding for mobile */
+        padding: 10px;
     }
 
     table {
-        display: table !important; /* Force it back to table mode */
+        display: table !important;
         width: 100%;
-        min-width: 600px; /* Forces a scrollbar if the screen is too small */
+        min-width: 600px;
     }
 
-    /* Make buttons slightly larger for thumb-tapping on mobile */
     .button {
         padding: 12px 15px !important;
         font-size: 0.85rem !important;
@@ -537,13 +530,6 @@ tbody td:nth-child(3) {
         text-align: center;
     }
 
-    .button, .logout-btn a {
-        display: block;
-        text-align: center;
-        padding: 12px;
-        font-size: 0.9rem;
-    }
-
     .modal-card {
         width: 95%;
         margin: 10px;
@@ -554,8 +540,6 @@ tbody td:nth-child(3) {
 /* =========================================
    NEW: PAYMENT & INCOME TRACKING STYLES
    ========================================= */
-
-/* 1. Income Card Specifics */
 .income-card {
     border-left: 5px solid #2e7d32 !important;
     background: linear-gradient(145deg, #ffffff, #f0fff4) !important;
@@ -573,7 +557,6 @@ tbody td:nth-child(3) {
     font-weight: 800;
 }
 
-/* 2. Notification Badge on Tab */
 .notification-dot {
     background: #ff5252;
     color: white;
@@ -585,7 +568,6 @@ tbody td:nth-child(3) {
     box-shadow: 0 2px 5px rgba(255, 82, 82, 0.3);
 }
 
-/* 3. Enhanced Status Badges */
 .status-badge {
     padding: 6px 12px;
     border-radius: 50px;
@@ -614,7 +596,6 @@ tbody td:nth-child(3) {
     border: 1px solid #ffcdd2;
 }
 
-/* 4. Action Buttons & Helpers */
 .approve-btn {
     background-color: #2e7d32 !important;
     color: white !important;
@@ -632,90 +613,16 @@ tbody td:nth-child(3) {
     font-size: 0.9rem;
 }
 
-/* 5. Animations */
 @keyframes pulse-orange {
-    0% {
-        box-shadow: 0 0 0 0 rgba(239, 108, 0, 0.4);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(239, 108, 0, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(239, 108, 0, 0);
-    }
+    0% { box-shadow: 0 0 0 0 rgba(239, 108, 0, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 108, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 108, 0, 0); }
 }
 
-/* Mobile Tweak for Income Card Layout */
 @media (max-width: 768px) {
     .income-card {
         grid-column: span 1;
     }
-}
-
-/* Thumbnail for Admin Table */
-.admin-event-thumb {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-}
-
-.no-image-text {
-    font-size: 11px;
-    color: #999;
-    font-style: italic;
-}
-
-/* Event Table Image Thumbnails */
-.admin-event-thumb {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-}
-
-.no-image-text {
-    font-size: 11px;
-    color: #999;
-    font-style: italic;
-}
-
-/* Action Buttons Container */
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-/* Edit Button Styling */
-.btn-edit {
-    background-color: #1A237E; /* Premium Blue */
-    color: white !important;
-    padding: 6px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 12px;
-    transition: opacity 0.2s;
-}
-
-/* Delete Button Styling */
-.btn-delete {
-    background-color: #d9534f; /* Red */
-    color: white !important;
-    padding: 6px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 12px;
-    transition: background 0.2s;
-}
-
-.btn-edit:hover, .btn-delete:hover {
-    opacity: 0.8;
-}
-
-.btn-delete:hover {
-    background-color: #c9302c;
 }
 
 .table-empty {
@@ -727,45 +634,32 @@ tbody td:nth-child(3) {
 /* =========================================================
    EXECUTIVE ROLE ASSIGNMENT STYLES
    ========================================================= */
-
-/* Wrap the action layout cleanly */
-.action-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: stretch;
-    width: 100%;
-    min-width: 160px; /* Prevents compression in the table row */
-}
-
-/* Base style for the dropdown selector */
 .action-container select {
     width: 100%;
     padding: 6px 10px;
     font-size: 0.85rem;
     font-weight: 600;
     font-family: inherit;
-    color: #1A237E; /* Premium Blue */
+    color: #1A237E;
     background-color: #FFFFFF;
-    border: 2px solid #D4A017; /* Premium Gold */
+    border: 2px solid #D4A017;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
     outline: none;
-    appearance: none; /* Removes default native browser arrows */
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A237E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 14px;
-    padding-right: 30px; /* Keeps text clear of custom arrow */
+    padding-right: 30px;
 }
 
-/* Subtle hover and focus transitions */
 .action-container select:hover {
     background-color: #FFFDF3;
-    border-color: #B8860B; /* Darker Gold */
+    border-color: #B8860B;
     box-shadow: 0 2px 4px rgba(26, 35, 126, 0.1);
 }
 
@@ -774,23 +668,19 @@ tbody td:nth-child(3) {
     box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.15);
 }
 
-/* Option configurations */
 .action-container select option {
     font-weight: normal;
     color: #333333;
     background-color: #FFFFFF;
 }
 
-/* =========================================================
-   MOBILE LAYOUT REFINEMENT (MEDIA QUERIES)
-   ========================================================= */
 @media (max-width: 767px) {
     .action-container {
         min-width: 100%;
     }
     
     .action-container select {
-        font-size: 0.9rem; /* Make it easily tappable on touch screens */
+        font-size: 0.9rem;
         padding: 8px 10px;
     }
 }
@@ -798,8 +688,6 @@ tbody td:nth-child(3) {
 /* ==========================================================================
    ANNOUNCEMENTS PANEL & MANAGEMENT ELEMENTS
    ========================================================================== */
-
-/* Header rows layout helper */
 .tab-section-header {
     display: flex; 
     justify-content: space-between; 
@@ -809,10 +697,9 @@ tbody td:nth-child(3) {
     gap: 0.75rem;
 }
 
-/* Custom action triggers */
 .btn-create-announcement {
-    background-color: #D4A017 !important; /* Premium Gold Accent */
-    color: #1A237E !important; /* Contrast Navy Text */
+    background-color: #D4A017 !important;
+    color: #1A237E !important;
     font-weight: 700 !important;
     border: none;
     transition: background 0.2s ease;
@@ -822,7 +709,6 @@ tbody td:nth-child(3) {
     background-color: #b0820f !important;
 }
 
-/* Badges for display fields */
 .badge-pinned {
     background-color: #fff8e1;
     color: #b0820f;
@@ -845,14 +731,12 @@ tbody td:nth-child(3) {
     display: inline-block;
 }
 
-/* View text helper state */
 .view-only-text {
     color: #94a3b8;
     font-size: 0.85rem;
     font-style: italic;
 }
 
-/* Modal Form styling elements */
 .admin-modal-form {
     display: flex;
     flex-direction: column;
@@ -932,7 +816,6 @@ tbody td:nth-child(3) {
     background-color: #121858 !important;
 }
 
-/* Mobile responsive fixes */
 @media (max-width: 600px) {
     .tab-section-header {
         flex-direction: column;
@@ -955,13 +838,10 @@ tbody td:nth-child(3) {
 /* ==========================================================================
    ADMIN SCHOLARSHIP MANAGEMENT LAYOUT
    ========================================================================== */
-
-/* Management Section wrapper utility rows */
 .scholarship-management-panel {
     margin-top: 25px;
 }
 
-/* Form Layout structural grid */
 .scholarship-form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -973,7 +853,6 @@ tbody td:nth-child(3) {
     grid-template-columns: 1fr;
 }
 
-/* Custom badges tailored for operational status items */
 .status-badge-active {
     background-color: rgba(46, 125, 50, 0.1);
     color: #2E7D32;
@@ -994,7 +873,6 @@ tbody td:nth-child(3) {
     display: inline-block;
 }
 
-/* Align inline tracking button vectors inside control table operations */
 .admin-table td .btn-danger-style {
     background-color: #C62828;
     color: #ffffff;
@@ -1012,14 +890,12 @@ tbody td:nth-child(3) {
     background-color: #B71C1C;
 }
 
-/* Break form down cleanly for mobile viewports */
 @media screen and (max-width: 768px) {
     .scholarship-form-grid {
         grid-template-columns: 1fr;
         gap: 12px;
     }
     
-    /* Make inline row indicators stack cleanly inside structural responsive screens */
     .admin-table td[data-label="Actions"] {
         display: flex;
         justify-content: flex-end;
@@ -1029,7 +905,6 @@ tbody td:nth-child(3) {
 
 /* =========================================
    RESPONSIVENESS LAYER - MOBILE & LAPTOP
-   Appended only. No existing code modified.
    ========================================= */
 
 /* --- 1. SMALL MOBILE: 320px - 480px --- */
@@ -1047,7 +922,7 @@ tbody td:nth-child(3) {
     .switch-btn, .logout-btn-link {
         padding: 5px 8px;
         font-size: 0.7rem;
-        min-height: 32px; /* Touch target */
+        min-height: 32px;
     }
     
     .container {
@@ -1056,6 +931,7 @@ tbody td:nth-child(3) {
     
     .stats-grid {
         gap: 10px;
+        grid-template-columns: 1fr !important;
     }
     
     .stat-card {
@@ -1073,17 +949,16 @@ tbody td:nth-child(3) {
     .tab-btn {
         padding: 10px 14px;
         font-size: 0.8rem;
-        min-height: 44px; /* iOS touch target */
+        min-height: 44px;
     }
     
-    /* Table: Better horizontal scroll + sticky first col */
     .table-container {
         border: 1px solid rgba(255, 215, 0, 0.1);
         border-radius: 8px;
     }
     
     table {
-        min-width: 500px; /* Reduced from 600px for small screens */
+        min-width: 500px;
     }
     
     thead th {
@@ -1096,8 +971,7 @@ tbody td:nth-child(3) {
         font-size: 0.8rem;
     }
     
-    /* Action buttons stack on tiny screens */
-    .action-buttons, .action-container {
+    .action-buttons {
         flex-direction: column;
         gap: 6px;
         min-width: 100px;
@@ -1115,7 +989,6 @@ tbody td:nth-child(3) {
         height: 35px;
     }
     
-    /* Modal adjustments */
     .modal-card {
         width: 94%;
         padding: 18px;
@@ -1132,7 +1005,7 @@ tbody td:nth-child(3) {
 /* --- 2. LARGE MOBILE / SMALL TABLET: 481px - 768px --- */
 @media only screen and (min-width: 481px) and (max-width: 768px) {
     .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 18px;
     }
     
@@ -1146,10 +1019,6 @@ tbody td:nth-child(3) {
     
     table {
         min-width: 550px;
-    }
-    
-    .action-container {
-        min-width: 140px;
     }
     
     .scholarship-form-grid {
@@ -1172,7 +1041,7 @@ tbody td:nth-child(3) {
     }
     
     .stats-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(4, 1fr) !important;
         gap: 20px;
     }
     
@@ -1192,7 +1061,6 @@ tbody td:nth-child(3) {
         padding: 25px;
     }
     
-    /* Tables: No scroll needed, full width */
     .table-container {
         overflow-x: visible;
     }
@@ -1207,8 +1075,7 @@ tbody td:nth-child(3) {
         max-width: 200px;
     }
     
-    /* Action buttons side-by-side */
-    .action-buttons, .action-container {
+    .action-buttons {
         flex-direction: row;
         min-width: 150px;
     }
@@ -1284,14 +1151,13 @@ tbody td:nth-child(3) {
 /* --- 6. TOUCH DEVICE OPTIMIZATIONS --- */
 @media (hover: none) and (pointer: coarse) {
     .switch-btn, .logout-btn-link, .button, .btn-edit, .btn-delete, .tab-btn {
-        min-height: 44px; /* WCAG touch target */
+        min-height: 44px;
     }
     
     .action-container select {
         min-height: 44px;
     }
     
-    /* Remove hover effects on touch */
     .stat-card:hover, .btn-edit:hover, .btn-delete:hover {
         transform: none;
     }
@@ -1301,7 +1167,7 @@ tbody td:nth-child(3) {
 @media only screen and (max-height: 500px) and (orientation: landscape) {
     header {
         padding: 8px 15px;
-        position: relative; /* Don't stick on short screens */
+        position: relative;
     }
     
     .admin-welcome {
@@ -1319,7 +1185,7 @@ tbody td:nth-child(3) {
     }
 }
 
-/* --- 8. PRINT STYLES - Bonus --- */
+/* --- 8. PRINT STYLES --- */
 @media print {
     body::before, header, .tab-buttons, .action-buttons, .button {
         display: none !important;
@@ -1349,7 +1215,7 @@ tbody td:nth-child(3) {
 
 .fundraising-card {
     background-color: #ffffff;
-    border-left: 4px solid #D4A017; /* Premium Gold Accent */
+    border-left: 4px solid #D4A017;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -1361,11 +1227,11 @@ tbody td:nth-child(3) {
 
 .fundraising-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(26, 35, 126, 0.1); /* Subtle Deep Blue glow */
+    box-shadow: 0 6px 12px rgba(26, 35, 126, 0.1);
 }
 
 .fundraising-card h3 {
-    color: #1A237E; /* Deep Premium Blue */
+    color: #1A237E;
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 1.25rem;
@@ -1391,7 +1257,6 @@ tbody td:nth-child(3) {
     padding-top: 15px;
 }
 
-/* Standardized Base Style for Card Buttons */
 .card-actions .btn-edit,
 .card-actions .btn-delete {
     flex: 1;
@@ -1405,19 +1270,16 @@ tbody td:nth-child(3) {
     display: inline-block;
 }
 
-/* Edit Link Style (Gold Accent) */
 .card-actions .btn-edit {
     background-color: #D4A017;
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
-/* Delete Link Style (Soft Crimson Crimson) */
 .card-actions .btn-delete {
     background-color: #d9534f;
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
-/* Interaction States */
 .card-actions .btn-edit:hover,
 .card-actions .btn-delete:hover {
     opacity: 0.9;
@@ -1428,12 +1290,9 @@ tbody td:nth-child(3) {
     transform: scale(0.98);
 }
 
-/* ==========================================================================
-   MOBILE RESPONSIVENESS (Clear and Bold)
-   ========================================================================== */
 @media (max-width: 600px) {
     .fundraising-grid {
-        grid-template-columns: 1fr; /* Stack into a single column on mobile */
+        grid-template-columns: 1fr;
         gap: 15px;
     }
     
@@ -1442,12 +1301,12 @@ tbody td:nth-child(3) {
     }
 
     .card-actions {
-        flex-direction: row; /* Keep buttons side-by-side or use 'column' if text is long */
+        flex-direction: row;
     }
     
     .card-actions .btn-edit,
     .card-actions .btn-delete {
-        padding: 10px 12px; /* Marginally larger touch target for mobile fingers */
+        padding: 10px 12px;
         font-size: 0.95rem;
     }
 }
