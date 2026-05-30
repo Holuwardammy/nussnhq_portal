@@ -28,6 +28,9 @@ SECRET_KEY = os.getenv(
     'django-insecure-dev-key'
 )
 
+# settings.py (Add this line at the bottom)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 DEBUG = os.getenv(
     'RENDER',
     'False'
