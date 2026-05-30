@@ -209,14 +209,14 @@
     <div class="contact-container">
         <!-- Contact Form -->
         <div class="contact-form">
-            <form action="#" method="post">
-                {% csrf_token %}
-                <input type="text" name="name" placeholder="Your Name" required>
-                <input type="email" name="email" placeholder="Your Email" required>
-                <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
-                <button type="submit">Send Message</button>
-            </form>
-        </div>
+            <form id="whatsappForm" onsubmit="sendToWhatsApp(event)">
+        {% csrf_token %}
+        <input type="text" id="contactName" placeholder="Your Name" required>
+        <input type="email" id="contactEmail" placeholder="Your Email" required>
+        <textarea id="contactMessage" placeholder="Your Message" rows="5" required></textarea>
+        <button type="submit">Send Message</button>
+    </form>
+    </div>
         <!-- Contact Info -->
         <div class="contact-info">
             <h3>Our Office</h3>
@@ -270,6 +270,24 @@
 <script src="{% static 'js/script.js' %}"></script>
 
 <script>
+// --- WHATSAPP CONTACT FORM HANDLE ---
+function sendToWhatsApp(event) {
+    event.preventDefault(); // Prevents the page from refreshing
+    
+    const name = document.getElementById('contactName').value;
+    const email = document.getElementById('contactEmail').value;
+    const msg = document.getElementById('contactMessage').value;
+    
+    const phoneNumber = "2349057016709"; // Your number in international format
+    
+    // Construct the formatted text message
+    const text = `Hello NUSS HQ, %0A%0A*Name:* ${name}%0A*Email:* ${email}%0A*Message:* ${msg}`;
+    
+    // Open the WhatsApp Link
+    window.open(`https://wa.me/${phoneNumber}?text=${text}`, '_blank');
+}
+
+// --- NAVIGATION & INTERACTIVE SCROLL HANDLERS ---
 const sections = document.querySelectorAll("section");
 const navLinks = document.querySelectorAll("nav ul li a");
 const navbar = document.getElementById("navbar");
