@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=4">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=5">
 </head>
 <body>
 
@@ -65,7 +65,7 @@
             <p><strong>School:</strong> {{ admin_student.school.name|default:"Not Assigned" }}</p>
             <p><strong>Department:</strong> {{ admin_student.department }}</p>
             <p><strong>Level:</strong> {{ admin_student.level }}</p>
-            <p><strong>Role:</strong> {{ admin_student.get_member_type_display }}</p>
+            <p><strong>Role:</strong> {{ admin_student.member_type|default:"Student Member" }}</p>
         </div>
     {% endif %}
 
@@ -83,8 +83,8 @@
         <button class="tab-btn active" data-tab="students-tab">Students</button>
         <button class="tab-btn" data-tab="payments-tab">
             Payments
-            {% if awaiting_verification.count > 0 %}
-                <span class="notification-dot">{{ awaiting_verification.count }}</span>
+            {% if processing_payments_count > 0 %}
+                <span class="notification-dot">{{ processing_payments_count }}</span>
             {% endif %}
         </button>
         <button class="tab-btn" data-tab="events-tab">Events</button>
@@ -350,6 +350,7 @@
                         <div class="action-buttons">
                             {% if admin_student.is_president or user.is_staff %}
                                 <a href="{% url 'delete_announcement' announcement.id %}" class="btn-delete" onclick="return confirm('Permanently remove this broadcast announcement?')">Delete</a>
+                            {% ceramics %}
                             {% else %}
                                 <span class="view-only-text">Viewing Only</span>
                             {% endif %}
@@ -490,7 +491,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // TAB LOGIC
         const buttons = document.querySelectorAll('.tab-btn');
         const contents = document.querySelectorAll('.tab-content');
 
@@ -505,7 +505,6 @@
             });
         });
 
-        // SAFE MODAL BINDING THROUGH EVENT LISTENERS (STUDENT VIEW)
         const viewButtons = document.querySelectorAll('.view-student-btn');
         viewButtons.forEach(button => {
             button.addEventListener('click', function() {
@@ -527,7 +526,6 @@
             });
         });
 
-        // ANNOUNCEMENT MODAL OPEN/CLOSE LOGIC
         const annModal = document.getElementById('announcementModal');
         const openAnnBtn = document.getElementById('openAnnouncementBtn');
         const closeAnnX = document.getElementById('closeAnnouncementX');
@@ -546,7 +544,6 @@
         if (closeAnnX) closeAnnX.addEventListener('click', closeAnnouncementModal);
         if (cancelAnnBtn) cancelAnnBtn.addEventListener('click', closeAnnouncementModal);
 
-        // SCHOLARSHIP MODAL OPEN/CLOSE LOGIC
         const schModal = document.getElementById('scholarshipModal');
         const openSchBtn = document.getElementById('openScholarshipBtn');
         const closeSchX = document.getElementById('closeScholarshipX');
@@ -565,7 +562,6 @@
         if (closeSchX) closeSchX.addEventListener('click', closeScholarshipModal);
         if (cancelSchBtn) cancelSchBtn.addEventListener('click', closeScholarshipModal);
 
-        // Global Outside Modal Window Clicks
         window.onclick = function(event) {
             const studentModal = document.getElementById('studentModal');
             if (event.target == studentModal) {

@@ -1,34 +1,48 @@
-import threading  # <-- Added for background execution to fix Render 500 errors
-from django.shortcuts import render, redirect, get_object_or_404
-from django.utils import timezone
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib import messages
-from django.db.models import Sum, Case, When, Value, IntegerField
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse
-from django.core.mail import send_mail
+# =========================================================
+# SYSTEM & STANDARD LIBRARIES
+# =========================================================
+import threading  # For background execution to fix Render 500 errors
+
+# =========================================================
+# DJANGO CORE & UTILITIES
+# =========================================================
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
-from .models import (
-    Student,
-    Payment,
-    Event,
-    Fundraising,
-    School,
-    ExecutiveAssignment,
-    ExecutivePosition,
-    Tenure,
-    Announcement,
-    Scholarship
-)
+# =========================================================
+# DJANGO DATABASE & QUERY ENGINES
+# =========================================================
+# Fixed: Prefetch is now imported directly from django.db.models
+from django.db.models import Case, CharField, IntegerField, Prefetch, Q, Sum, Value, When
 
+# =========================================================
+# LOCAL APPLICATION IMPORTS (MODELS & FORMS)
+# =========================================================
 from .forms import (
-    StudentForm,
+    AnnouncementForm,
     EventForm,
     FundraisingForm,
-    AnnouncementForm,
-    ScholarshipForm
+    ScholarshipForm,
+    StudentForm,
+)
+from .models import (
+    Announcement,
+    Event,
+    ExecutiveAssignment,
+    ExecutivePosition,
+    Fundraising,
+    Payment,
+    Scholarship,
+    School,
+    Student,
+    Tenure,
 )
 
 # =========================================================
@@ -222,7 +236,7 @@ def school_autocomplete(request):
 
 
 # =========================================================
-# ADMIN DASHBOARD
+# ADMIN DASHBOARD (OPTIMIZED)
 # =========================================================
 @login_required
 def admin_dashboard(request):
@@ -238,7 +252,8 @@ def admin_dashboard(request):
         Sum('amount')
     )['amount__sum'] or 0
 
-    all_payments = Payment.objects.annotate(
+    # OPTIMIZED: Added select_related('student') here to resolve the background template lookup bottleneck
+    all_payments = Payment.objects.select_related('student').annotate(
         priority=Case(
             When(status='processing', then=Value(1)),
             When(status='paid', then=Value(2)),
@@ -247,27 +262,45 @@ def admin_dashboard(request):
         )
     ).order_by('priority', '-created_at')
 
+    # OPTIMIZED: Derive the count from the pre-fetched payments array list in RAM to save a DB request
+    processing_payments_count = sum(1 for p in all_payments if p.status == 'processing')
+
     unpaid_count = Student.objects.filter(payments__isnull=True).count()
 
     executives = ExecutiveAssignment.objects.filter(
         is_active=True
     ).select_related('student', 'position', 'tenure')
 
-    students_list = Student.objects.all().select_related('user').prefetch_related('payments', 'executive_assignments')
+    active_assignments_prefetch = Prefetch(
+        'executive_assignments',
+        queryset=ExecutiveAssignment.objects.filter(is_active=True).select_related('position'),
+        to_attr='active_assignments'
+    )
+
+    students_list = Student.objects.all().select_related('user', 'school').prefetch_related(
+        'payments', 
+        active_assignments_prefetch
+    )
+    
     for s in students_list:
-        active_assignment = s.executive_assignments.filter(is_active=True).first()
-        s.member_type = active_assignment.position.title.replace('_', ' ').title() if active_assignment else "Student Member"
+        active_assignment = s.active_assignments[0] if s.active_assignments else None
+        if active_assignment and active_assignment.position:
+            s.member_type = active_assignment.position.title.replace('_', ' ').title()
+        else:
+            s.member_type = "Student Member"
 
     if student:
-        student.is_president = student.executive_assignments.filter(position__title='president', is_active=True).exists()
-        student.is_financial_secretary = student.executive_assignments.filter(position__title='financial_secretary', is_active=True).exists()
-        student.is_treasurer = student.executive_assignments.filter(position__title='treasurer', is_active=True).exists()
+        student_assignments = list(student.executive_assignments.filter(is_active=True).select_related('position'))
+        student.is_president = any(a.position.title == 'president' for a in student_assignments if a.position)
+        student.is_financial_secretary = any(a.position.title == 'financial_secretary' for a in student_assignments if a.position)
+        student.is_treasurer = any(a.position.title == 'treasurer' for a in student_assignments if a.position)
 
     return render(request, 'admin_dashboard.html', {
         'students': students_list,
         'total_income': total_income,
         'unpaid_count': unpaid_count,
         'all_payments': all_payments,
+        'processing_payments_count': processing_payments_count,  # Passed context variable safely
         'events': Event.objects.all(),
         'fundraising': Fundraising.objects.all(),
         'executives': executives,
