@@ -350,7 +350,6 @@
                         <div class="action-buttons">
                             {% if admin_student.is_president or user.is_staff %}
                                 <a href="{% url 'delete_announcement' announcement.id %}" class="btn-delete" onclick="return confirm('Permanently remove this broadcast announcement?')">Delete</a>
-                            {% ceramics %}
                             {% else %}
                                 <span class="view-only-text">Viewing Only</span>
                             {% endif %}
