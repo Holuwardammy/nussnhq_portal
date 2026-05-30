@@ -114,12 +114,12 @@
     </div>
 </section>
 
-<!-- EVENTS SECTION -->
 <section id="events" class="events">
     <h2>Upcoming Events</h2>
     <p class="events-intro">
         Join our events to learn, connect, and grow with fellow Saki students.
     </p>
+    
     <div class="events-container">
         {% for event in events %}
             <div class="event-card">
@@ -129,13 +129,20 @@
                     </div>
                 {% endif %}
                 
-                <h3>{{ event.title }}</h3>
-                <p class="event-date">{{ event.date|date:"F d, Y" }}</p>
-                <p class="event-location"><strong>{{ event.location }}</strong></p>
-                <p>{{ event.description|truncatewords:25 }}</p>
+                <div class="event-details-content">
+                    <span class="event-date">{{ event.date|date:"F d, Y" }}</span>
+                    <h3>{{ event.title }}</h3>
+                    
+                    <div class="event-location">
+                        <i class="fas fa-map-marker-alt"></i> <strong>{{ event.location }}</strong>
+                    </div>
+                    
+                    <p class="event-description">{{ event.description|truncatewords:25 }}</p>
+                </div>
             </div>
         {% empty %}
             <div class="no-events">
+                <i class="fas fa-calendar-times"></i>
                 <p>No upcoming events at the moment. Check back soon!</p>
             </div>
         {% endfor %}
