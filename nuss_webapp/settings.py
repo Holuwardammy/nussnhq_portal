@@ -31,8 +31,14 @@ SECRET_KEY = os.getenv(
 # Trust secure connection proxy headers coming from Cloudflare / Render
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# 🛠️ FORCE DEBUG FOR TROUBLESHOOTING LIVE TRACEBACKS
-DEBUG = True
+# 🛠️ DYNAMIC DEBUG CONFIGURATION
+# Debug will evaluate to True ONLY when live on your specific Render domain
+RENDER_HOST = os.environ.get('RENDER_EXTERNAL_HOSTNAME', '')
+
+if RENDER_HOST == 'nussnhq-portal.onrender.com':
+    DEBUG = True
+else:
+    DEBUG = False
 
 
 ALLOWED_HOSTS = [
@@ -42,6 +48,10 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
 ]
+
+# Safeguard to append dynamic system routing fallback hosts automatically if available
+if RENDER_HOST and RENDER_HOST not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(RENDER_HOST)
 
 CSRF_TRUSTED_ORIGINS = [
     'https://nussnhq-portal.onrender.com',
